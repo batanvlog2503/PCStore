@@ -1,0 +1,260 @@
+// ==========================================================================
+// AddressModal.scss — PC Store / Profile
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-text: #2b2b2b;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+
+$transition-fast: 0.2s ease-in-out;
+$transition-medium: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+$bp-sm: 576px;
+$bp-md: 768px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popInPanel {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.address-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($color-black, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  animation: fadeInBackdrop 0.25s ease-out;
+
+  .address-modal-panel {
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: $color-white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: popInPanel 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid $color-border;
+      position: sticky;
+      top: 0;
+      background-color: $color-white;
+      border-radius: 16px 16px 0 0;
+
+      h3 {
+        font-weight: 800;
+        font-size: 17px;
+        margin: 0;
+      }
+
+      .close-btn {
+        width: 34px;
+        height: 34px;
+        border: none;
+        border-radius: 50%;
+        background-color: $color-white-soft;
+        color: $color-gray;
+        font-size: 15px;
+        cursor: pointer;
+        transition:
+          background-color $transition-fast,
+          color $transition-fast,
+          transform $transition-fast;
+
+        &:hover {
+          background-color: rgba($color-yellow, 0.2);
+          color: $color-black;
+          transform: rotate(90deg);
+        }
+      }
+    }
+
+    form {
+      padding: 22px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+
+      .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+          font-size: 13px;
+          font-weight: 700;
+          color: $color-text;
+        }
+
+        input {
+          height: 48px;
+          padding: 0 16px;
+          border-radius: 8px;
+          border: 1.5px solid $color-border;
+          background-color: $color-white-soft;
+          font-size: 15px;
+          color: $color-text;
+          transition:
+            border-color $transition-fast,
+            box-shadow $transition-fast,
+            background-color $transition-fast;
+
+          &:hover {
+            border-color: darken($color-border, 12%);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: $color-yellow;
+            background-color: $color-white;
+            box-shadow: 0 0 0 3px rgba($color-yellow, 0.25);
+          }
+        }
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+
+        // Phường/Xã tách riêng 1 dòng full-width để tên dài vẫn hiển thị rõ,
+        // không bị bóp chật như khi nhét chung 3 cột
+        .ward-row {
+          grid-column: 1 / -1;
+        }
+
+        @include respond($bp-sm) {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 13.5px;
+        color: $color-text;
+
+        input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          accent-color: $color-yellow-dark;
+          cursor: pointer;
+        }
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 8px;
+        padding-top: 16px;
+        border-top: 1px solid $color-border;
+
+        button {
+          height: 44px;
+          padding: 0 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all $transition-fast;
+        }
+
+        .cancel-btn {
+          border: 1.5px solid $color-border;
+          background-color: $color-white;
+          color: $color-text;
+
+          &:hover {
+            background-color: $color-white-soft;
+          }
+        }
+
+        .save-btn {
+          border: none;
+          background-color: $color-yellow;
+          color: $color-black;
+
+          &:hover:not(:disabled) {
+            background-color: $color-yellow-dark;
+            box-shadow: 0 6px 16px rgba($color-yellow-dark, 0.35);
+            transform: translateY(-2px);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        @include respond($bp-sm) {
+          flex-direction: column-reverse;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  // Mobile: modal biến thành "bottom sheet" trượt lên từ dưới, chiếm gần hết màn hình
+  @include respond($bp-md) {
+    align-items: flex-end;
+    padding: 0;
+
+    .address-modal-panel {
+      max-width: 100%;
+      max-height: 92vh;
+      border-radius: 20px 20px 0 0;
+      animation: slideUpSheet 0.3s ease-out both;
+    }
+  }
+}

@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import "./Profile.scss"
 import MyWishList from "./MyWishlist/MyWishlist.jsx"
 import MyOrdered from "./MyOrdered/MyOrdered.jsx"
+import MyAddress from "./MyAddress/MyAddress.jsx"
 export const OPTIONS = {
   INFO: "info",
   ORDER: "order",
@@ -27,7 +28,7 @@ const Profile = () => {
       case OPTIONS.WISHLIST:
         return <MyWishList />
       case OPTIONS.ADDRESS:
-        return <MyOrdered />
+        return <MyAddress></MyAddress>
       case OPTIONS.LOG:
         return <MyLog />
       default:
