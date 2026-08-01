@@ -139,6 +139,31 @@ class UserController {
       user,
     })
   }
+
+  async updateProfile(req, res, next) {
+    try {
+      const { username, phone } = req.body
+      const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { username, phone },
+        { new: true, runValidators: true },
+      ).select("-password")
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" })
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Update profile successfully",
+        user,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new UserController()

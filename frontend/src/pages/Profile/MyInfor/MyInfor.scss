@@ -1,0 +1,276 @@
+// ==========================================================================
+// MyInfor.scss — PC Store / Profile
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-text: #2b2b2b;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+
+$transition-fast: 0.2s ease-in-out;
+$transition-medium: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.my-infor {
+  h2 {
+    font-weight: 800;
+    font-size: 22px;
+    margin-bottom: 4px;
+    animation: fadeInUp 0.4s ease-out;
+  }
+
+  > p {
+    color: $color-gray;
+    font-size: 13.5px;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.4s ease-out 0.05s both;
+  }
+
+  .information.row {
+    display: flex;
+    gap: 24px;
+    margin: 0;
+
+    @include respond($bp-md) {
+      flex-direction: column;
+      gap: 18px;
+    }
+  }
+
+  // ------------------------------
+  // Cột trái — thông tin tổng quan
+  // ------------------------------
+  .infor.left-3 {
+    flex: 0 0 30%;
+    background-color: $color-white-soft;
+    border: 1px solid $color-border;
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    animation: fadeInUp 0.45s ease-out 0.1s both;
+
+    @include respond($bp-md) {
+      flex: 1 1 auto;
+      padding: 22px 16px;
+    }
+
+    .infor-top {
+      .avatar {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 800;
+        color: $color-black;
+        background: linear-gradient(135deg, $color-yellow, $color-yellow-dark);
+        box-shadow: 0 6px 16px rgba($color-yellow-dark, 0.35);
+        animation: popIn 0.4s ease-out 0.2s both;
+      }
+
+      h3 {
+        font-weight: 700;
+        font-size: 17px;
+        margin-bottom: 6px;
+        color: $color-black;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        background-color: rgba($color-yellow, 0.2);
+        color: $color-yellow-dark;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid $color-border;
+      margin: 20px 0;
+    }
+
+    .infor-bottom {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .infor-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13.5px;
+        color: $color-text;
+
+        i {
+          width: 16px;
+          color: $color-yellow-dark;
+          text-align: center;
+        }
+
+        span {
+          word-break: break-word;
+        }
+      }
+    }
+  }
+
+  // ------------------------------
+  // Cột phải — form chỉnh sửa
+  // ------------------------------
+  .edit-info.right-7 {
+    flex: 1 1 70%;
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: 12px;
+    padding: 28px 32px;
+    animation: fadeInUp 0.45s ease-out 0.15s both;
+
+    @include respond($bp-md) {
+      padding: 20px;
+    }
+
+    h4 {
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid $color-border;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      max-width: 460px;
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: $color-text;
+        margin-bottom: 6px;
+      }
+
+      input {
+        width: 100%;
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: 1.5px solid $color-border;
+        background-color: $color-white-soft;
+        font-size: 14px;
+        color: $color-text;
+        transition:
+          border-color $transition-fast,
+          box-shadow $transition-fast,
+          background-color $transition-fast;
+
+        &:hover:not(:disabled) {
+          border-color: darken($color-border, 12%);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $color-yellow;
+          background-color: $color-white;
+          box-shadow: 0 0 0 3px rgba($color-yellow, 0.25);
+        }
+
+        &:disabled {
+          background-color: $color-white-soft;
+          color: $color-gray;
+          cursor: not-allowed;
+        }
+      }
+
+      .email small {
+        display: block;
+        margin-top: 6px;
+        font-size: 11.5px;
+        color: $color-gray;
+      }
+
+      button.submit {
+        align-self: flex-start;
+        margin-top: 8px;
+        height: 46px;
+        padding: 0 32px;
+        border: none;
+        outline: none;
+        border-radius: 8px;
+        background-color: $color-yellow;
+        color: $color-black;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+        transition:
+          background-color $transition-fast,
+          transform $transition-fast,
+          box-shadow $transition-fast;
+
+        &:hover:not(:disabled) {
+          background-color: $color-yellow-dark;
+          box-shadow: 0 6px 16px rgba($color-yellow-dark, 0.35);
+          transform: translateY(-2px);
+        }
+
+        &:active:not(:disabled) {
+          transform: translateY(0) scale(0.97);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        @include respond($bp-sm) {
+          width: 100%;
+          align-self: stretch;
+        }
+      }
+    }
+  }
+}

@@ -106,6 +106,29 @@ class UserService {
 
     return user
   }
+
+  async updateUser(id, data) {
+    const { username, phone } = data
+
+    if (!username) {
+      throw new AppError(400, "Invalid username")
+    }
+
+    if (!phone) {
+      throw new AppError(400, "Invalid phone")
+    }
+
+    const user = await UserRepo.updateUser(id, {
+      username,
+      phone,
+    })
+
+    if (!user) {
+      throw new AppError(404, "User not found")
+    }
+
+    return user
+  }
 }
 
 module.exports = new UserService()

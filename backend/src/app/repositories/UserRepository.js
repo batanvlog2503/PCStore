@@ -17,6 +17,13 @@ class UserRepository {
   async findByEmail(email) {
     return await User.findOne({ email })
   }
+
+  async updateUser(id, data) {
+    return await User.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    })
+  }
 }
 
 module.exports = new UserRepository()
