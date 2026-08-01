@@ -1,0 +1,87 @@
+pcstore/
+├── public/
+│   └── favicon.ico
+├── src/
+│   ├── assets/                  # ảnh, icon, logo
+│   ├── components/
+│   │   ├── common/              # Button, Input, Modal, Badge, Rating...
+│   │   ├── layout/
+│   │   │   ├── Header.jsx       # top bar + navbar (như ảnh 1)
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Sidebar.jsx      # sidebar filter danh mục (ảnh 2)
+│   │   │   └── AdminSidebar.jsx # sidebar admin (ảnh cuối)
+│   │   ├── product/
+│   │   │   ├── ProductCard.jsx
+│   │   │   ├── ProductGrid.jsx
+│   │   │   ├── ProductFilter.jsx    # filter giá, brand
+│   │   │   └── ProductGallery.jsx   # ảnh SP + thumbnail (ảnh 3)
+│   │   ├── cart/
+│   │   │   ├── CartItem.jsx
+│   │   │   └── CartSummary.jsx
+│   │   ├── checkout/
+│   │   │   ├── CheckoutSteps.jsx    # thanh bước: Giỏ hàng > Thông tin > Thanh toán > Hoàn tất
+│   │   │   └── PaymentMethod.jsx    # COD, chuyển khoản, VNPay, Momo
+│   │   ├── order/
+│   │   │   ├── OrderTracking.jsx    # timeline trạng thái đơn
+│   │   │   └── OrderCard.jsx
+│   │   └── admin/
+│   │       ├── StatCard.jsx         # Doanh thu, Đơn hàng, Khách hàng
+│   │       ├── RevenueChart.jsx     # line chart
+│   │       └── OrderStatusChart.jsx # donut chart
+│   │
+│   ├── pages/
+│   │   ├── HomePage.jsx
+│   │   ├── CategoryPage.jsx         # trang danh mục + filter (ảnh 2)
+│   │   ├── ProductDetailPage.jsx    # ảnh 3
+│   │   ├── CartPage.jsx             # ảnh giỏ hàng
+│   │   ├── CheckoutPage.jsx         # ảnh thanh toán
+│   │   ├── OrderSuccessPage.jsx     # "Đặt hàng thành công"
+│   │   ├── OrderTrackingPage.jsx    # "Theo dõi đơn hàng"
+│   │   ├── account/
+│   │   │   ├── AccountLayout.jsx
+│   │   │   ├── AccountInfo.jsx
+│   │   │   ├── AccountOrders.jsx
+│   │   │   └── AccountAddress.jsx
+│   │   └── admin/
+│   │       ├── AdminDashboard.jsx
+│   │       ├── AdminProducts.jsx
+│   │       ├── AdminOrders.jsx
+│   │       └── AdminCustomers.jsx
+│   │
+│   ├── layouts/
+│   │   ├── MainLayout.jsx       # Header + Outlet + Footer
+│   │   └── AdminLayout.jsx      # AdminSidebar + Outlet
+│   │
+│   ├── routes/
+│   │   ├── AppRoutes.jsx
+│   │   └── PrivateRoute.jsx     # bảo vệ route admin/account
+│   │
+│   ├── services/                # gọi API (axios instance riêng từng domain)
+│   │   ├── api.js               # axios base config
+│   │   ├── authService.js
+│   │   ├── productService.js
+│   │   ├── cartService.js
+│   │   ├── orderService.js
+│   │   └── adminService.js
+│   │
+│   ├── store/                   # state management
+│   │   ├── useCartStore.js      # zustand cho cart (nhẹ, dễ dùng)
+│   │   ├── useAuthStore.js
+│   │   └── useUIStore.js        # modal, toast, loading
+│   │
+│   ├── hooks/
+│   │   ├── useProducts.js
+│   │   ├── useDebounce.js       # debounce ô search
+│   │   └── useFetch.js
+│   │
+│   ├── utils/
+│   │   ├── formatCurrency.js    # format 16.870.000đ
+│   │   ├── formatDate.js
+│   │   └── constants.js
+│   │
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css
+├── .env
+├── vite.config.js
+└── package.json

@@ -1,0 +1,471 @@
+// ==========================================================================
+// Header.scss — PC Store
+// Theme: Black / White / Yellow
+// Có thể dùng kèm Bootstrap (container-fluid, row, p-0 vẫn giữ nguyên)
+// ==========================================================================
+
+// ------------------------------
+// 1. Variables
+// ------------------------------
+$color-black: #0d0d0d;
+$color-black-soft: #1a1a1a;
+$color-white: #ffffff;
+$color-white-soft: #f5f5f5;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-gray: #8a8a8a;
+
+$font-main: "Segoe UI", "Roboto", Arial, sans-serif;
+
+$transition-fast: 0.2s ease-in-out;
+$transition-medium: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+$header-top-height: 38px;
+$header-middle-height: 90px;
+$header-bottom-height: 50px;
+
+// Breakpoints (theo Bootstrap)
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+// ------------------------------
+// 2. Keyframe Animations
+// ------------------------------
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba($color-yellow, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba($color-yellow, 0.7);
+  }
+}
+
+@keyframes bounceCart {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+// ------------------------------
+// 3. Header wrapper
+// ------------------------------
+.header {
+  font-family: $font-main;
+  color: $color-white;
+  background-color: $color-black;
+  animation: fadeInDown 0.5s ease-out;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+// ------------------------------
+// 4. HEADER TOP
+// ------------------------------
+.header-top {
+  background-color: $color-black-soft;
+  border-bottom: 1px solid rgba($color-yellow, 0.15);
+  font-size: 13px;
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: $header-top-height;
+    padding: 0 24px;
+
+    @include respond($bp-md) {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 6px 12px;
+      gap: 6px;
+    }
+  }
+
+  .header-top-1,
+  .header-top-3 {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    @include respond($bp-sm) {
+      gap: 10px;
+      font-size: 11px;
+    }
+  }
+
+  .header-top-2 {
+    color: $color-yellow;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+
+    @include respond($bp-md) {
+      order: 3;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .in-header-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: $color-white-soft;
+    transition: color $transition-fast;
+    cursor: pointer;
+
+    i {
+      color: $color-yellow;
+      transition: transform $transition-fast;
+    }
+
+    &:hover {
+      color: $color-yellow;
+
+      i {
+        transform: scale(1.15) rotate(-4deg);
+      }
+    }
+  }
+
+  .register:hover i {
+    animation: pulseGlow 1s ease-in-out infinite;
+  }
+}
+
+// ------------------------------
+// 5. HEADER MIDDLE
+// ------------------------------
+.header-middle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $header-middle-height;
+  padding: 0 24px;
+  background-color: $color-black;
+
+  @include respond($bp-md) {
+    height: auto;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  // --- Logo ---
+  &-1.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInUp 0.5s ease-out 0.1s both;
+
+    .image {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: $color-white;
+      border: 2px solid $color-yellow;
+      overflow: hidden;
+      transition:
+        transform $transition-medium,
+        box-shadow $transition-medium;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        // ảnh gốc có nền trắng hình chữ nhật -> scale nhẹ để logo
+        // choán trọn khung tròn thay vì để viền trắng quá dày
+        transform: scale(1.3);
+      }
+
+      &:hover {
+        transform: rotate(8deg) scale(1.05);
+        box-shadow: 0 0 10px rgba($color-yellow, 0.5);
+      }
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+
+      h4 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 22px;
+        color: $color-white;
+        letter-spacing: 0.5px;
+
+        &::first-letter {
+          color: $color-yellow;
+        }
+      }
+
+      p {
+        margin: 2px 0 0;
+        font-size: 12px;
+        color: $color-gray;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+    }
+
+    @include respond($bp-sm) {
+      .image {
+        width: 44px;
+        height: 44px;
+      }
+      .title h4 {
+        font-size: 18px;
+      }
+      .title p {
+        font-size: 10px;
+      }
+    }
+  }
+
+  // --- Search ---
+  &-2.search {
+    flex: 1;
+    max-width: 520px;
+    margin: 0 32px;
+    height: 42px;
+    border-radius: 30px;
+    background-color: $color-white-soft;
+    border: 2px solid transparent;
+    position: relative;
+    transition:
+      border-color $transition-fast,
+      box-shadow $transition-fast;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba($color-yellow, 0.15),
+      transparent
+    );
+    background-size: 400px 100%;
+
+    &:hover,
+    &:focus-within {
+      border-color: $color-yellow;
+      box-shadow: 0 0 12px rgba($color-yellow, 0.35);
+      animation: shimmer 2.5s linear infinite;
+    }
+
+    @include respond($bp-md) {
+      order: 3;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+    }
+  }
+
+  // --- Love / Cart ---
+  &-3 {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    animation: slideInUp 0.5s ease-out 0.2s both;
+
+    .love,
+    .my-cart {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 30px;
+      background-color: $color-black-soft;
+      border: 1px solid rgba($color-yellow, 0.3);
+      color: $color-white;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      position: relative;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        transform $transition-fast;
+
+      i {
+        color: $color-yellow;
+        font-size: 16px;
+        transition:
+          color $transition-fast,
+          transform $transition-fast;
+      }
+
+      &:hover {
+        background-color: $color-yellow;
+        color: $color-black;
+        transform: translateY(-3px);
+
+        i {
+          color: $color-black;
+        }
+      }
+
+      &:active {
+        animation: bounceCart 0.4s ease;
+      }
+    }
+
+    @include respond($bp-md) {
+      .love,
+      .my-cart {
+        height: 38px;
+        padding: 0 14px;
+        font-size: 13px;
+      }
+    }
+
+    @include respond($bp-sm) {
+      gap: 10px;
+
+      .love,
+      .my-cart {
+        // màn hình quá nhỏ: thu về chỉ hiện icon cho gọn
+        padding: 0;
+        width: 38px;
+        height: 38px;
+        justify-content: center;
+        border-radius: 50%;
+
+        span,
+        .label-text {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------
+// 6. HEADER BOTTOM (Navigation)
+// ------------------------------
+.header-bottom {
+  background-color: $color-yellow;
+  height: $header-bottom-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include respond($bp-md) {
+    height: auto;
+    padding: 8px 0;
+  }
+
+  .dropdown {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .list {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    @include respond($bp-lg) {
+      gap: 20px;
+    }
+
+    @include respond($bp-md) {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 16px;
+      padding: 0 12px;
+    }
+
+    li {
+      position: relative;
+      font-weight: 700;
+      font-size: 14px;
+      color: $color-black;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      padding: 4px 2px;
+      transition: color $transition-fast;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 0;
+        height: 2px;
+        background-color: $color-black;
+        transition: width $transition-medium;
+      }
+
+      &:hover {
+        color: $color-white;
+
+        &::after {
+          width: 100%;
+          background-color: $color-white;
+        }
+      }
+
+      @include respond($bp-sm) {
+        font-size: 12px;
+      }
+    }
+  }
+}
