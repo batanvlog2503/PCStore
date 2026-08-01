@@ -1,35 +1,135 @@
-import React from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import "./Header.scss"
 
 export const Header = () => {
+  const navigate = useNavigate()
+  const [user, setUser] = useState(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  // Đọc user đã lưu trong localStorage khi component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user")
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch {
+        setUser(null)
+      }
+    }
+  }, [])
+
+  // Click ra ngoài dropdown -> tự đóng lại
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("user")
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+    setUser(null)
+    setIsDropdownOpen(false)
+    navigate("/login")
+  }
+
   return (
     <div className="container-fluid p-0 header">
       <div className="header-top p-0">
         <div className="row">
           <div className="header-top-1">
             <div className="in-header-top hotline">
-              <i class="fa-solid fa-phone"></i> Hotline: 0947.584.056
+              <i className="fa-solid fa-phone"></i> Hotline: 0947.584.056
             </div>
             <div className="in-header-top email">
-              <i class="fa-solid fa-at"></i> Email: tanden1367@gmail.com
+              <i className="fa-solid fa-at"></i> Email: tanden1367@gmail.com
             </div>
           </div>
           <div className="header-top-2">
             <div className="in-header-top freeship">
-              <i class="fa-solid fa-cart-arrow-down"></i> Miễn phí giao hàng cho
-              đơn hàng từ 2 củ.
+              <i className="fa-solid fa-cart-arrow-down"></i> Miễn phí giao hàng
+              cho đơn hàng từ 2 củ.
             </div>
           </div>
           <div className="header-top-3">
             <div className="in-header-top map">
-              <i class="fa-solid fa-location-crosshairs"></i> Hệ thống cửa hàng
+              <i className="fa-solid fa-location-crosshairs"></i> Hệ thống cửa
+              hàng
             </div>
-            <div className="in-header-top register">
-              <i class="fa-solid fa-user"></i> Đăng nhập/Đăng kí
-            </div>
+
+            {/* Chưa đăng nhập -> hiện link Đăng nhập/Đăng kí như cũ */}
+            {!user && (
+              <Link
+                to="/login"
+                className="in-header-top register"
+              >
+                <i className="fa-solid fa-user"></i> Đăng nhập/Đăng kí
+              </Link>
+            )}
+
+            {/* Đã đăng nhập -> hiện tên + dropdown tài khoản */}
+            {user && (
+              <div
+                className="account"
+                ref={dropdownRef}
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+              >
+                <div className="in-header-top account-trigger">
+                  <i className="fa-solid fa-circle-user"></i>
+                  {user.username}
+                  <i
+                    className={`fa-solid fa-chevron-down chevron ${
+                      isDropdownOpen ? "open" : ""
+                    }`}
+                  ></i>
+                </div>
+
+                <ul
+                  className={`account-dropdown ${isDropdownOpen ? "show" : ""}`}
+                >
+                  <li>
+                    <Link to="/account">
+                      <i className="fa-solid fa-id-card"></i> Thông tin tài
+                      khoản
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/account/orders">
+                      <i className="fa-solid fa-box"></i> Đơn hàng của tôi
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/account/wishlist">
+                      <i className="fa-regular fa-heart"></i> Yêu thích
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/account/addresses">
+                      <i className="fa-solid fa-location-dot"></i> Địa chỉ của
+                      tôi
+                    </Link>
+                  </li>
+                  <li className="divider"></li>
+                  <li
+                    onClick={handleLogout}
+                    className="logout"
+                  >
+                    <i className="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
+
       <div className="header-middle p-0">
         <div className="header-middle-1 logo">
           <div className="image">
@@ -42,20 +142,20 @@ export const Header = () => {
           </div>
           <div className="title">
             <h4>PC Store</h4>
-
             <p>Technology For Life</p>
           </div>
         </div>
         <div className="header-middle-2 search"></div>
         <div className="header-middle-3">
           <div className="love">
-            <i class="fa-regular fa-heart"></i> Yêu thích
+            <i className="fa-regular fa-heart"></i> <span>Yêu thích</span>
           </div>
           <div className="my-cart">
-            <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+            <i className="fa-solid fa-cart-shopping"></i> <span>Giỏ hàng</span>
           </div>
         </div>
       </div>
+
       <div className="header-bottom p-0">
         <div className="dropdown">
           <ul className="list">

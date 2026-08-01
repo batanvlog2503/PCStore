@@ -1,5 +1,6 @@
 import React from "react"
 import "./Login.scss"
+import axiosInstance from "../../utils/axiosInstance"
 const gioiThieu = ["/gioithieu.png"]
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -14,13 +15,23 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/auth/login`,
         user,
       )
 
+      const accessToken = response.data.accessToken
+      const refreshToken = response.data.refreshToken
+      console.log(response.data.user)
+      if (response.data.accessToken) {
+        console.log("Have an Access Token")
+      }
+      const userData = response.data.user
       if (response.data.success) {
         console.log("Login SuccessFully", response.data.message)
+        localStorage.setItem("accessToken", accessToken)
+        localStorage.setItem("refreshToken", refreshToken)
+        localStorage.setItem("user", JSON.stringify(userData))
         alert("Login Successfully")
         navigate("/")
       }
