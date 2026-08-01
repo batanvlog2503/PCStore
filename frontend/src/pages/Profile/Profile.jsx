@@ -1,4 +1,5 @@
 import React from "react"
+<<<<<<< HEAD
 import Sidebar from "./Sidebar/Sidebar.jsx"
 import MyInfor from "./MyInfor/MyInfor.jsx"
 import MyOrder from "./MyOrder/MyOrder.jsx"
@@ -52,6 +53,6 @@ const Profile = () => {
       </div>
     </div>
   )
-}
+Ư
 
 export default Profile

@@ -1,0 +1,91 @@
+1. AUTH (/auth)
+Method	Endpoint	Auth	Mô tả
+POST	/auth/register	–	Đăng ký tài khoản mới
+POST	/auth/login	–	Đăng nhập, trả về access token
+POST	/auth/refresh	–	Cấp lại access token từ refresh token
+POST	/auth/logout	🔒	Vô hiệu hoá refresh token hiện tại
+GET	/auth/me	🔒	Lấy thông tin user đang đăng nhập
+
+
+2. USERS (/users)
+Method	Endpoint	Auth	Mô tả
+GET	/users/me	🔒	Xem hồ sơ cá nhân
+PATCH	/users/me	🔒	Cập nhật hồ sơ (email, phone...)
+PATCH	/users/me/password	🔒	Đổi mật khẩu
+GET	/users	🔒👑	Admin xem danh sách user
+PATCH	/users/:id/status	🔒👑	Admin khoá/mở tài khoản
+
+3. ADDRESSES (/addresses)
+Method	Endpoint	Auth	Mô tả
+GET	/addresses	🔒	Danh sách địa chỉ của user hiện tại
+POST	/addresses	🔒	Thêm địa chỉ mới
+PATCH	/addresses/:id	🔒	Sửa địa chỉ
+DELETE	/addresses/:id	🔒	Xoá địa chỉ
+PATCH	/addresses/:id/default	🔒	Đặt làm địa chỉ mặc định
+
+4. CATEGORIES (/categories)
+Method	Endpoint	Auth	Mô tả
+GET	/categories	–	Danh sách danh mục dạng cây (cha-con)
+GET	/categories/:slug	–	Chi tiết 1 danh mục
+POST	/categories	🔒👑	Tạo danh mục
+PATCH	/categories/:id	🔒👑	Sửa danh mục
+DELETE	/categories/:id	🔒👑	Xoá danh mục
+
+5. BRANDS (/brands)
+Method	Endpoint	Auth	Mô tả
+GET	/brands	–	Danh sách hãng (dùng cho phần "Máy tính Laptop" ở Home)
+POST	/brands	🔒👑	Thêm hãng
+PATCH	/brands/:id	🔒👑	Sửa hãng
+DELETE	/brands/:id	🔒👑	Xoá hãng
+
+Method	Endpoint	Auth	Mô tả
+GET	/products	–	Danh sách sản phẩm, hỗ trợ filter + phân trang
+GET	/products/:slug	–	Chi tiết sản phẩm (kèm variants, images, brand, category)
+POST	/products	🔒👑	Tạo sản phẩm mới
+PATCH	/products/:id	🔒👑	Sửa sản phẩm
+DELETE	/products/:id	🔒👑	Xoá sản phẩm
+POST	/products/:id/variants	🔒👑	Thêm 1 variant cho sản phẩm
+PATCH	/products/:id/variants/:variantId	🔒👑	Sửa variant (giá, tồn kho)
+POST	/products/:id/images	🔒👑	Upload thêm ảnh sản phẩm
+
+7. REVIEWS (/products/:productId/reviews)
+Method	Endpoint	Auth	Mô tả
+GET	/products/:productId/reviews	–	Danh sách đánh giá của sản phẩm
+POST	/products/:productId/reviews	🔒	Viết đánh giá (chỉ khi đã mua — nên check ở Service)
+DELETE	/reviews/:id	🔒	Xoá đánh giá của chính mình
+
+8. WISHLIST (/wishlist)
+Method	Endpoint	Auth	Mô tả
+GET	/wishlist	🔒	Danh sách sản phẩm yêu thích
+POST	/wishlist/:productId	🔒	Thêm vào yêu thích
+DELETE	/wishlist/:productId	🔒	Bỏ yêu thích
+
+9. CART (/cart)
+Method	Endpoint	Auth	Mô tả
+GET	/cart	🔒	Xem giỏ hàng hiện tại
+POST	/cart/items	🔒	Thêm sản phẩm (kèm variant) vào giỏ
+PATCH	/cart/items/:itemId	🔒	Đổi số lượng
+DELETE	/cart/items/:itemId	🔒	Xoá 1 dòng khỏi giỏ
+DELETE	/cart	🔒	Xoá sạch giỏ hàng
+
+10. VOUCHERS (/vouchers)
+Method	Endpoint	Auth	Mô tả
+GET	/vouchers	🔒	Danh sách voucher user có thể dùng
+POST	/vouchers/apply	🔒	Kiểm tra + áp mã giảm giá vào đơn đang tính
+POST	/vouchers	🔒👑	Tạo voucher
+PATCH	/vouchers/:id	🔒👑	Sửa voucher
+
+11. ORDERS (/orders)
+Method	Endpoint	Auth	Mô tả
+POST	/orders	🔒	Tạo đơn hàng (checkout từ giỏ hàng)
+GET	/orders	🔒	Danh sách đơn hàng của tôi
+GET	/orders/:id	🔒	Chi tiết 1 đơn hàng
+PATCH	/orders/:id/cancel	🔒	Huỷ đơn (chỉ khi status = pending)
+GET	/admin/orders	🔒👑	Admin xem tất cả đơn
+PATCH	/admin/orders/:id/status	🔒👑	Admin cập nhật trạng thái vận chuyển
+
+12. PAYMENTS (/payments)
+Method	Endpoint	Auth	Mô tả
+POST	/payments/:orderId	🔒	Khởi tạo thanh toán (COD tự tạo record, online thì trả link thanh toán)
+POST	/payments/webhook/:provider	–	Webhook callback từ cổng thanh toán (Momo/VNPay)
+GET	/payments/:orderId	🔒	Xem trạng thái thanh toán của 1 đơn
