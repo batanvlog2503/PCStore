@@ -2,6 +2,7 @@ import React from "react"
 import "../Login/Login.scss"
 
 import axios from "axios"
+import axiosInstance from "../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 const gioiThieu = ["/gioithieu.png"]
@@ -31,7 +32,7 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/auth/register`,
         user,
       )

@@ -13,6 +13,7 @@ import { Home } from "./pages/Home/Home"
 import { MainLayout } from "./layouts/MainLayout/MainLayout"
 import { Login } from "./pages/Login/Login"
 import { Register } from "./pages/Register/Register"
+import Profile from "./pages/Profile/Profile"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -25,6 +26,10 @@ const router = createBrowserRouter(
           index
           element={<Home />}
         />
+        <Route
+          path="profile"
+          element={<Profile></Profile>}
+        ></Route>
       </Route>
 
       {/* Login đứng riêng, KHÔNG bọc MainLayout */}

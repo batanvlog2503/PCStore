@@ -1,5 +1,6 @@
 import React from "react"
 import "./Login.scss"
+import axiosInstance from "../../utils/axiosInstance"
 const gioiThieu = ["/gioithieu.png"]
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -14,7 +15,7 @@ export const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/auth/login`,
         user,
       )
