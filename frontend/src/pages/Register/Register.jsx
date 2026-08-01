@@ -2,10 +2,7 @@ import React from "react"
 import "../Login/Login.scss"
 import axiosInstance from "../../utils/axiosInstance"
 import axios from "axios"
-<<<<<<< HEAD
-import axiosInstance from "../../utils/axiosInstance"
-=======
->>>>>>> jwt
+
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 const gioiThieu = ["/gioithieu.png"]

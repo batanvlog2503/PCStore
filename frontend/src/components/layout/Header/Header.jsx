@@ -95,39 +95,23 @@ export const Header = () => {
                   className={`account-dropdown ${isDropdownOpen ? "show" : ""}`}
                 >
                   <li>
-<<<<<<< HEAD
-                    <Link to="/profile">
-=======
                     <Link to="/account">
->>>>>>> jwt
                       <i className="fa-solid fa-id-card"></i> Thông tin tài
                       khoản
                     </Link>
                   </li>
                   <li>
-<<<<<<< HEAD
-                    <Link to="/profile/orders">
-=======
                     <Link to="/account/orders">
->>>>>>> jwt
                       <i className="fa-solid fa-box"></i> Đơn hàng của tôi
                     </Link>
                   </li>
                   <li>
-<<<<<<< HEAD
-                    <Link to="/profile/wishlist">
-=======
                     <Link to="/account/wishlist">
->>>>>>> jwt
                       <i className="fa-regular fa-heart"></i> Yêu thích
                     </Link>
                   </li>
                   <li>
-<<<<<<< HEAD
-                    <Link to="/profile/addresses">
-=======
                     <Link to="/account/addresses">
->>>>>>> jwt
                       <i className="fa-solid fa-location-dot"></i> Địa chỉ của
                       tôi
                     </Link>

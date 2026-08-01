@@ -1,11 +1,8 @@
 import React from "react"
 import "./Login.scss"
 import axiosInstance from "../../utils/axiosInstance"
-import axiosInstance from "../../utils/axiosInstance"
 const gioiThieu = ["/gioithieu.png"]
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 export const Login = () => {
@@ -23,8 +20,18 @@ export const Login = () => {
         user,
       )
 
+      const accessToken = response.data.accessToken
+      const refreshToken = response.data.refreshToken
+      console.log(response.data.user)
+      if (response.data.accessToken) {
+        console.log("Have an Access Token")
+      }
+      const userData = response.data.user
       if (response.data.success) {
         console.log("Login SuccessFully", response.data.message)
+        localStorage.setItem("accessToken", accessToken)
+        localStorage.setItem("refreshToken", refreshToken)
+        localStorage.setItem("user", JSON.stringify(userData))
         alert("Login Successfully")
         navigate("/")
       }
@@ -51,19 +58,8 @@ export const Login = () => {
           onSubmit={handleSubmit}
         >
           <label htmlFor="">Email</label>
-        <form
-          action=""
-          onSubmit={handleSubmit}
-        >
-          <label htmlFor="">Email</label>
           <br />
           <input
-            type="email"
-            value={user.email}
-            name="email"
-            className="email input"
-            onChange={handleInputChange}
-            placeholder="Nhập email của bạn"
             type="email"
             value={user.email}
             name="email"
@@ -78,9 +74,7 @@ export const Login = () => {
           <input
             type="password"
             value={user.password}
-            value={user.password}
             name="password"
-            onChange={handleInputChange}
             onChange={handleInputChange}
             className="password input"
             placeholder="Vui lòng nhập mật khẩu"
