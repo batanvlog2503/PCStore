@@ -2,8 +2,36 @@ import React from "react"
 import "./Login.scss"
 const gioiThieu = ["/gioithieu.png"]
 import { useState, useEffect } from "react"
-
+import { useNavigate } from "react-router-dom"
+import axios from "axios"
 export const Login = () => {
+  const navigate = useNavigate()
+  const [user, setUser] = useState({
+    password: "",
+    email: "",
+  })
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/auth/login`,
+        user,
+      )
+
+      if (response.data.success) {
+        console.log("Login SuccessFully", response.data.message)
+        alert("Login Successfully")
+        navigate("/")
+      }
+    } catch (error) {
+      alert(error.response?.data.message || "Error Submit Login")
+    }
+  }
+
+  const handleInputChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value })
+  }
   return (
     <div className="container-fluid login p-0">
       <div className="privacy">
@@ -14,15 +42,19 @@ export const Login = () => {
       </div>
       <div className="form-login">
         <h2>Đăng nhập PC Store</h2>
-        <form action="">
-          <label htmlFor="">Số điện thoại</label>
+        <form
+          action=""
+          onSubmit={handleSubmit}
+        >
+          <label htmlFor="">Email</label>
           <br />
           <input
-            type="text"
-            value="phone"
-            name="phone"
-            className="phone input"
-            placeholder="Nhập số điện thoại của bạn"
+            type="email"
+            value={user.email}
+            name="email"
+            className="email input"
+            onChange={handleInputChange}
+            placeholder="Nhập email của bạn"
             required
           />
 
@@ -30,8 +62,9 @@ export const Login = () => {
           <br />
           <input
             type="password"
-            value="password"
+            value={user.password}
             name="password"
+            onChange={handleInputChange}
             className="password input"
             placeholder="Vui lòng nhập mật khẩu"
             required
