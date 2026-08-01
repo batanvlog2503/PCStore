@@ -1,6 +1,7 @@
 const UserRepo = require("../repositories/UserRepository")
 const AppError = require("../utils/AppError")
 const bcrypt = require("bcrypt")
+const User = require("../models/User")
 // AppError(status, message)
 class UserService {
   async getAllUsers() {
@@ -22,19 +23,28 @@ class UserService {
   }
 
   async createUser(data) {
-    if (!data.email || !data.password || !data.phone || !data.username) {
+    const { username, email, password, phone } = data
+    if (!email || !password || !phone || !username) {
       throw new AppError(400, "Missing required fields")
     }
 
-    const existingUser = await UserRepo.findByEmail(data.email)
+    const existingUser = await UserRepo.findByEmail(email)
 
     if (existingUser) {
       throw new AppError(409, "Email already exists")
     }
+    const hashPassword = await bcrypt.hash(password, 10)
 
-    const newUser = await UserRepo.createUser(data)
+    const user = new User({
+      username,
+      email,
+      phone,
+      password: hashPassword,
+    })
 
-    return newUser
+    const userData = await user.save()
+
+    return userData
   }
 
   async userLogin(data) {
