@@ -1,8 +1,17 @@
 const UserRepo = require("../repositories/UserRepository")
 const AppError = require("../utils/AppError")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const User = require("../models/User")
+const RefreshToken = require("../models/RefreshToken")
 // AppError(status, message)
+
+const generateAccessToken = async (user) => {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "8h" })
+}
+const generateRefreshToken = async (user) => {
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "3d" })
+}
 class UserService {
   async getAllUsers() {
     const users = await UserRepo.findAllUsers()
@@ -65,7 +74,25 @@ class UserService {
       throw new AppError("400", "Invalid Password")
     }
 
-    return user
+    await RefreshToken.deleteMany({ user_id: user._id })
+
+    const accessToken = await generateAccessToken(user.toObject())
+    const refreshToken = await generateRefreshToken(user.toObject())
+    console.log("Token Login: ", accessToken)
+
+    // tạo refreshToken
+    await RefreshToken.create({
+      user_id: user._id,
+      refreshToken: refreshToken,
+    })
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+      tokenType: "Bearer",
+      createAt: new Date(),
+    }
   }
   async getUserByEmail(email) {
     if (!email) {

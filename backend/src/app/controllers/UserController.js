@@ -54,11 +54,11 @@ class UserController {
         })
       }
       const data = req.body
-      const user = await UserService.userLogin(data)
+      const response = await UserService.userLogin(data)
       return res.status(201).json({
         success: true,
         message: "Login Successfully",
-        user,
+        ...response,
       })
     } catch (error) {
       next(error)

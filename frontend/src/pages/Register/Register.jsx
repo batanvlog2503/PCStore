@@ -2,19 +2,45 @@ import React from "react"
 import "../Login/Login.scss"
 
 import axios from "axios"
+import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 const gioiThieu = ["/gioithieu.png"]
 export const Register = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState({
     username: "",
     phone: "",
     password: "",
     email: "",
   })
+  const [toast, setToast] = useState({
+    show: false,
+    message: "",
+    type: "success",
+  })
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type })
 
-  const handleSubmit = (e) => {
+    setTimeout(() => {
+      setToast({ show: false, message: "", type: "success" })
+    }, 3000)
+  }
+
+  const [message, setMessage] = useState("")
+  const [type, setType] = useState("")
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_APP_URL}/auth/register`,
+        user,
+      )
+
+      if (response.data.success) {
+        console.log("Register SuccessFully", response.data.message)
+        alert("Register Successfully")
+        navigate("/login")
+      }
     } catch (error) {
       alert(error.response?.data.message || "Error Submit Register")
     }
@@ -32,7 +58,10 @@ export const Register = () => {
       </div>
       <div className="form-login">
         <h2>Đăng nhập PC Store</h2>
-        <form action="">
+        <form
+          action=""
+          onSubmit={handleSubmit}
+        >
           <label htmlFor="">Username</label>
 
           <input
