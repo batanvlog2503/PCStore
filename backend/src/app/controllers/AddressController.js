@@ -61,6 +61,23 @@ class AddressController {
       next(err)
     }
   }
+  async updateAddress(req, res, next) {
+    try {
+      const address = await AddressService.updateAddress(
+        req.user._id,
+        req.params.id,
+        req.body,
+      )
+
+      return res.status(200).json({
+        success: true,
+        message: "Update address successfully",
+        address,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new AddressController()

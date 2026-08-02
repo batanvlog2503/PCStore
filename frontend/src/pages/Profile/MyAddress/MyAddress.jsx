@@ -6,6 +6,8 @@ const MyAddress = () => {
   const [addresses, setAddresses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  // sửa address
+  const [editingAddress, setEditingAddress] = useState(null)
 
   useEffect(() => {
     getAllAddresses()
@@ -57,6 +59,28 @@ const MyAddress = () => {
       alert("Add address successfully")
     } catch (error) {
       alert(error.response?.data?.message || "Add address failed")
+    }
+  }
+
+  const handleSubmitAddress = async (formData) => {
+    try {
+      if (editingAddress) {
+        const response = await axiosInstance.put(
+          `${import.meta.env.VITE_APP_URL}/address/update/${editingAddress._id}`,
+          formData,
+        )
+
+        alert("Cập nhật địa chỉ thành công")
+      } else {
+        const response = await axiosInstance.post(
+          `${import.meta.env.VITE_APP_URL}/address/add`,
+          formData,
+        )
+        alert("Thêm địa chỉ thành công")
+      }
+      await getAllAddresses()
+    } catch (error) {
+      alert(error.response?.data?.message || "Có lỗi xảy ra")
     }
   }
   // xóa địa chỉ
@@ -135,7 +159,13 @@ const MyAddress = () => {
                   Đặt làm mặc định
                 </button>
               )}
-              <button className="edit">
+              <button
+                className="edit"
+                onClick={() => {
+                  setEditingAddress(a) // ← thêm dòng này
+                  setIsModalOpen(true)
+                }}
+              >
                 <i className="fa-solid fa-pen"></i> Sửa
               </button>
               <button
@@ -153,8 +183,24 @@ const MyAddress = () => {
 
       <AddressModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddAddress}
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingAddress(null)
+        }}
+        onSubmit={handleSubmitAddress}
+        initialData={
+          editingAddress
+            ? {
+                receiver_name: editingAddress.receiver_name,
+                phone: editingAddress.phone,
+                province: editingAddress.province,
+                district: editingAddress.district,
+                ward: editingAddress.ward,
+                detail: editingAddress.detail,
+                is_default: editingAddress.is_default,
+              }
+            : null
+        }
       />
     </div>
   )

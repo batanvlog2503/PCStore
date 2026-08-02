@@ -15,6 +15,12 @@ class AddressRepository {
       user_id: userId,
     })
   }
+  async updateAddress(addressId, data) {
+    return await Address.findByIdAndUpdate(addressId, data, {
+      new: true,
+      runValidators: true,
+    })
+  }
   // xóa hết, mặc định là false cho tất cả
   async clearDefaultAddress(userId) {
     return await Address.updateMany(
@@ -25,7 +31,12 @@ class AddressRepository {
       },
     )
   }
-
+  async updateAddress(addressId, data) {
+    return await Address.findByIdAndUpdate(addressId, data, {
+      new: true,
+      runValidators: true,
+    })
+  }
   async setDefaultAddress(id, userId) {
     return await Address.findOneAndUpdate(
       { _id: id, user_id: userId },

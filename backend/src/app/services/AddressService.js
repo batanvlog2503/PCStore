@@ -101,6 +101,52 @@ class AddressService {
     }
     return { message: "Delete address successfully" }
   }
+
+  async updateAddress(userId, addressId, data) {
+    if (!addressId) {
+      throw new AppError(400, "Address ID is required")
+    }
+
+    const address = await AddressRepo.getAddressesById(addressId)
+
+    if (!address) {
+      throw new AppError(404, "Address not found")
+    }
+
+    if (address.user_id.toString() !== userId.toString()) {
+      throw new AppError(403, "You are not authorized to update this address")
+    }
+
+    const {
+      receiver_name,
+      phone,
+      province,
+      district,
+      ward,
+      detail,
+      is_default,
+    } = data
+
+    if (
+      !receiver_name ||
+      !phone ||
+      !province ||
+      !district ||
+      !ward ||
+      !detail
+    ) {
+      throw new AppError(400, "Missing required fields")
+    }
+
+    // Nếu đặt địa chỉ này thành mặc định
+    if (is_default) {
+      await AddressRepo.clearDefault(userId)
+    }
+
+    const updatedAddress = await AddressRepo.updateAddress(addressId, data)
+
+    return updatedAddress
+  }
 }
 
 module.exports = new AddressService()
