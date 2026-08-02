@@ -84,7 +84,7 @@ export const Login = () => {
         </form>
         <a href="">Quên mật khẩu</a>
 
-        <p>
+        <p onClick={() => navigate("/register")}>
           Bạn chưa có tài khoản? <a href="">Đăng kí ngay</a>
         </p>
         <p>

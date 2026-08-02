@@ -1,10 +1,14 @@
 import React from "react"
 import { OPTIONS } from "../Profile.jsx"
 import "./Sidebar.scss"
-
+import axiosInstance from "../../../utils/axiosInstance.js"
 const Sidebar = ({ activeTab, onSelect }) => {
   const items = [
-    { key: OPTIONS.INFO, label: "Thông tin của tôi", icon: "fa-solid fa-id-card" },
+    {
+      key: OPTIONS.INFO,
+      label: "Thông tin của tôi",
+      icon: "fa-solid fa-id-card",
+    },
     { key: OPTIONS.ORDER, label: "Đơn hàng của tôi", icon: "fa-solid fa-box" },
     {
       key: OPTIONS.WISHLIST,
@@ -23,11 +27,24 @@ const Sidebar = ({ activeTab, onSelect }) => {
     },
   ]
 
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    window.location.href = "/login"
+  const handleLogout = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/auth/logout`,
+        {
+          refreshToken: localStorage.getItem("refreshToken"),
+        },
+      )
+
+      alert("Đăng xuất thành công")
+      localStorage.removeItem("user")
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("refreshToken")
+      window.location.href = "/login"
+    } catch (err) {
+      alert("Có lỗi xảy ra khi đăng xuất")
+    }
   }
 
   return (

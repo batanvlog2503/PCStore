@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import "./Header.scss"
-
+import axiosInstance from "../../../utils/axiosInstance.js"
 export const Header = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
@@ -31,13 +31,24 @@ export const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
-    setUser(null)
-    setIsDropdownOpen(false)
-    navigate("/login")
+  const handleLogout = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/auth/logout`,
+        {
+          refreshToken: localStorage.getItem("refreshToken"),
+        },
+      )
+
+      alert("Đăng xuất thành công")
+      localStorage.removeItem("user")
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("refreshToken")
+      window.location.href = "/login"
+    } catch (err) {
+      alert("Có lỗi xảy ra khi đăng xuất")
+    }
   }
 
   return (
@@ -140,7 +151,11 @@ export const Header = () => {
               alt="PC Store Logo"
             />
           </div>
-          <div className="title">
+          <div
+            className="title"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
             <h4>PC Store</h4>
             <p>Technology For Life</p>
           </div>

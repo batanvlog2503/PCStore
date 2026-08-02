@@ -109,7 +109,7 @@ export const Register = () => {
           />
           <button type="submit">Đăng Ký</button>
         </form>
-        <p>
+        <p onClick={() => navigate("/login")}>
           Bạn đã có tài khoản? <a href="">Đăng nhập ngay</a>
         </p>
         <p>
