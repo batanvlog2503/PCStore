@@ -57,3 +57,18 @@ class CategoryController {
 }
 
 module.exports = new CategoryController()
+
+// đã add
+// ├── Laptop Gaming
+// └── Laptop Văn phòng
+
+// Linh kiện
+// ├── CPU
+// ├── RAM
+// ├── SSD
+// ├── Mainboard
+// └── Card màn hình
+
+// PC Gaming
+// ├── PC Gaming Intel
+// └── PC Gaming AMD
