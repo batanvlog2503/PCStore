@@ -4,7 +4,11 @@ const { Schema } = mongoose
 // Chỉ chứa thông tin mô tả — price/stock nằm ở ProductVariant
 const ProductSchema = new Schema(
   {
-    category_id: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    category_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     brand_id: { type: Schema.Types.ObjectId, ref: "Brand", required: true },
     name: { type: String, required: true, maxlength: 255 },
     slug: { type: String, required: true, unique: true, maxlength: 255 },
@@ -13,7 +17,7 @@ const ProductSchema = new Schema(
     sold_count: { type: Number, default: 0, min: 0 },
     status: { type: String, enum: ["active", "hidden"], default: "active" },
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 )
 
 ProductSchema.index({ category_id: 1 })

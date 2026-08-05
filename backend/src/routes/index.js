@@ -4,6 +4,7 @@ const authRoute = require("./auth")
 const categoryRoute = require("./category")
 const addressRoute = require("./address")
 const brandRoute = require("./brand")
+const productRoute = require("./product")
 function route(app) {
   console.log("Category route mounted")
 
@@ -12,6 +13,7 @@ function route(app) {
   app.use("/auth", authRoute)
   app.use("/address", addressRoute)
   app.use("/brand", brandRoute)
+  app.use("/product", productRoute)
 }
 
 module.exports = route
