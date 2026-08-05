@@ -47,6 +47,7 @@
     "mongoose-delete": "^1.0.7",
     "mongoose-sequence": "^6.0.1",
     "mongoose-slug-generator": "^1.0.4",
+    "multer": "^2.2.0",
     "nodemailer": "^8.0.2",
     "ollama": "^0.6.3",
     "openai": "^6.34.0",
