@@ -5,9 +5,14 @@ const { Schema } = mongoose
 const OrderItemSchema = new Schema({
   order_id: { type: Schema.Types.ObjectId, ref: "Order", required: true },
   product_id: { type: Schema.Types.ObjectId, ref: "Product", required: true },
-  variant_id: { type: Schema.Types.ObjectId, ref: "ProductVariant", default: null },
+  variant_id: {
+    type: Schema.Types.ObjectId,
+    ref: "ProductVariant",
+    required: true,
+  },
   quantity: { type: Number, required: true, default: 1, min: 1 },
   price: { type: Number, required: true, min: 0 },
+  // giá tại thời điểm đặt hàng
 })
 
 OrderItemSchema.index({ order_id: 1 })

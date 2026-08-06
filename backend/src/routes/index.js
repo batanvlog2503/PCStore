@@ -9,6 +9,7 @@ const productImageRoute = require("./productImage")
 const cartRoute = require("./cart")
 const cartItemRoute = require("./cartItem")
 const orderRoute = require("./order")
+const orderItemRoute = require("./orderItem")
 function route(app) {
   console.log("Category route mounted")
 
@@ -23,6 +24,7 @@ function route(app) {
   app.use("/cart", cartRoute)
   app.use("/cart-item", cartItemRoute)
   app.use("/order", orderRoute)
+  app.use("/order-item", orderItemRoute)
 }
 
 module.exports = route
