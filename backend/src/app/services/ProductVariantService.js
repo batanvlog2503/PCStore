@@ -6,7 +6,9 @@ class ProductVariantService {
   async getAllVariants() {
     return await ProductVariantRepo.getAllProductVariants()
   }
-
+  async getAllId() {
+    return await ProductVariantRepo.getAllId()
+  }
   async getVariantsByProduct(productId) {
     return await ProductVariantRepo.getByProduct(productId)
   }

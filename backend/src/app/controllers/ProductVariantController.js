@@ -15,7 +15,19 @@ class ProductVariantController {
       next(err)
     }
   }
+  async getAllId(req, res, next) {
+    try {
+      const variants = await ProductVariantService.getAllId()
 
+      return res.status(200).json({
+        success: true,
+        message: "get all id variants successfully !!!",
+        ...variants,
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
   async getVariantsByProduct(req, res, next) {
     try {
       const variants = await ProductVariantService.getVariantsByProduct(

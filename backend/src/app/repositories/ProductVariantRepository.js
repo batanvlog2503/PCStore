@@ -9,6 +9,9 @@ class ProductVariantRepository {
     return { total, variants }
   }
   // .populate("product_id", "name slug")
+  async getAllId() {
+    return await ProductVariant.find().select("_id")
+  }
   async getByProduct(productId) {
     const [variants, total] = await Promise.all([
       ProductVariant.find({ product_id: productId }).populate(
