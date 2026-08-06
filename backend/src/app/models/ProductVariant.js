@@ -3,8 +3,11 @@ const { Schema } = mongoose
 
 const ProductVariantSchema = new Schema({
   product_id: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+  // stock keeping unit mã quản lý nội bộ unique
   sku: { type: String, required: true, unique: true, maxlength: 100 },
+  // configName tên cấu hình
   config_name: { type: String, required: true, maxlength: 255 },
+  // giá
   price: { type: Number, required: true, min: 0 },
   discount_price: {
     type: Number,

@@ -1,6 +1,6 @@
 const userRoute = require("./user")
 const authRoute = require("./auth")
-
+const productVariant = require("./productVariant")
 const categoryRoute = require("./category")
 const addressRoute = require("./address")
 const brandRoute = require("./brand")
@@ -16,6 +16,7 @@ function route(app) {
   app.use("/brand", brandRoute)
   app.use("/product", productRoute)
   app.use("/product-image", productImageRoute)
+  app.use("/product-variant", productVariant)
 }
 
 module.exports = route
