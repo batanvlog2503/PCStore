@@ -39,6 +39,9 @@ class ProductRepository {
   //       },
   //     })
   //   }
+  async getIdAndNameProduct() {
+    return await Product.find().select("_id name")
+  }
   async findById(id) {
     return await Product.findById(id)
       .populate("category_id", "name slug")

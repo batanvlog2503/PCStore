@@ -7,6 +7,9 @@ class ProductService {
   async getAllProducts(req) {
     return await ProductRepo.getAll(req)
   }
+  async getIdAndNameProduct() {
+    return await ProductRepo.getIdAndNameProduct()
+  }
   async getBestSeller() {
     return await ProductRepo.getBestSeller()
   }
@@ -92,7 +95,7 @@ class ProductService {
 
     return await ProductRepo.updateById(id, data)
   }
-
+  
   async deleteProduct(id) {
     const product = await ProductRepo.findById(id)
 

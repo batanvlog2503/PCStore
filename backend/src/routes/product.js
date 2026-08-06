@@ -9,6 +9,7 @@ const {
   updateProductValidator,
 } = require("../helpers/validationProduct")
 const Product = require("../app/models/Product")
+router.get("/name/all", auth, ProductController.getIdAndNameProduct)
 router.get("/slug/:slug", auth, ProductController.getProductBySlug)
 router.get("/all", auth, ProductController.getAllProducts)
 router.post("/add", auth, addProductValidator, ProductController.createProduct)
