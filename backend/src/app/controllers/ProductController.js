@@ -15,7 +15,20 @@ class ProductController {
       next(err)
     }
   }
+  async getBestSeller(req, res, next) {
+    try {
+      const products = await ProductService.getBestSeller()
 
+      return res.status(200).json({
+        success: true,
+        message: "Get best seller products successfully",
+        total: products.length,
+        products,
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
   async getProductBySlug(req, res, next) {
     try {
       const product = await ProductService.getProductBySlug(req.params.slug)

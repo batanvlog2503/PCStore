@@ -7,7 +7,9 @@ class ProductService {
   async getAllProducts(req) {
     return await ProductRepo.getAll(req)
   }
-
+  async getBestSeller() {
+    return await ProductRepo.getBestSeller()
+  }
   async getProductBySlug(slug) {
     if (!slug) {
       throw new AppError(400, "Slug is required")

@@ -18,5 +18,6 @@ router.put(
   updateProductValidator,
   ProductController.updateProduct,
 )
+router.get("/bestseller", auth, ProductController.getBestSeller)
 
 module.exports = router
