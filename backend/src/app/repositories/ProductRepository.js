@@ -2,7 +2,7 @@ const Product = require("../models/Product")
 const paginationHelper = require("../../helpers/pagination")
 const sortableHelper = require("../../helpers/sortable")
 const searchHelper = require("../../helpers/search")
-const filterHelper = require("../../helpers/filter")
+const filterHelper = require("../../helpers/filterProduct")
 class ProductRepository {
   // full GET /product/all?search=asus&brand=6a735...&status=active&sort=sold_count&order=desc&page=2&limit=8
   // pagination http://localhost:3000/product/all?page=2&limit=5
