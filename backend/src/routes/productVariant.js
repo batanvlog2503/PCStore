@@ -2,6 +2,7 @@ const express = require("express")
 const auth = require("../app/middlewares/auth")
 const {
   addProductVariantValidator,
+  updateProductVariantValidator,
 } = require("../helpers/validationProductVariant")
 const router = express.Router()
 
@@ -18,5 +19,12 @@ router.post(
   auth,
   addProductVariantValidator,
   ProductVariantController.addVariant,
+)
+router.delete("/delete/:id", auth, ProductVariantController.deleteVariant)
+router.put(
+  "/update/:id",
+  auth,
+  updateProductVariantValidator,
+  ProductVariantController.updateVariant,
 )
 module.exports = router
