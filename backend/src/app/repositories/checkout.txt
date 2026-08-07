@@ -1,0 +1,27 @@
+1. Order - Nghiệp vụ tạo đơn hàng (⭐⭐⭐⭐⭐)
+
+Đây là API quan trọng nhất của cả website.
+
+POST /order/checkout
+
+Luồng:
+
+Cart
+↓
+Lấy CartItem
+↓
+Kiểm tra tồn kho
+↓
+Áp voucher
+↓
+Tạo Order
+↓
+Tạo OrderItem
+↓
+Trừ tồn kho
+↓
+Xóa CartItem
+
+Đây là API "xương sống" của website bán hàng.
+
+giải thích cái này đã checkout
