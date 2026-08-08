@@ -7,6 +7,7 @@ const {
 const router = express.Router()
 
 const ProductVariantController = require("../app/controllers/ProductVariantController")
+router.get("/image/all", auth, ProductVariantController.getAllVariantsAndImage)
 router.get("/all/id", auth, ProductVariantController.getAllId)
 router.get("/all", auth, ProductVariantController.getAllVariants)
 router.get(
