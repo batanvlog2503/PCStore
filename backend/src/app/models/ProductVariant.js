@@ -8,6 +8,18 @@ const ProductVariantSchema = new Schema({
   // configName tên cấu hình
   config_name: { type: String, required: true, maxlength: 255 },
   // giá
+
+  // Thông số kỹ thuật — tách riêng object cho gọn, dễ mở rộng thêm sau
+  // (VD: sau này thêm màu, cân nặng, pin... không làm rối root schema)
+  specs: {
+    cpu: { type: String, required: true }, // "Intel Core i5-13420H"
+    ram: { type: Number, required: true }, // 16 (đơn vị GB, lưu số để filter/sort được)
+    storage_capacity: { type: Number, required: true }, // 512 (đơn vị GB)
+    storage_type: { type: String, enum: ["SSD", "HDD"], default: "SSD" },
+    gpu: { type: String, required: true }, // "RTX 4050"
+    screen_size: { type: Number, required: true }, // 15.6 (inch)
+    screen_resolution: { type: String }, // "Full HD", "2.5K", "WUXGA"
+  },
   price: { type: Number, required: true, min: 0 },
   discount_price: {
     type: Number,
