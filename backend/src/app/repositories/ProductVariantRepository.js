@@ -8,6 +8,9 @@ class ProductVariantRepository {
     ])
     return { total, variants }
   }
+  async getVariantById(id) {
+    return await ProductVariant.findById(id)
+  }
   // .populate("product_id", "name slug")
   async getAllId() {
     return await ProductVariant.find()
@@ -18,7 +21,7 @@ class ProductVariantRepository {
     const [variants, total] = await Promise.all([
       ProductVariant.find({ product_id: productId }).populate(
         "product_id",
-        "name slug",
+        // "name slug",
       ),
       ProductVariant.countDocuments({ product_id: productId }),
     ])

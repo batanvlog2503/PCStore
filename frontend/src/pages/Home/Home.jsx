@@ -2,11 +2,13 @@ import React from "react"
 import "./Home.scss"
 import { useState, useEffect } from "react"
 import axiosInstance from "../../utils/axiosInstance"
+import { useNavigate } from "react-router-dom"
 
 const ADS_SET_A = ["/quangcao1.png", "/quangcao2.png"]
 const ADS_SET_B = ["/quangcao3.png", "/quangcao4.png"]
 
 export const Home = () => {
+  const navigate = useNavigate()
   const formatDateTime = (date) => {
     if (!date) return ""
     return new Date(date).toLocaleString("vi-VN", {
@@ -277,7 +279,10 @@ export const Home = () => {
                 : 0
 
               return (
-                <li key={variant._id}>
+                <li
+                  key={variant._id}
+                  onClick={() => navigate(`/product/${variant.product_id}`)}
+                >
                   <div className="product-details">
                     {hasDiscount && (
                       <span className="discount-badge">

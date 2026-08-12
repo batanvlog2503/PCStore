@@ -1,4 +1,5 @@
 const CartItemService = require("../services/CartItemService")
+const CartService = require("../services/CartService")
 
 class CartItemController {
   async getAllCartItems(req, res, next) {
@@ -33,15 +34,27 @@ class CartItemController {
 
   async addCartItem(req, res, next) {
     try {
-      const item = await CartItemService.addCartItem(req.body)
+      const { variant_id, quantity } = req.body
 
-      return res.status(201).json({
+      const cart = await CartService.getCartByUserId(req.user._id)
+
+      if (!cart) {
+        throw new AppError(404, "Cart not found")
+      }
+
+      const item = await CartItemService.addCartItem({
+        cart_id: cart._id,
+        variant_id,
+        quantity,
+      })
+
+      return res.status(200).json({
         success: true,
         message: "Add cart item successfully",
         item,
       })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   }
 

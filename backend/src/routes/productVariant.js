@@ -8,6 +8,7 @@ const router = express.Router()
 
 const ProductVariantController = require("../app/controllers/ProductVariantController")
 router.get("/image/all", auth, ProductVariantController.getAllVariantsAndImage)
+
 router.get("/all/id", auth, ProductVariantController.getAllId)
 router.get("/all", auth, ProductVariantController.getAllVariants)
 router.get(
@@ -15,6 +16,8 @@ router.get(
   auth,
   ProductVariantController.getVariantsByProduct,
 )
+// Lấy 1 variant theo ID
+router.get("/:id", auth, ProductVariantController.getVariantById)
 router.post(
   "/add",
   auth,

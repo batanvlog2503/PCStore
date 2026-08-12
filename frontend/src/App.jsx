@@ -14,6 +14,7 @@ import { MainLayout } from "./layouts/MainLayout/MainLayout"
 import { Login } from "./pages/Login/Login"
 import { Register } from "./pages/Register/Register"
 import Profile from "./pages/Profile/Profile"
+import Product from "./pages/Product/Product"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -26,6 +27,10 @@ const router = createBrowserRouter(
           index
           element={<Home />}
         />
+        <Route
+          path="product/:id"
+          element={<Product></Product>}
+        ></Route>
         <Route
           path="account"
           element={<Profile></Profile>}

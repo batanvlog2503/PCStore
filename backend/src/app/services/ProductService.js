@@ -2,10 +2,41 @@ const ProductRepo = require("../repositories/ProductRepository")
 const CategoryRepo = require("../repositories/CategoryRepository")
 const BrandRepo = require("../repositories/BrandRepository")
 const AppError = require("../utils/AppError")
-
+const Product = require("../models/Product")
+const ProductVariantRepo = require("../repositories/ProductVariantRepository")
+const ProductImageRepo = require("../repositories/ProductImageRepository")
+const ProductVariant = require("../models/ProductVariant")
+const ProductImage = require("../models/ProductImage")
 class ProductService {
   async getAllProducts(req) {
     return await ProductRepo.getAll(req)
+  }
+
+  async getProductDetail(productId) {
+    if (!productId) {
+      throw new AppError(404, "Product Id is required")
+    }
+
+    const product = await Product.findById(productId).populate("brand_id")
+
+    if (!product) throw new AppError(404, "Product not found")
+
+    const variants = await ProductVariant.find({
+      product_id: productId,
+      status: "active",
+    })
+
+    const images = await ProductImage.find({
+      product_id: productId,
+    }).sort({
+      is_main: -1,
+    })
+
+    return {
+      product,
+      variants,
+      images,
+    }
   }
   async getIdAndNameProduct() {
     return await ProductRepo.getIdAndNameProduct()
@@ -95,7 +126,7 @@ class ProductService {
 
     return await ProductRepo.updateById(id, data)
   }
-  
+
   async deleteProduct(id) {
     const product = await ProductRepo.findById(id)
 

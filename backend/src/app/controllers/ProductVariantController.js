@@ -118,6 +118,20 @@ class ProductVariantController {
       next(err)
     }
   }
+
+  async getVariantById(req, res, next) {
+    try {
+      const variant = await ProductVariantService.getVariantById(req.params.id)
+
+      return res.status(200).json({
+        success: true,
+        message: "get variant by id successfully !!!",
+        variant,
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
 }
 
 module.exports = new ProductVariantController()

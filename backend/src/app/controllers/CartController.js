@@ -1,5 +1,6 @@
 const CartService = require("../services/CartService")
 // tạo user thì auto có cả cart
+const CartItemService = require("../services/CartItemService")
 class CartController {
   async getAllCarts(req, res, next) {
     try {
@@ -82,6 +83,22 @@ class CartController {
       })
     } catch (err) {
       next(err)
+    }
+  }
+
+  async getMyCartItems(req, res, next) {
+    try {
+      const userId = req.user._id
+
+      const result = await CartItemService.getMyCartItems(userId)
+
+      return res.status(200).json({
+        success: true,
+        message: "Get cart items successfully",
+        ...result,
+      })
+    } catch (error) {
+      next(error)
     }
   }
 }

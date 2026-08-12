@@ -9,6 +9,7 @@ const {
   updateProductValidator,
 } = require("../helpers/validationProduct")
 const Product = require("../app/models/Product")
+
 router.get("/name/all", auth, ProductController.getIdAndNameProduct)
 router.get("/slug/:slug", auth, ProductController.getProductBySlug)
 router.get("/all", auth, ProductController.getAllProducts)
@@ -20,5 +21,5 @@ router.put(
   ProductController.updateProduct,
 )
 router.get("/bestseller", auth, ProductController.getBestSeller)
-
+router.get("/:productId", auth, ProductController.getProductDetail)
 module.exports = router

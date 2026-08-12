@@ -27,24 +27,29 @@ class CartItemService {
       throw new AppError(404, "Variant not found")
     }
 
-    if (variant.status != "active") {
+    if (variant.status !== "active") {
       throw new AppError(400, "Product discontinued !!!")
     }
-    if (quantity > variant.stock) {
-      throw new AppError(400, "Insufficient stock")
-    }
-    if (item.quantity + quantity > variant.stock) {
+
+    const item = await CartItemRepo.findByCartAndVariant(cart_id, variant_id)
+
+    const currentQuantity = item?.quantity || 0
+
+    if (currentQuantity + quantity > variant.stock) {
       throw new AppError(400, "Not enough stock")
     }
-    const item = await CartItemRepo.findByCartAndVariant(cart_id, variant_id)
 
     if (item) {
       return await CartItemRepo.updateById(item._id, {
-        quantity: item.quantity + quantity,
+        quantity: currentQuantity + quantity,
       })
     }
 
-    return await CartItemRepo.create(data)
+    return await CartItemRepo.create({
+      cart_id,
+      variant_id,
+      quantity,
+    })
   }
 
   async updateQuantity(id, quantity) {
@@ -101,6 +106,21 @@ class CartItemService {
         totalPrice: 0,
       }
     )
+  }
+
+  async getMyCartItems(userId) {
+    const cart = await CartRepo.findByUserId(userId)
+
+    if (!cart) {
+      throw new AppError(404, "Cart not found")
+    }
+
+    const result = await CartItemRepo.findByCartId(cart._id)
+
+    return {
+      cart,
+      ...result,
+    }
   }
 }
 

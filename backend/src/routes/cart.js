@@ -3,7 +3,7 @@ const auth = require("../app/middlewares/auth")
 const router = express.Router()
 const CartController = require("../app/controllers/CartController")
 router.get("/all", auth, CartController.getAllCarts)
-
+router.get("/my-cart/all", auth, CartController.getMyCartItems)
 router.get("/:id", auth, CartController.getCartById)
 
 router.get("/user/:userId", auth, CartController.getCartByUserId)

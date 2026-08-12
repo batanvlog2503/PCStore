@@ -26,6 +26,21 @@ class CartItemRepository {
     })
   }
 
+  async findByCartId(cartId) {
+    const [items, totalItem] = await Promise.all([
+      CartItem.find({
+        cart_id: cartId,
+      }).populate({
+        path: "variant_id",
+        populate: {
+          path: "product_id",
+        },
+      }),
+      CartItem.countDocuments({ cart_id: cartId }),
+    ])
+
+    return { totalItem, items }
+  }
   async findById(id) {
     return await CartItem.findById(id)
   }

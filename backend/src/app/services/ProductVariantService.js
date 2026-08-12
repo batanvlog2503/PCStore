@@ -6,6 +6,12 @@ class ProductVariantService {
   async getAllVariants() {
     return await ProductVariantRepo.getAllProductVariants()
   }
+  async getVariantById(id) {
+    if (!id) {
+      throw new AppError(404, "Id is required")
+    }
+    return await ProductVariantRepo.findById(id)
+  }
   async getAllVariantsAndImage() {
     return await ProductVariantRepo.getAllWithProductAndImage()
   }

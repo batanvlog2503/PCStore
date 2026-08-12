@@ -15,7 +15,19 @@ class ProductController {
       next(err)
     }
   }
+  async getProductDetail(req, res, next) {
+    try {
+      const result = await ProductService.getProductDetail(req.params.productId)
 
+      return res.status(200).json({
+        success: true,
+        message: "Get all product detail successfully",
+        ...result,
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
   async getIdAndNameProduct(req, res, next) {
     try {
       const products = await ProductService.getIdAndNameProduct()
@@ -101,7 +113,6 @@ class ProductController {
       next(err)
     }
   }
-  
 }
 
 module.exports = new ProductController()
