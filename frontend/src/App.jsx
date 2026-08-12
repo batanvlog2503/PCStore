@@ -15,6 +15,7 @@ import { Login } from "./pages/Login/Login"
 import { Register } from "./pages/Register/Register"
 import Profile from "./pages/Profile/Profile"
 import Product from "./pages/Product/Product"
+import Cart from "./pages/Cart/Cart"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -34,6 +35,10 @@ const router = createBrowserRouter(
         <Route
           path="account"
           element={<Profile></Profile>}
+        ></Route>
+        <Route
+          path="cart"
+          element={<Cart></Cart>}
         ></Route>
       </Route>
 

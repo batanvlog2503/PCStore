@@ -166,7 +166,14 @@ export const Header = () => {
             <i className="fa-regular fa-heart"></i> <span>Yêu thích</span>
           </div>
           <div className="my-cart">
-            <i className="fa-solid fa-cart-shopping"></i> <span>Giỏ hàng</span>
+            <Link
+              to="/cart"
+              style={{ color: "white", textDecoration: "none" }}
+              className="navigate-cart"
+            >
+              <i className="fa-solid fa-cart-shopping"></i>{" "}
+              <span>Giỏ hàng</span>
+            </Link>
           </div>
         </div>
       </div>
