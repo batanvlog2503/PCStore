@@ -1,5 +1,6 @@
 const CartItem = require("../models/CartItem")
 const mongoose = require("mongoose")
+const ProductImage = require("../models/ProductImage")
 class CartItemRepository {
   async getAll() {
     const [cartItems, total] = await Promise.all([
@@ -25,21 +26,67 @@ class CartItemRepository {
       },
     })
   }
-
   async findByCartId(cartId) {
-    const [items, totalItem] = await Promise.all([
-      CartItem.find({
-        cart_id: cartId,
-      }).populate({
+    const items = await CartItem.find({
+      cart_id: cartId,
+    })
+      .populate({
         path: "variant_id",
         populate: {
           path: "product_id",
         },
-      }),
-      CartItem.countDocuments({ cart_id: cartId }),
-    ])
+      })
+      .lean()
+    // lấy items
+    // Lấy danh sách product_id// của tất cả cart-item
+    const productIds = items
+      .map((item) => item.variant_id?.product_id?._id)
+      .filter(Boolean)
 
-    return { totalItem, items }
+    // Lấy toàn bộ ảnh chính trong 1 query
+    const images = await ProductImage.find({
+      product_id: { $in: productIds }, // chỉ cần product_id trong list-product_id
+      is_main: true, // main
+    }).lean()
+
+    // Map product_id -> image_url
+    const imageMap = new Map(
+      images.map((image) => [image.product_id.toString(), image.image_url]), // tạo map [productId, image_url]
+    ) // tại sao dùng product_id.toString
+
+    const formattedItems = items.map((item) => {
+      const product = item.variant_id?.product_id
+
+      const productId = product?._id?.toString()
+
+      return {
+        // CartItem
+        _id: item._id,
+        quantity: item.quantity,
+
+        // Variant
+        variant_id: item.variant_id?._id,
+        sku: item.variant_id?.sku,
+        config_name: item.variant_id?.config_name,
+
+        price: item.variant_id?.price,
+        discount_price: item.variant_id?.discount_price,
+        stock: item.variant_id?.stock,
+
+        // Product
+        product_id: product?._id,
+        product_name: product?.name,
+        product_slug: product?.slug,
+
+        // ProductImage
+        image_url: imageMap.get(productId) || null,
+      }
+    })
+
+    return {
+      total: formattedItems.length,
+      items: formattedItems,
+    }
   }
   async findById(id) {
     return await CartItem.findById(id)

@@ -1072,3 +1072,571 @@ $transition-base: 0.28s $ease-out;
     font-size: 19px;
   }
 }
+
+// ==========================================================================
+// Cart.scss — phần loading spinner
+// (Ghép đoạn này vào đầu file Cart.scss hiện có của bạn — không ảnh hưởng
+// tới các class BEM cart-page__..., order-summary__... đã viết trước đó)
+// ==========================================================================
+
+$color-yellow: #ffc107;
+$color-border: #ececec;
+$color-gray: #8a8a8a;
+
+$bp-sm: 576px;
+
+.cart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 60vh;
+  padding: 40px 0;
+  animation: cartLoadingFadeIn 0.3s ease-out;
+
+  p {
+    font-size: 14px;
+    color: $color-gray;
+    margin: 0;
+    animation: cartLoadingFadeIn 0.4s ease-out 0.1s both;
+  }
+
+  .spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 5px solid $color-border;
+    border-top-color: $color-yellow;
+    border-right-color: $color-yellow;
+    animation: cartSpin 0.8s linear infinite;
+
+    @media (max-width: $bp-sm) {
+      width: 40px;
+      height: 40px;
+      border-width: 4px;
+    }
+  }
+}
+
+@keyframes cartSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cartLoadingFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ==========================================================================
+// Cart.scss — phần loading spinner
+// (Ghép đoạn này vào đầu file Cart.scss hiện có của bạn — không ảnh hưởng
+// tới các class BEM cart-page__..., order-summary__... đã viết trước đó)
+// ==========================================================================
+
+$color-yellow: #ffc107;
+$color-border: #ececec;
+$color-gray: #8a8a8a;
+
+$bp-sm: 576px;
+
+.cart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 60vh;
+  padding: 40px 0;
+  animation: cartLoadingFadeIn 0.3s ease-out;
+
+  p {
+    font-size: 14px;
+    color: $color-gray;
+    margin: 0;
+    animation: cartLoadingFadeIn 0.4s ease-out 0.1s both;
+  }
+
+  .spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 5px solid $color-border;
+    border-top-color: $color-yellow;
+    border-right-color: $color-yellow;
+    animation: cartSpin 0.8s linear infinite;
+
+    @media (max-width: $bp-sm) {
+      width: 40px;
+      height: 40px;
+      border-width: 4px;
+    }
+  }
+}
+
+@keyframes cartSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cartLoadingFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ==========================================================================
+// Hàng đang bị xoá — mờ dần + trượt sang trái trong lúc chờ API xoá xong
+// ==========================================================================
+.cart-row--removing {
+  opacity: 0.4;
+  transform: translateX(-12px);
+  pointer-events: none;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+// ==========================================================================
+// Modal xác nhận xoá sản phẩm
+// ==========================================================================
+@keyframes confirmFadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirmPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(13, 13, 13, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  animation: confirmFadeInBackdrop 0.2s ease-out;
+
+  .confirm-modal-panel {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 32px 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: confirmPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    .confirm-modal-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: rgba(#e5484d, 0.12);
+      color: #e5484d;
+      font-size: 26px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #0d0d0d;
+    }
+
+    p {
+      margin: 0 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #8a8a8a;
+
+      strong {
+        color: #0d0d0d;
+      }
+    }
+
+    .confirm-modal-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        flex: 1 1 50%;
+        height: 44px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease-in-out,
+          transform 0.2s ease-in-out,
+          box-shadow 0.2s ease-in-out;
+      }
+
+      .cancel-btn {
+        border: 1.5px solid #ececec;
+        background-color: #ffffff;
+        color: #0d0d0d;
+
+        &:hover {
+          background-color: #f7f7f7;
+        }
+      }
+
+      .delete-btn {
+        border: none;
+        background-color: #e5484d;
+        color: #ffffff;
+
+        &:hover {
+          background-color: darken(#e5484d, 8%);
+          box-shadow: 0 8px 18px rgba(#e5484d, 0.35);
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(0) scale(0.97);
+        }
+      }
+    }
+  }
+
+  // Mobile: modal biến thành bottom sheet, giống AddressModal đã làm trước đó
+  @media (max-width: $bp-sm) {
+    align-items: flex-end;
+    padding: 0;
+
+    .confirm-modal-panel {
+      max-width: 100%;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 22px 22px;
+    }
+  }
+}
+
+// ==========================================================================
+// Cart.scss — phần loading spinner
+// (Ghép đoạn này vào đầu file Cart.scss hiện có của bạn — không ảnh hưởng
+// tới các class BEM cart-page__..., order-summary__... đã viết trước đó)
+// ==========================================================================
+
+$color-yellow: #ffc107;
+$color-border: #ececec;
+$color-gray: #8a8a8a;
+
+$bp-sm: 576px;
+
+.cart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 60vh;
+  padding: 40px 0;
+  animation: cartLoadingFadeIn 0.3s ease-out;
+
+  p {
+    font-size: 14px;
+    color: $color-gray;
+    margin: 0;
+    animation: cartLoadingFadeIn 0.4s ease-out 0.1s both;
+  }
+
+  .spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 5px solid $color-border;
+    border-top-color: $color-yellow;
+    border-right-color: $color-yellow;
+    animation: cartSpin 0.8s linear infinite;
+
+    @media (max-width: $bp-sm) {
+      width: 40px;
+      height: 40px;
+      border-width: 4px;
+    }
+  }
+}
+
+@keyframes cartSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cartLoadingFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ==========================================================================
+// Hàng đang bị xoá — mờ dần trong lúc chờ API xoá xong
+// ==========================================================================
+.cart-row--removing {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+// ==========================================================================
+// Spinner nhỏ trong nút Xoá (khi đang gọi API xoá)
+// ==========================================================================
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(#e5484d, 0.3);
+  border-top-color: #e5484d;
+  animation: cartSpin 0.7s linear infinite;
+}
+
+// ==========================================================================
+// Toast thông báo
+// ==========================================================================
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0d0d0d;
+  animation:
+    toastSlideIn 0.3s ease-out,
+    toastSlideOut 0.3s ease-in 2.2s forwards;
+
+  svg {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &.toast--success {
+    border-left: 4px solid #2fb344;
+
+    svg {
+      color: #2fb344;
+    }
+  }
+
+  &.toast--error {
+    border-left: 4px solid #e5484d;
+
+    svg {
+      color: #e5484d;
+    }
+  }
+
+  @media (max-width: $bp-sm) {
+    top: auto;
+    bottom: 20px;
+    left: 16px;
+    right: 16px;
+    max-width: none;
+  }
+}
+
+// ==========================================================================
+// Modal xác nhận xoá sản phẩm
+// ==========================================================================
+@keyframes confirmFadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes confirmPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(13, 13, 13, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  animation: confirmFadeInBackdrop 0.2s ease-out;
+
+  .confirm-modal-panel {
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 32px 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: confirmPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    .confirm-modal-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: rgba(#e5484d, 0.12);
+      color: #e5484d;
+      font-size: 26px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #0d0d0d;
+    }
+
+    p {
+      margin: 0 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #8a8a8a;
+
+      strong {
+        color: #0d0d0d;
+      }
+    }
+
+    .confirm-modal-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        flex: 1 1 50%;
+        height: 44px;
+        border-radius: 10px;
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease-in-out,
+          transform 0.2s ease-in-out,
+          box-shadow 0.2s ease-in-out;
+      }
+
+      .cancel-btn {
+        border: 1.5px solid #ececec;
+        background-color: #ffffff;
+        color: #0d0d0d;
+
+        &:hover {
+          background-color: #f7f7f7;
+        }
+      }
+
+      .delete-btn {
+        border: none;
+        background-color: #e5484d;
+        color: #ffffff;
+
+        &:hover {
+          background-color: darken(#e5484d, 8%);
+          box-shadow: 0 8px 18px rgba(#e5484d, 0.35);
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(0) scale(0.97);
+        }
+      }
+    }
+  }
+
+  // Mobile: modal biến thành bottom sheet, giống AddressModal đã làm trước đó
+  @media (max-width: $bp-sm) {
+    align-items: flex-end;
+    padding: 0;
+
+    .confirm-modal-panel {
+      max-width: 100%;
+      border-radius: 20px 20px 0 0;
+      padding: 28px 22px 22px;
+    }
+  }
+}

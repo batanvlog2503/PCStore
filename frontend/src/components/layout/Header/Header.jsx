@@ -181,12 +181,24 @@ export const Header = () => {
       <div className="header-bottom p-0">
         <div className="dropdown">
           <ul className="list">
-            <li>Trang chủ</li>
-            <li>Sản phẩm</li>
-            <li>PC Build</li>
-            <li>Khuyến mãi</li>
-            <li>Tin Tức</li>
-            <li>Liên hệ</li>
+            <li>
+              <Link to="/">Trang chủ</Link>
+            </li>
+            <li>
+              <Link>Sản phẩm</Link>
+            </li>
+            <li>
+              <Link>PC Build</Link>
+            </li>
+            <li>
+              <Link>Khuyến mãi</Link>
+            </li>
+            <li>
+              <Link>Tin Tức</Link>
+            </li>
+            <li>
+              <Link>Liên hệ</Link>
+            </li>
           </ul>
         </div>
       </div>

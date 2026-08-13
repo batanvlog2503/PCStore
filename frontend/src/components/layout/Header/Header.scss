@@ -578,12 +578,19 @@ $bp-xl: 1200px;
       position: relative;
       font-weight: 700;
       font-size: 14px;
-      color: $color-black;
       text-transform: uppercase;
       letter-spacing: 0.4px;
       cursor: pointer;
       padding: 4px 2px;
       transition: color $transition-fast;
+
+      // Link bên trong li
+      a {
+        color: $color-black;
+        text-decoration: none;
+        font: inherit;
+        transition: color $transition-fast;
+      }
 
       &::after {
         content: "";
@@ -598,6 +605,10 @@ $bp-xl: 1200px;
 
       &:hover {
         color: $color-white;
+
+        a {
+          color: $color-white;
+        }
 
         &::after {
           width: 100%;

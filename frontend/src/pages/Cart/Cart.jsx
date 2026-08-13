@@ -1,37 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react"
+import React, { useState, useMemo, useCallback, useEffect } from "react"
+import { MdDelete, MdCheckCircle, MdError } from "react-icons/md"
 import "./Cart.scss"
-
-const INITIAL_ITEMS = [
-  {
-    id: 1,
-    name: "MSI Katana 15",
-    config: "Cấu hình: Core i7 / RAM 16GB / SSD 1TB",
-    image:
-      "https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=300&auto=format&fit=crop",
-    price: 32990000,
-    oldPrice: 34990000,
-    discountPercent: 6,
-    stock: 12,
-    inStock: true,
-    quantity: 1,
-    checked: true,
-  },
-  {
-    id: 2,
-    name: "Chuột Gaming ASUS ROG Gladius III",
-    config: null,
-    image:
-      "https://images.unsplash.com/photo-1527814050087-3793815479db?q=80&w=300&auto=format&fit=crop",
-    price: 1290000,
-    oldPrice: null,
-    discountPercent: 0,
-    stock: 25,
-    inStock: true,
-    quantity: 1,
-    checked: true,
-  },
-]
-
+import axiosInstance from "../../utils/axiosInstance"
+import { Link } from "react-router-dom"
 const formatVND = (value) => value.toLocaleString("vi-VN") + "đ"
 
 const TrustItem = ({ icon, title, subtitle }) => (
@@ -50,13 +21,54 @@ const TrustItem = ({ icon, title, subtitle }) => (
 )
 
 export default function Cart() {
-  const [items, setItems] = useState(INITIAL_ITEMS)
+  const [items, setItems] = useState([])
   const [couponInput, setCouponInput] = useState("")
+  const [couponMessage, setCouponMessage] = useState(null)
 
-  const [removingIds, setRemovingIds] = useState([])
+  const [itemToDelete, setItemToDelete] = useState(null) // item đang chờ xác nhận xoá
+  const [deletingId, setDeletingId] = useState(null) // _id đang gọi API xoá (để hiện spinner)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Toast đơn giản, tự viết — không cần cài thêm thư viện ngoài
+  const [toast, setToast] = useState(null) // { type: "success" | "error", message: string }
+
+  const showToast = (type, message) => {
+    setToast({ type, message })
+  }
+
+  // Toast tự ẩn sau 2.5s
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 2500)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  const getMyCart = async () => {
+    try {
+      setIsLoading(true)
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/cart/my-cart/all`,
+      )
+
+      if (response.data.success) {
+        const formatItems = response?.data?.items.map((item) => ({
+          ...item,
+          checked: false,
+        }))
+        setItems(formatItems)
+      }
+    } catch (error) {
+      alert(error?.response?.data?.message || "Get My Cart failed ")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getMyCart()
+  }, [])
 
   const allChecked = items.length > 0 && items.every((it) => it.checked)
-  const someChecked = items.some((it) => it.checked)
 
   const handleToggleAll = useCallback(() => {
     setItems((prev) => prev.map((it) => ({ ...it, checked: !allChecked })))
@@ -64,14 +76,14 @@ export default function Cart() {
 
   const handleToggleItem = useCallback((id) => {
     setItems((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, checked: !it.checked } : it)),
+      prev.map((it) => (it._id === id ? { ...it, checked: !it.checked } : it)),
     )
   }, [])
 
   const handleQuantityChange = useCallback((id, delta) => {
     setItems((prev) =>
       prev.map((it) => {
-        if (it.id !== id) return it
+        if (it._id !== id) return it
         const next = Math.min(Math.max(it.quantity + delta, 1), it.stock)
         return { ...it, quantity: next }
       }),
@@ -81,21 +93,76 @@ export default function Cart() {
   const selectedItems = useMemo(() => items.filter((it) => it.checked), [items])
 
   const subtotal = useMemo(
-    () => selectedItems.reduce((sum, it) => sum + it.price * it.quantity, 0),
+    () =>
+      selectedItems.reduce(
+        (sum, it) => sum + it.discount_price * it.quantity,
+        0,
+      ),
     [selectedItems],
   )
 
   const productDiscount = useMemo(
     () =>
       selectedItems.reduce((sum, it) => {
-        if (!it.oldPrice) return sum
-        return sum + (it.oldPrice - it.price) * it.quantity
+        if (!it.price) return sum
+        return sum + (it.price - it.discount_price) * it.quantity
       }, 0),
     [selectedItems],
   )
 
+  const discountPercent = (item) =>
+    item?.price && item?.discount_price
+      ? Math.round(((item.price - item.discount_price) / item.price) * 100)
+      : 0
+
   const shippingFee = 0
-  const total = subtotal - productDiscount + shippingFee
+  const total = subtotal
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault()
+    // TODO: gọi API POST /vouchers/apply với couponInput + subtotal - productDiscount
+  }
+
+  const handleOpenDeleteConfirm = (item) => {
+    setItemToDelete(item)
+  }
+
+  const handleCloseDeleteConfirm = () => {
+    setItemToDelete(null)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return
+    const id = itemToDelete._id
+    const name = itemToDelete.product_name
+
+    setDeletingId(id) // bật spinner + làm mờ đúng dòng này
+    setItemToDelete(null) // đóng modal ngay, không đợi API
+
+    try {
+      await axiosInstance.delete(
+        `${import.meta.env.VITE_APP_URL}/cart-item/delete/${id}`,
+      )
+      setItems((prev) => prev.filter((it) => it._id !== id))
+      showToast("success", `Đã xoá "${name}" khỏi giỏ hàng`)
+    } catch (error) {
+      showToast(
+        "error",
+        error.response?.data?.message || "Xoá sản phẩm thất bại",
+      )
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="cart-loading">
+        <div className="spinner"></div>
+        <p>Đang tải giỏ hàng...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="cart-page">
@@ -112,12 +179,9 @@ export default function Cart() {
             <p className="cart-empty__subtitle">
               Hãy khám phá thêm sản phẩm và quay lại đây nhé
             </p>
-            <a
-              href="#/"
-              className="btn btn--primary"
-            >
-              Tiếp tục mua hàng
-            </a>
+            <p className="btn btn--primary">
+              <Link to="/">Tiếp tục mua hàng</Link>
+            </p>
           </div>
         ) : (
           <div className="cart-layout">
@@ -145,18 +209,20 @@ export default function Cart() {
 
                 <ul className="cart-table__body">
                   {items.map((item) => {
-                    const isRemoving = removingIds.includes(item.id)
+                    const isDeletingRow = deletingId === item._id
+
                     return (
                       <li
-                        key={item.id}
-                        className={`cart-row${isRemoving ? " cart-row--removing" : ""}`}
+                        key={item._id}
+                        className={`cart-row${isDeletingRow ? " cart-row--removing" : ""}`}
                       >
                         <label className="cart-checkbox cart-row__select">
                           <input
                             type="checkbox"
-                            checked={item.checked}
-                            onChange={() => handleToggleItem(item.id)}
-                            aria-label={`Chọn ${item.name}`}
+                            checked={item?.checked}
+                            onChange={() => handleToggleItem(item._id)}
+                            aria-label={`Chọn ${item?.product_name}`}
+                            disabled={isDeletingRow}
                           />
                           <span className="cart-checkbox__box" />
                         </label>
@@ -164,26 +230,30 @@ export default function Cart() {
                         <div className="cart-row__product">
                           <div className="cart-row__thumb">
                             <img
-                              src={item.image}
-                              alt={item.name}
+                              src={`${import.meta.env.VITE_APP_URL}${item.image_url}`}
+                              alt={item?.product_name}
                               loading="lazy"
                             />
                           </div>
                           <div className="cart-row__info">
-                            <p className="cart-row__name">{item.name}</p>
-                            {item.config && (
-                              <p className="cart-row__config">{item.config}</p>
+                            <p className="cart-row__name">
+                              {item?.product_name}
+                            </p>
+                            {item?.config_name && (
+                              <p className="cart-row__config">
+                                {item?.config_name}
+                              </p>
                             )}
                             <p
                               className={`cart-row__stock${
-                                item.inStock ? "" : " cart-row__stock--out"
+                                item?.stock ? "" : " cart-row__stock--out"
                               }`}
                             >
                               <span
                                 className="cart-row__stock-dot"
                                 aria-hidden="true"
                               />
-                              {item.inStock ? "Còn hàng" : "Hết hàng"}
+                              {item?.stock ? "Còn hàng" : "Hết hàng"}
                             </p>
                           </div>
                         </div>
@@ -193,16 +263,19 @@ export default function Cart() {
                           data-label="Đơn giá"
                         >
                           <span className="cart-row__price-current">
-                            {formatVND(item.price)}
+                            {formatVND(item?.discount_price)}
                           </span>
-                          {item.oldPrice && (
+                          {item.price && (
                             <>
                               <span className="cart-row__price-old">
-                                {formatVND(item.oldPrice)}
+                                {formatVND(item.price)}
                               </span>
-                              <span className="cart-row__price-badge">
-                                -{item.discountPercent}%
-                              </span>
+                              {item?.discount_price != null &&
+                                item?.discount_price < item?.price && (
+                                  <span className="cart-row__price-badge">
+                                    -{discountPercent(item)}%
+                                  </span>
+                                )}
                             </>
                           )}
                         </div>
@@ -215,21 +288,23 @@ export default function Cart() {
                             <button
                               type="button"
                               className="qty-stepper__btn"
-                              onClick={() => handleQuantityChange(item.id, -1)}
-                              disabled={item.quantity <= 1}
-                              aria-label={`Giảm số lượng ${item.name}`}
+                              onClick={() => handleQuantityChange(item._id, -1)}
+                              disabled={item.quantity <= 1 || isDeletingRow}
+                              aria-label={`Giảm số lượng ${item?.name}`}
                             >
                               −
                             </button>
                             <span className="qty-stepper__value">
-                              {item.quantity}
+                              {item?.quantity}
                             </span>
                             <button
                               type="button"
                               className="qty-stepper__btn"
-                              onClick={() => handleQuantityChange(item.id, 1)}
-                              disabled={item.quantity >= item.stock}
-                              aria-label={`Tăng số lượng ${item.name}`}
+                              onClick={() => handleQuantityChange(item._id, 1)}
+                              disabled={
+                                item.quantity >= item?.stock || isDeletingRow
+                              }
+                              aria-label={`Tăng số lượng ${item?.product_name}`}
                             >
                               +
                             </button>
@@ -243,17 +318,23 @@ export default function Cart() {
                           className="cart-row__total"
                           data-label="Thành tiền"
                         >
-                          {formatVND(item.price * item.quantity)}
+                          {formatVND(item?.discount_price * item.quantity)}
                         </div>
 
                         <div className="cart-row__action">
                           <button
                             type="button"
                             className="icon-btn icon-btn--danger"
-                            aria-label={`Xóa ${item.name}`}
+                            aria-label={`Xóa ${item.product_name}`}
                             title="Xóa sản phẩm"
+                            onClick={() => handleOpenDeleteConfirm(item)}
+                            disabled={isDeletingRow}
                           >
-                            Xóa
+                            {isDeletingRow ? (
+                              <span className="btn-spinner"></span>
+                            ) : (
+                              <MdDelete />
+                            )}
                           </button>
                         </div>
                       </li>
@@ -273,17 +354,12 @@ export default function Cart() {
                   <span>Chọn tất cả</span>
                 </label>
 
-                <button
-                  type="button"
-                  className="link-btn link-btn--danger"
-                  disabled={!someChecked}
+                <Link
+                  to="/"
+                  className="btn btn--outline cart-panel__continue"
                 >
-                  Xóa đã chọn
-                </button>
-
-                <a className="btn btn--outline cart-panel__continue">
                   Tiếp tục mua hàng
-                </a>
+                </Link>
               </div>
             </section>
 
@@ -306,7 +382,10 @@ export default function Cart() {
                   </div>
                 )}
 
-                <form className="coupon-form">
+                <form
+                  className="coupon-form"
+                  onSubmit={handleApplyCoupon}
+                >
                   <input
                     type="text"
                     className="coupon-form__input"
@@ -324,6 +403,9 @@ export default function Cart() {
                     Áp dụng
                   </button>
                 </form>
+                {couponMessage && (
+                  <p className="coupon-form__message">{couponMessage}</p>
+                )}
 
                 <div className="order-summary__row">
                   <span className="order-summary__ship-label">
@@ -400,6 +482,52 @@ export default function Cart() {
           />
         </section>
       </div>
+
+      {/* ================= MODAL XÁC NHẬN XOÁ ================= */}
+      {itemToDelete && (
+        <div
+          className="confirm-modal-backdrop"
+          onClick={handleCloseDeleteConfirm}
+        >
+          <div
+            className="confirm-modal-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="confirm-modal-icon">
+              <MdDelete />
+            </div>
+
+            <h3>Xoá sản phẩm khỏi giỏ hàng?</h3>
+            <p>
+              Bạn có chắc muốn xoá <strong>{itemToDelete?.product_name}</strong>{" "}
+              khỏi giỏ hàng không? Hành động này không thể hoàn tác.
+            </p>
+
+            <div className="confirm-modal-actions">
+              <button
+                className="cancel-btn"
+                onClick={handleCloseDeleteConfirm}
+              >
+                Huỷ
+              </button>
+              <button
+                className="delete-btn"
+                onClick={handleConfirmDelete}
+              >
+                Xoá sản phẩm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= TOAST ================= */}
+      {toast && (
+        <div className={`toast toast--${toast.type}`}>
+          {toast.type === "success" ? <MdCheckCircle /> : <MdError />}
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   )
 }
