@@ -91,16 +91,24 @@ class ProductVariantRepository {
     ])
   }
 
-  async decreaseStock(id, quantity, session) {
-    return await ProductVariant.updateOne(
-      { _id: id },
+  async decreaseStock(variantId, quantity, session) {
+    const result = await ProductVariant.updateOne(
+      {
+        _id: variantId,
+        status: "active",
+        stock: { $gte: quantity },
+      },
       {
         $inc: {
           stock: -quantity,
         },
       },
-      { session },
+      {
+        session,
+      },
     )
+
+    return result
   }
 }
 

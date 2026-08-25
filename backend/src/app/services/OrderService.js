@@ -196,11 +196,15 @@ class OrderService {
       for (const item of items) {
         const variant = item.variant_id
 
-        await ProductVariantRepo.decreaseStock(
+        const result = await ProductVariantRepo.decreaseStock(
           variant._id,
           item.quantity,
           session,
         )
+        if (result.modifiedCount !== 1) {
+          // ===1 có nghĩa là đã thay đổi stock
+          throw new AppError(400, `${variant.sku} is out of stock`)
+        }
       }
       // B10. Xóa CartItem
       await CartItemRepo.deleteManyByIds(cart_item_ids, session)
