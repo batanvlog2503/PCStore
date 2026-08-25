@@ -172,9 +172,13 @@ class CartItemRepository {
     ])
   }
 
-  async deleteManyByIds(ids) {
-    return await CartItem.deleteMany({ _id: { $in: ids } })
-    // $in là trong ids là được
+  async deleteManyByIds(ids, session) {
+    return await CartItem.deleteMany(
+      {
+        _id: { $in: ids },
+      },
+      { session },
+    )
   }
 }
 

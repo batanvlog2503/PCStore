@@ -37,8 +37,9 @@ class OrderRepository {
     //   .populate("voucher_id", "code discount_value")
   }
 
-  async create(data) {
-    return await Order.create(data)
+  async create(data, session) {
+    const [order] = await Order.create([data], { session })
+    return order
   }
 
   async updateById(id, data) {

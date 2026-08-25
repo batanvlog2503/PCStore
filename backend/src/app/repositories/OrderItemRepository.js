@@ -46,8 +46,8 @@ class OrderItemRepository {
     return await OrderItem.countDocuments()
   }
 
-  async createMany(items) {
-    return await OrderItem.insertMany(items)
+  async createMany(data, session) {
+    return await OrderItem.insertMany(data, { session })
   }
 }
 

@@ -1,0 +1,162 @@
+1. Transaction là gì
+
+hiểu đơn giản 
+Transaction = Một nhóm thao tac database được xem như 1 lần thực hiện 
+duy nhất
+
+
+có 2 kết quả -> tất cả thành công -> commit -> lưu tất cả
+             -> Chỉ cần 1 bước lỗi -> Rollback -> hủy toàn bộ thay đổi
+
+2. Tại sao Order cần transaction 
+
+Tạo Order              ✅
+Tạo OrderItem          ✅
+Trừ Stock              ❌
+Xóa CartItem           chưa chạy
+
+Database lúc này sẽ có:
+
+Order        ← ĐÃ TỒN TẠI
+OrderItem    ← ĐÃ TỒN TẠI
+Stock        ← CHƯA TRỪ
+CartItem     ← VẪN CÒN
+
+đơn giản là chuyển tiền cho người kia nhưng mình bị trừ tiền và
+người kia chưa nhận được
+
+4. Áp dụng vào Order của bạn
+
+Tạo Order              ✅
+Tạo OrderItem          ✅
+Trừ Stock              ❌
+Xóa CartItem           chưa chạy
+
+Database lúc này sẽ có:
+
+Order        ← ĐÃ TỒN TẠI
+OrderItem    ← ĐÃ TỒN TẠI
+Stock        ← CHƯA TRỪ
+CartItem     ← VẪN CÒN
+
+Transaction sẽ bao quanh những thao tác làm thay đổi database
+
+START TRANSACTION
+       ↓
+   Tạo Order
+       ↓
+   Tạo OrderItem
+       ↓
+   Trừ Stock
+       ↓
+   Xóa CartItem
+       ↓
+     COMMIT
+
+5. Có 3 khái niệm cần nhớ
+
+startTransaction
+
+bắt đầu 1 transaction -> BEGIN
+
+commitTransaction
+
+Xác nhận tất cả các thay đổi -> COMMIT 
+sau commit thì thay đổi được lưu chính thức
+
+abortTransaction
+
+hủy Transaction -> ROLLBACK toàn bọ thay đổi trong transaction bị quay lại
+
+
+6. MongoDB /Mongoose làm như nào? 
+
+Vì Project bạn dùng mongoose
+
+const session = await mongoose.startSession() khởi tạo phiên
+
+tại sao phải cần session 
+-> để biết nhưng thao tác database nào thuộc về transaction
+sau đó
+
+session.startTransaction()
+
+Bắt đầu transaction.
+
+Cuối cùng:
+
+await session.commitTransaction()
+
+hoặc nếu lỗi:
+
+await session.abortTransaction()
+
+7. Cấu trúc cơ bản
+
+Đừng vội đưa vào Order. Trước tiên hãy nhớ cấu trúc này:
+
+const session = await mongoose.startSession()
+
+
+
+try {
+  session.startTransaction()
+
+  // database operation 1
+  // database operation 2
+  // database operation 3
+
+  await session.commitTransaction()
+} catch (error) {
+  await session.abortTransaction()
+
+  throw error
+} finally {
+  session.endSession()
+}
+
+Đọc theo tiếng Việt:
+
+Tạo session
+   ↓
+Bắt đầu transaction
+   ↓
+Làm các thao tác DB
+   ↓
+Nếu tất cả OK
+   ↓
+COMMIT
+
+Nếu có lỗi
+   ↓
+CATCH
+   ↓
+ROLLBACK
+
+Cuối cùng
+   ↓
+Đóng session\
+
+8. Nhưng tại sao lại cần session?
+
+Đây là phần rất quan trọng.
+
+Bạn có:
+
+const session = await mongoose.startSession()
+
+Transaction phải biết:
+
+"Những thao tác database nào thuộc về transaction này?"
+
+Ví dụ:
+
+await Order.create(
+  [
+    {
+      user_id: userId,
+      total_amount: 100000,
+    },
+  ],
+  { session },
+)

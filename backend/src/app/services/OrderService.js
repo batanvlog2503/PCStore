@@ -1,6 +1,7 @@
 const OrderRepo = require("../repositories/OrderRepository")
 const UserRepository = require("../repositories/UserRepository")
 const AppError = require("../utils/AppError")
+const mongoose = require("mongoose")
 const CartRepo = require("../repositories/CartRepository")
 const ProductImageRepo = require("../repositories/ProductImageRepository")
 const OrderItemRepo = require("../repositories/OrderItemRepository")
@@ -134,61 +135,86 @@ class OrderService {
         image.image_url,
       ]),
     )
-    // B5: tao order voi cac field trong order model
-    const order = await OrderRepo.create({
-      user_id: userId,
-      address_id,
-      order_code: generateOrderCode(),
-      subtotal: amount.subtotal,
-      product_discount: amount.product_discount,
-      voucher_discount: amount.voucher_discount,
-      shipping_fee: amount.shipping_fee,
-      total_amount: amount.total_amount,
-      payment_method,
-      payment_status: "pending",
-      status: "pending",
-      note: note || null,
-    })
-    // B6: tao orderItem [list]
-    const orderItems = items.map((item) => {
-      const variant = item.variant_id
-      const product = variant.product_id
-      const productImage = imageMap.get(product._id.toString())
-      return {
-        order_id: order._id,
-        product_id: product._id,
-        variant_id: variant._id,
-        // SNAPSHOT
-        // =====================
-        product_name: product.name,
-        product_image: productImage || null,
-        sku: variant.sku,
-        config_name: variant.config_name || null,
-        price: variant.price,
-        discount_price: variant.discount_price,
-        quantity: item.quantity,
-        subtotal: variant.discount_price * item.quantity,
+
+    // B6: Start Transaction bắt đầu khởi tạo
+
+    const session = await mongoose.startSession()
+
+    try {
+      session.startTransaction()
+      // B7. Tạo Order
+      const order = await OrderRepo.create(
+        {
+          user_id: userId,
+          address_id,
+          order_code: generateOrderCode(),
+          subtotal: amount.subtotal,
+          product_discount: amount.product_discount,
+          voucher_discount: amount.voucher_discount,
+          shipping_fee: amount.shipping_fee,
+          total_amount: amount.total_amount,
+          payment_method,
+          payment_status: "pending",
+          status: "pending",
+
+          note: note || null,
+        },
+        session,
+      )
+      // B8. Tạo OrderItem
+      const orderItems = items.map((item) => {
+        const variant = item.variant_id
+        const product = variant.product_id
+
+        const productImage = imageMap.get(product._id.toString())
+
+        return {
+          order_id: order._id,
+
+          product_id: product._id,
+          variant_id: variant._id,
+
+          // SNAPSHOT
+          product_name: product.name,
+          product_image: productImage || null,
+
+          sku: variant.sku,
+          config_name: variant.config_name || null,
+
+          price: variant.price,
+          discount_price: variant.discount_price,
+
+          quantity: item.quantity,
+
+          subtotal: variant.discount_price * item.quantity,
+        }
+      })
+
+      await OrderItemRepo.createMany(orderItems, session)
+
+      // B9. Trừ Stock
+      for (const item of items) {
+        const variant = item.variant_id
+
+        await ProductVariantRepo.decreaseStock(
+          variant._id,
+          item.quantity,
+          session,
+        )
       }
-    })
-
-    await OrderItemRepo.createMany(orderItems)
-
-    // b7: tru stock cua productVariantRepo
-
-    for (const item of items) {
-      const variant = item.variant_id
-
-      await ProductVariantRepo.decreaseStock(variant._id, item.quantity)
+      // B10. Xóa CartItem
+      await CartItemRepo.deleteManyByIds(cart_item_ids, session)
+      // B11. COMMIT
+      await session.commitTransaction()
+      // B12. Trả Order
+      return order
+    } catch (error) {
+      // Có lỗi → ROLLBACK
+      await session.abortTransaction()
+      throw error
+    } finally {
+      await session.endSession()
     }
-
-    // b8: sau khi da tru stock nghia la đã mua
-    // thì xóa cartItem đã selected
-
-    await CartItemRepo.deleteManyByIds(cart_item_ids)
-
-    // b9 trả về order đã tạo
-
-    return order
   }
 
   async getOrderCode(orderCode) {

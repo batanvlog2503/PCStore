@@ -91,14 +91,15 @@ class ProductVariantRepository {
     ])
   }
 
-  async decreaseStock(variantId, quantity) {
-    return await ProductVariant.findByIdAndUpdate(
+  async decreaseStock(id, quantity, session) {
+    return await ProductVariant.updateOne(
+      { _id: id },
       {
-        _id: variantId,
-        stock: { $gte: quantity }, // tranh stock bi am
+        $inc: {
+          stock: -quantity,
+        },
       },
-      { $inc: { stock: -quantity } },
-      { new: true },
+      { session },
     )
   }
 }
