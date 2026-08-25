@@ -1,0 +1,639 @@
+Được. Mình nói lại Atomic Update từ đầu, đúng theo case stock của code bạn.
+
+1. Atomic Update là gì?
+
+Atomic Update có thể hiểu đơn giản là:
+
+Database kiểm tra điều kiện và cập nhật dữ liệu trong cùng một thao tác, không để request khác chen vào giữa.
+
+Ví dụ bạn có:
+
+stock = 10
+
+Khách muốn mua:
+
+quantity = 7
+
+Ta muốn:
+
+kiểm tra stock >= 7
+        ↓
+     đúng?
+        ↓
+stock = stock - 7
+
+Hai việc này cần được xử lý atomic.
+
+2. Cách KHÔNG atomic
+
+Code cũ của bạn:
+
+const variant = await ProductVariant.findById(id)
+
+if (variant.stock >= quantity) {
+  variant.stock -= quantity
+
+  await variant.save()
+}
+
+Thực tế có 2 bước riêng biệt:
+
+Bước 1:
+findById()
+     ↓
+đọc stock
+
+Bước 2:
+save()
+     ↓
+ghi stock
+
+Khoảng giữa hai bước đó, request khác có thể chạy.
+
+3. Race Condition xảy ra
+
+Giả sử:
+
+stock = 10
+
+Có 2 người cùng mua:
+
+A mua 7
+B mua 7
+
+Có thể xảy ra:
+
+             DATABASE
+             stock = 10
+
+A                         B
+│                         │
+├── đọc stock = 10        │
+│                         ├── đọc stock = 10
+│                         │
+├── 10 >= 7 ✅            │
+│                         ├── 10 >= 7 ✅
+│                         │
+├── stock = 3             │
+│                         ├── stock = 3
+│                         │
+└── save()                └── save()
+
+Cả A và B đều nghĩ:
+
+"Tôi mua được hàng."
+
+Đây là race condition.
+
+4. Atomic Update
+
+Thay vì đọc rồi save:
+
+findById()
+↓
+if
+↓
+save()
+
+Ta nói MongoDB:
+
+"Nếu stock còn ít nhất bằng quantity thì giảm stock ngay."
+
+const result = await ProductVariant.updateOne(
+  {
+    _id: variantId,
+    status: "active",
+    stock: { $gte: quantity },
+  },
+  {
+    $inc: {
+      stock: -quantity,
+    },
+  },
+  {
+    session,
+  },
+)
+
+Đây chính là atomic update.
+
+5. Đọc câu query như thế nào?
+
+Phần này:
+
+{
+  _id: variantId,
+  status: "active",
+  stock: { $gte: quantity },
+}
+
+nghĩa là:
+
+Tìm variant này
+    AND
+phải active
+    AND
+stock >= quantity
+
+Ví dụ:
+
+stock = 10
+quantity = 7
+
+thì:
+
+10 >= 7
+
+✅ Match.
+
+Sau đó:
+
+{
+  $inc: {
+    stock: -quantity,
+  },
+}
+
+nghĩa là:
+
+stock = stock - quantity
+
+Ví dụ:
+
+10 - 7 = 3
+6. Tại sao nó chống overselling?
+
+Giả sử vẫn có:
+
+stock = 10
+
+A và B cùng mua 7.
+
+MongoDB xử lý atomic:
+
+A:
+stock >= 7
+    ↓
+YES
+    ↓
+stock = 3
+
+Sau đó B:
+
+B:
+stock >= 7
+    ↓
+NO
+    ↓
+Không update
+
+Kết quả:
+
+A → mua thành công
+B → hết hàng
+
+Không xảy ra:
+
+stock = -4
+7. modifiedCount liên quan gì?
+
+updateOne() trả về kết quả:
+
+const result = await ProductVariant.updateOne(...)
+
+Ví dụ thành công:
+
+result.modifiedCount === 1
+
+Không đủ stock:
+
+result.modifiedCount === 0
+
+Nên bạn viết:
+
+if (result.modifiedCount !== 1) {
+  throw new AppError(
+    400,
+    `${variant.sku} is out of stock`,
+  )
+}
+
+Có thể đọc là:
+
+MongoDB có update đúng 1 variant không?
+
+        │
+        ├── 1 → OK
+        │
+        └── 0 → Không đủ stock / không match
+8. Atomic Update khác Transaction
+
+Hai khái niệm này không giống nhau.
+
+Atomic Update
+
+Bảo vệ một thao tác update:
+
+updateOne(
+  {
+    stock: { $gte: quantity },
+  },
+  {
+    $inc: { stock: -quantity },
+  }
+)
+
+Nó giải quyết vấn đề:
+
+"Hai người cùng mua một sản phẩm thì có bị bán quá stock không?"
+
+Transaction
+
+Bảo vệ nhiều thao tác cùng nhau:
+
+START TRANSACTION
+
+Create Order
+     ↓
+Create OrderItems
+     ↓
+Decrease Stock
+     ↓
+Delete CartItems
+
+COMMIT
+
+Nếu giữa chừng lỗi:
+
+Create Order       ✅
+Create OrderItems  ✅
+Decrease Stock     ❌
+       ↓
+    ROLLBACK
+       ↓
+mọi thứ quay lại
+9. Trong code của bạn, hai cái kết hợp với nhau
+
+Đây mới là kiến trúc tốt:
+
+                TRANSACTION
+                     │
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+   Create Order  Create Items  Atomic Stock
+                                  │
+                                  ↓
+                           stock >= quantity
+                                  │
+                           ┌──────┴──────┐
+                           ↓             ↓
+                         TRUE          FALSE
+                           ↓             ↓
+                      $inc -qty       throw
+                           │             │
+                           └──────┬──────┘
+                                  ↓
+                              COMMIT
+
+Transaction đảm bảo nhiều thao tác đi cùng nhau.
+
+Atomic Update đảm bảo việc check stock + decrease stock an toàn khi có nhiều request đồng thời.
+
+Một câu để nhớ
+
+Nếu gặp code:
+
+{
+  stock: { $gte: quantity }
+}
+
+{
+  $inc: {
+    stock: -quantity
+  }
+}
+
+hãy nghĩ ngay:
+
+"MongoDB: nếu còn đủ hàng thì trừ hàng ngay trong một operation."
+
+Đó chính là Atomic Update, và đây là pattern cực kỳ quan trọng khi xây dựng giỏ hàng / order / inventory / flash sale.Được. Mình nói lại Atomic Update từ đầu, đúng theo case stock của code bạn.
+
+1. Atomic Update là gì?
+
+Atomic Update có thể hiểu đơn giản là:
+
+Database kiểm tra điều kiện và cập nhật dữ liệu trong cùng một thao tác, không để request khác chen vào giữa.
+
+Ví dụ bạn có:
+
+stock = 10
+
+Khách muốn mua:
+
+quantity = 7
+
+Ta muốn:
+
+kiểm tra stock >= 7
+        ↓
+     đúng?
+        ↓
+stock = stock - 7
+
+Hai việc này cần được xử lý atomic.
+
+2. Cách KHÔNG atomic
+
+Code cũ của bạn:
+
+const variant = await ProductVariant.findById(id)
+
+if (variant.stock >= quantity) {
+  variant.stock -= quantity
+
+  await variant.save()
+}
+
+Thực tế có 2 bước riêng biệt:
+
+Bước 1:
+findById()
+     ↓
+đọc stock
+
+Bước 2:
+save()
+     ↓
+ghi stock
+
+Khoảng giữa hai bước đó, request khác có thể chạy.
+
+3. Race Condition xảy ra
+
+Giả sử:
+
+stock = 10
+
+Có 2 người cùng mua:
+
+A mua 7
+B mua 7
+
+Có thể xảy ra:
+
+             DATABASE
+             stock = 10
+
+A                         B
+│                         │
+├── đọc stock = 10        │
+│                         ├── đọc stock = 10
+│                         │
+├── 10 >= 7 ✅            │
+│                         ├── 10 >= 7 ✅
+│                         │
+├── stock = 3             │
+│                         ├── stock = 3
+│                         │
+└── save()                └── save()
+
+Cả A và B đều nghĩ:
+
+"Tôi mua được hàng."
+
+Đây là race condition.
+
+4. Atomic Update
+
+Thay vì đọc rồi save:
+
+findById()
+↓
+if
+↓
+save()
+
+Ta nói MongoDB:
+
+"Nếu stock còn ít nhất bằng quantity thì giảm stock ngay."
+
+const result = await ProductVariant.updateOne(
+  {
+    _id: variantId,
+    status: "active",
+    stock: { $gte: quantity },
+  },
+  {
+    $inc: {
+      stock: -quantity,
+    },
+  },
+  {
+    session,
+  },
+)
+
+Đây chính là atomic update.
+
+5. Đọc câu query như thế nào?
+
+Phần này:
+
+{
+  _id: variantId,
+  status: "active",
+  stock: { $gte: quantity },
+}
+
+nghĩa là:
+
+Tìm variant này
+    AND
+phải active
+    AND
+stock >= quantity
+
+Ví dụ:
+
+stock = 10
+quantity = 7
+
+thì:
+
+10 >= 7
+
+✅ Match.
+
+Sau đó:
+
+{
+  $inc: {
+    stock: -quantity,
+  },
+}
+
+nghĩa là:
+
+stock = stock - quantity
+
+Ví dụ:
+
+10 - 7 = 3
+6. Tại sao nó chống overselling?
+
+Giả sử vẫn có:
+
+stock = 10
+
+A và B cùng mua 7.
+
+MongoDB xử lý atomic:
+
+A:
+stock >= 7
+    ↓
+YES
+    ↓
+stock = 3
+
+Sau đó B:
+
+B:
+stock >= 7
+    ↓
+NO
+    ↓
+Không update
+
+Kết quả:
+
+A → mua thành công
+B → hết hàng
+
+Không xảy ra:
+
+stock = -4
+7. modifiedCount liên quan gì?
+
+updateOne() trả về kết quả:
+
+const result = await ProductVariant.updateOne(...)
+
+Ví dụ thành công:
+
+result.modifiedCount === 1
+
+Không đủ stock:
+
+result.modifiedCount === 0
+
+Nên bạn viết:
+
+if (result.modifiedCount !== 1) {
+  throw new AppError(
+    400,
+    `${variant.sku} is out of stock`,
+  )
+}
+
+Có thể đọc là:
+
+MongoDB có update đúng 1 variant không?
+
+        │
+        ├── 1 → OK
+        │
+        └── 0 → Không đủ stock / không match
+8. Atomic Update khác Transaction
+
+Hai khái niệm này không giống nhau.
+
+Atomic Update
+
+Bảo vệ một thao tác update:
+
+updateOne(
+  {
+    stock: { $gte: quantity },
+  },
+  {
+    $inc: { stock: -quantity },
+  }
+)
+
+Nó giải quyết vấn đề:
+
+"Hai người cùng mua một sản phẩm thì có bị bán quá stock không?"
+
+Transaction
+
+Bảo vệ nhiều thao tác cùng nhau:
+
+START TRANSACTION
+
+Create Order
+     ↓
+Create OrderItems
+     ↓
+Decrease Stock
+     ↓
+Delete CartItems
+
+COMMIT
+
+Nếu giữa chừng lỗi:
+
+Create Order       ✅
+Create OrderItems  ✅
+Decrease Stock     ❌
+       ↓
+    ROLLBACK
+       ↓
+mọi thứ quay lại
+9. Trong code của bạn, hai cái kết hợp với nhau
+
+Đây mới là kiến trúc tốt:
+
+                TRANSACTION
+                     │
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+   Create Order  Create Items  Atomic Stock
+                                  │
+                                  ↓
+                           stock >= quantity
+                                  │
+                           ┌──────┴──────┐
+                           ↓             ↓
+                         TRUE          FALSE
+                           ↓             ↓
+                      $inc -qty       throw
+                           │             │
+                           └──────┬──────┘
+                                  ↓
+                              COMMIT
+
+Transaction đảm bảo nhiều thao tác đi cùng nhau.
+
+Atomic Update đảm bảo việc check stock + decrease stock an toàn khi có nhiều request đồng thời.
+
+Một câu để nhớ
+
+Nếu gặp code:
+
+{
+  stock: { $gte: quantity }
+}
+
+{
+  $inc: {
+    stock: -quantity
+  }
+}
+
+hãy nghĩ ngay:
+
+"MongoDB: nếu còn đủ hàng thì trừ hàng ngay trong một operation."
+
+Đó chính là Atomic Update, và đây là pattern cực kỳ quan trọng khi xây dựng giỏ hàng / order / inventory / flash sale.

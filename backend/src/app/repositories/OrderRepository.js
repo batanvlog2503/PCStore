@@ -57,6 +57,30 @@ class OrderRepository {
       order_code: orderCode,
     })
   }
+
+  async updateStatus(id, newStatus) {
+    const order = await OrderRepo.findById(id)
+
+    const allowedTransitions = {
+      pending: ["shipping", "cancelled"], // được phép chuyển sang
+      shipping: ["completed"],
+      completed: [],
+      cancelled: [],
+    }
+    const allowedNextStatuses = allowedTransitions[order.status] // trạng thái tiếp theo có thể chuyển
+
+    if (!allowedNextStatuses.includes(newStatus)) {
+      // nếu trạng thái newStatus không nằm trong allowedNextStatuses thì error
+      throw new AppError(
+        400,
+        `Cannot change order status from ${order.status} to ${newStatus}`,
+      )
+    }
+
+    return await OrderRepo.updateById(id, {
+      status: newStatus,
+    })
+  }
 }
 
 module.exports = new OrderRepository()
