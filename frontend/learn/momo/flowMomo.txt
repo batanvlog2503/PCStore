@@ -1,0 +1,42 @@
+Frontend
+   │
+   │ POST /api/payments/momo/create
+   │ { orderId }
+   ▼
+PaymentController
+   │
+   ▼
+PaymentService
+   │
+   ├── tìm Order
+   ├── check user
+   ├── check status
+   ├── check payment
+   ├── tạo Payment pending
+   │
+   ▼
+MomoGateway
+   │
+   ├── tạo rawSignature
+   ├── HMAC SHA256
+   ├── gọi MoMo API
+   │
+   ▼
+MoMo
+   │
+   │ payUrl
+   ▼
+MomoGateway
+   │
+   ▼
+PaymentService
+   │
+   ▼
+PaymentController
+   │
+   ▼
+Frontend
+   │
+   │ redirect(payUrl)
+   ▼
+MoMo

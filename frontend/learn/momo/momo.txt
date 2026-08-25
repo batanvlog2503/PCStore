@@ -1,0 +1,577 @@
+Đúng. Trước khi code MoMo, bạn nên hiểu bản chất và luồng hoạt động trước. Nếu không thì rất dễ thành kiểu copy code mà không hiểu tại sao có redirectUrl, ipnUrl, signature, transactionId...
+
+Mình sẽ giải thích như một hệ thống thật.
+
+1. Bản chất của thanh toán online
+
+Có 3 bên chính:
+
+┌─────────────┐
+│   Khách     │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Website    │
+│  của bạn    │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│    MoMo     │
+└─────────────┘
+
+Trong đó:
+
+Website của bạn
+
+Biết:
+
+Order
+Amount
+User
+Payment status
+MoMo
+
+Chịu trách nhiệm:
+
+Nhận tiền
+Xử lý giao dịch
+Xác định thanh toán thành công/thất bại
+Khách hàng
+
+Thực hiện:
+
+Chọn phương thức thanh toán
+Xác nhận thanh toán
+2. Một điều rất quan trọng
+
+Tiền không đi qua server Node.js của bạn.
+
+Đây là điểm người mới thường hiểu nhầm.
+
+Không phải:
+
+Customer
+   ↓
+Node.js
+   ↓
+Money
+   ↓
+MoMo
+
+Mà là:
+
+Customer
+   │
+   │ thanh toán
+   ▼
+MoMo
+   │
+   │ xử lý tiền
+   ▼
+MoMo
+
+Server của bạn chủ yếu điều phối và xác nhận trạng thái.
+
+3. Ví dụ thực tế
+
+Giả sử khách mua:
+
+Áo
+100.000đ
+
+Bạn tạo Order:
+
+Order #ORD001
+total_amount = 100000
+payment_status = pending
+
+Lúc này:
+
+Bạn chưa nhận được tiền.
+4. Bước 1 — Website tạo yêu cầu thanh toán
+
+Server của bạn nói với MoMo:
+
+"Tôi có một đơn hàng ORD001, số tiền 100.000đ. Hãy tạo cho tôi một phiên thanh toán."
+
+Node.js
+   │
+   │ Create Payment Request
+   ▼
+MoMo
+
+MoMo kiểm tra request.
+
+Nếu hợp lệ, MoMo tạo một payment session/request.
+
+5. MoMo trả về Payment URL
+
+MoMo trả cho server của bạn một URL.
+
+Ví dụ tưởng tượng:
+
+https://momo.vn/pay/abcxyz
+
+Server trả URL này cho frontend.
+
+Node.js
+   │
+   │ payUrl
+   ▼
+Frontend
+   │
+   ▼
+Khách click
+   │
+   ▼
+MoMo
+6. Tại thời điểm này Node.js chưa biết thanh toán thành công
+
+Đây là điểm cực kỳ quan trọng.
+
+Bạn có:
+
+Order:
+payment_status = pending
+
+MoMo có:
+
+Payment:
+đang chờ khách thanh toán
+
+Khách có thể:
+
+Thanh toán
+
+hoặc:
+
+Thoát
+
+hoặc:
+
+Thanh toán thất bại
+7. Khách được đưa sang MoMo
+
+Browser của khách lúc này hoạt động kiểu:
+
+Website
+   │
+   │ redirect
+   ▼
+MoMo
+
+Khách nhìn thấy giao diện thanh toán của MoMo.
+
+Server Node.js của bạn không trực tiếp xử lý màn hình thanh toán này.
+
+8. Khách thanh toán
+
+Ví dụ khách xác nhận:
+
+100.000đ
+
+MoMo xử lý giao dịch.
+
+Nếu thành công:
+
+MoMo
+  │
+  ▼
+Transaction thành công
+
+Nhưng lúc này vẫn còn một câu hỏi:
+
+Làm sao backend của bạn biết MoMo đã nhận tiền?
+
+Đây chính là lý do có Webhook/IPN.
+
+9. Webhook là gì?
+
+Webhook đơn giản là:
+
+MoMo chủ động gọi API backend của bạn để báo kết quả giao dịch.
+
+Ví dụ backend của bạn có:
+
+POST /payments/momo/webhook
+
+MoMo gọi:
+
+MoMo
+   │
+   │ HTTP POST
+   ▼
+POST /payments/momo/webhook
+
+Nó gửi thông tin giao dịch.
+
+10. Tại sao MoMo phải chủ động gọi server?
+
+Hãy tưởng tượng:
+
+Khách thanh toán xong rồi:
+
+Customer
+   ↓
+MoMo
+
+Browser có thể:
+
+đóng tab
+mất mạng
+không quay về website
+bị lỗi
+
+Nếu hệ thống của bạn chỉ dựa vào browser:
+
+Customer
+   ↓
+MoMo
+   ↓
+Redirect
+   ↓
+Website
+
+thì rất không đáng tin.
+
+Vì vậy MoMo có một kênh server-to-server:
+
+MoMo
+   │
+   │ webhook
+   ▼
+Backend
+
+Đây mới là nguồn dữ liệu backend nên dựa vào để cập nhật trạng thái thanh toán, sau khi xác minh.
+
+11. Return URL và Webhook khác nhau
+
+Đây là thứ bạn phải phân biệt thật chắc.
+
+Return URL
+MoMo
+  ↓
+Browser của user
+  ↓
+Website
+
+Mục đích:
+
+Đưa khách quay lại website để xem kết quả.
+
+Webhook
+MoMo
+  ↓
+Backend
+
+Mục đích:
+
+Backend nhận thông báo kết quả giao dịch.
+
+Nhớ bằng hình này:
+                    MoMo
+                   /    \
+                  /      \
+                 ▼        ▼
+            Browser     Backend
+               │           │
+               ▼           ▼
+          Return URL    Webhook
+12. Nhưng tại sao backend không tin webhook ngay?
+
+Giả sử endpoint của bạn:
+
+POST /payments/momo/webhook
+
+Nếu ai đó trên Internet gửi:
+
+{
+  "orderId": "ORD001",
+  "amount": 100000,
+  "resultCode": 0
+}
+
+thì sao?
+
+Nếu backend ngây thơ:
+
+resultCode = 0
+       ↓
+payment = paid
+
+thì hacker có thể tự gửi request.
+
+Vì vậy cần:
+
+Signature
+13. Signature là gì?
+
+Hiểu đơn giản:
+
+Signature là cách MoMo chứng minh request thực sự được tạo bởi MoMo và dữ liệu không bị thay đổi.
+
+MoMo và server của bạn cùng biết một secret key.
+
+Ví dụ:
+
+MoMo
+  │
+  │ Secret Key
+  │
+  ▼
+ tạo signature
+
+Backend của bạn cũng dùng secret key:
+
+Request data
+    +
+Secret Key
+    ↓
+Backend tự tính signature
+
+Sau đó:
+
+Signature MoMo
+       ↕
+Signature Backend
+
+Nếu giống:
+
+✅ Có thể tin request
+
+Nếu khác:
+
+❌ Không tin
+14. Nhưng signature đúng vẫn chưa đủ
+
+Ví dụ webhook nói:
+
+orderId = ORD001
+amount = 100.000
+result = success
+
+Bạn vẫn cần backend kiểm tra:
+
+Order có tồn tại không?
+ORD001
+   ↓
+Database
+   ↓
+Có?
+Amount có đúng không?
+
+Database:
+
+100.000
+
+Webhook:
+
+100.000
+
+→ OK.
+
+Nếu:
+
+Database = 500.000
+Webhook = 100.000
+
+→ ❌ Không hợp lệ.
+
+15. Sau đó còn Idempotency
+
+Đây là phần rất quan trọng.
+
+MoMo có thể gửi lại webhook.
+
+Ví dụ:
+
+MoMo
+ │
+ ├── Webhook #1
+ ├── Webhook #2
+ └── Webhook #3
+
+Cả 3 có thể liên quan đến cùng một transaction.
+
+Backend phải xử lý kiểu:
+
+Transaction ABC
+
+Lần 1:
+Chưa xử lý → xử lý
+
+Lần 2:
+Đã xử lý → bỏ qua
+
+Lần 3:
+Đã xử lý → bỏ qua
+
+Nếu không có idempotency, bạn có thể xử lý cùng một giao dịch nhiều lần.
+
+16. Cuối cùng mới cập nhật database
+
+Sau khi:
+
+Webhook
+   ↓
+Verify signature       ✅
+   ↓
+Tìm Order              ✅
+   ↓
+Verify amount           ✅
+   ↓
+Verify transaction      ✅
+   ↓
+Idempotency             ✅
+
+mới:
+
+Payment
+status = paid
+
+và:
+
+Order
+payment_status = paid
+17. Toàn bộ luồng
+
+Đây là flow bạn nên thuộc:
+
+                    CUSTOMER
+                       │
+                       │
+                       ▼
+                  YOUR WEBSITE
+                       │
+                       │ Create Payment
+                       ▼
+                     MoMo
+                       │
+                       │ trả payUrl
+                       ▼
+                  YOUR WEBSITE
+                       │
+                       │ redirect
+                       ▼
+                    CUSTOMER
+                       │
+                       │ thanh toán
+                       ▼
+                     MoMo
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+             ▼                   ▼
+        Return URL           Webhook
+             │                   │
+             ▼                   ▼
+         Browser             Backend
+                                 │
+                                 ▼
+                         Verify Signature
+                                 │
+                                 ▼
+                          Verify Amount
+                                 │
+                                 ▼
+                       Check Transaction
+                                 │
+                                 ▼
+                           Idempotency
+                                 │
+                                 ▼
+                         Update Payment
+                                 │
+                                 ▼
+                     Order.payment_status
+                            = paid
+18. Và liên hệ với những thứ bạn vừa học
+
+Bạn vừa học:
+
+Transaction
+
+Dùng khi cần đảm bảo nhiều thay đổi DB cùng thành công/thất bại.
+
+Payment update
+      +
+Order update
+
+có thể nằm trong transaction.
+
+Atomic Update
+
+Bạn đã dùng cho stock:
+
+stock >= quantity
+       +
+$inc stock
+
+Payment cũng có những thao tác cần tính đến concurrency.
+
+Order Status Flow
+
+Payment không đồng nghĩa Order completed.
+
+payment_status = paid
+
+không có nghĩa:
+
+status = completed
+19. Có thể hình dung MoMo như "người thu tiền"
+
+Bạn là shop.
+
+Bạn:
+"Tôi có đơn hàng 100k."
+        │
+        ▼
+     MoMo:
+"Đưa khách sang đây, tôi thu tiền."
+        │
+        ▼
+     Khách:
+"Thanh toán."
+        │
+        ▼
+     MoMo:
+"Tôi đã xử lý."
+        │
+        ▼
+     Backend:
+"Chứng minh cho tôi."
+        │
+        ▼
+     MoMo:
+"Signature + transaction information."
+        │
+        ▼
+     Backend:
+"Kiểm tra hợp lệ."
+        │
+        ▼
+     Database:
+payment_status = paid
+
+Đây mới là bản chất của việc tích hợp payment gateway.
+
+Bạn không "tự làm hệ thống thanh toán". Bạn đang kết nối hệ thống Order của mình với hệ thống thanh toán của MoMo, rồi xây cơ chế để backend xác minh và đồng bộ kết quả một cách an toàn.
+
+20. Trước khi code, bạn chỉ cần nắm 7 từ này
+1. Order
+       ↓
+2. Payment Request
+       ↓
+3. Pay URL
+       ↓
+4. Customer Payment
+       ↓
+5. Webhook/IPN
+       ↓
+6. Signature Verification
+       ↓
+7. Update Payment Status
+
+Sau khi bạn thực sự hiểu 7 bước này, lúc viết code MoMo sẽ dễ hơn rất nhiều, vì lúc đó mỗi đoạn code đều có lý do tồn tại chứ không phải copy từ tài liệu.
