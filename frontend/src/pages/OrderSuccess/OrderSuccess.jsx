@@ -5,24 +5,25 @@ import "./OrderSuccess.scss"
 
 const PAYMENT_LABELS = {
   cod: "Thanh toán khi nhận hàng (COD)",
-  bank_transfer: "Chuyển khoản ngân hàng",
+  bank: "Chuyển khoản ngân hàng",
   e_wallet: "Ví điện tử",
 }
 
 const OrderSuccess = () => {
-  const { orderId } = useParams()
+  const { orderId } = useParams() // lấy orderId từ navigate
   const navigate = useNavigate()
 
   const [order, setOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState(null)
   const [isCopied, setIsCopied] = useState(false)
-
+  // format price thêm đ
   const formatPrice = (price) => {
     if (price == null) return ""
     return price.toLocaleString("vi-VN") + "đ"
   }
 
+  // format Time
   const formatDateTime = (date) => {
     if (!date) return ""
     return new Date(date).toLocaleString("vi-VN", {
@@ -38,9 +39,9 @@ const OrderSuccess = () => {
     try {
       setIsLoading(true)
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_APP_URL}/orders/${orderId}`,
+        `${import.meta.env.VITE_APP_URL}/order/${orderId}`,
       )
-      setOrder(response.data.data)
+      setOrder(response.data.order) // setOrder
     } catch (error) {
       setLoadError(
         error.response?.data?.message || "Không tìm thấy đơn hàng này",
@@ -56,7 +57,8 @@ const OrderSuccess = () => {
 
   const handleCopyCode = () => {
     if (!order?.order_code) return
-    navigator.clipboard.writeText(order.order_code)
+    navigator.clipboard.writeText(order.order_code) // copy vào clipboard vào hẹ thống
+
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 1500)
   }
@@ -146,12 +148,12 @@ const OrderSuccess = () => {
           <div className="info-row align-top">
             <span className="label">Địa chỉ giao hàng</span>
             <span className="value address">
-              {order.address?.receiver_name}
+              {order.address_id?.receiver_name}
               <br />
-              {order.address?.detail}, {order.address?.ward},{" "}
-              {order.address?.district}, {order.address?.province}
+              {order.address_id?.detail}, {order.address_id?.ward},{" "}
+              {order.address_id?.district}, {order.address_id?.province}
               <br />
-              SĐT: {order.address?.phone}
+              SĐT: {order.address_id?.phone}
             </span>
           </div>
         </div>
@@ -169,22 +171,34 @@ const OrderSuccess = () => {
               >
                 <img
                   src={
-                    item.image_url
-                      ? `${import.meta.env.VITE_APP_URL}${item.image_url}`
+                    item.product_image
+                      ? `${import.meta.env.VITE_APP_URL}${item?.product_image}`
                       : "/no-image.png"
                   }
-                  alt={item.product_name}
+                  alt={item?.product_id?.name}
                 />
                 <div className="item-text">
-                  <p className="name">{item.product_name}</p>
+                  <p className="name">{item?.product_id?.name}</p>
                   {item.config_name && (
-                    <p className="config">{item.config_name}</p>
+                    <p className="config">{item?.variant_id?.config_name}</p>
                   )}
-                  <span className="qty">SL: {item.quantity}</span>
+                  <span className="qty">SL: {item?.quantity}</span>
                 </div>
                 <div className="item-price">
-                  {formatPrice(
-                    (item.discount_price ?? item.price) * item.quantity,
+                  {item.discount_price != null &&
+                  item.discount_price < item.price ? (
+                    <>
+                      <span className="price-new">
+                        {formatPrice(item.discount_price * item.quantity)}
+                      </span>
+                      <span className="price-old">
+                        {formatPrice(item.price * item.quantity)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="price-new">
+                      {formatPrice(item.price * item.quantity)}
+                    </span>
                   )}
                 </div>
               </div>

@@ -38,6 +38,15 @@ class ProductImageRepository {
   async countImage(productId) {
     return await ProductImage.countDocuments({ product_id: productId })
   }
+
+  async findMainImagesByProductIds(productIds) {
+    return await ProductImage.find({
+      product_id: {
+        $in: productIds,
+      },
+      is_main: true,
+    }).select("product_id image_url")
+  }
 }
 
 module.exports = new ProductImageRepository()

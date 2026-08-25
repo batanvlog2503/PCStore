@@ -99,7 +99,24 @@ const Checkout = () => {
       }
     }
   }, [])
+  const getDefaultAddress = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/address/my-address`,
+      )
+      const addresses = response.data.addresses || []
+      const defaultAddress = addresses.find((a) => a.is_default)
 
+      if (defaultAddress) {
+        handleSelectAddress(defaultAddress) // ← tái dùng lại đúng hàm đã có, không viết code trùng lặp
+      }
+    } catch (error) {
+      console.error(error) // im lặng bỏ qua, không chặn cả trang nếu lỗi
+    }
+  }
+  useEffect(() => {
+    getDefaultAddress()
+  }, [])
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }

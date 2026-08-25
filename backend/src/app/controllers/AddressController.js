@@ -13,7 +13,19 @@ class AddressController {
       next(error)
     }
   }
-
+  async getMyAddress(req, res, next) {
+    try {
+      const userId = req.user._id
+      const addresses = await AddressService.getMyAddress(userId)
+      return res.status(200).json({
+        message: "Get my addresses successfully",
+        success: true,
+        addresses,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
   async addAddress(req, res, next) {
     try {
       const address = await AddressService.addAddress(req.user._id, req.body)

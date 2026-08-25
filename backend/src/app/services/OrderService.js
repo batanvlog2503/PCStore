@@ -2,6 +2,7 @@ const OrderRepo = require("../repositories/OrderRepository")
 const UserRepository = require("../repositories/UserRepository")
 const AppError = require("../utils/AppError")
 const CartRepo = require("../repositories/CartRepository")
+const ProductImageRepo = require("../repositories/ProductImageRepository")
 const OrderItemRepo = require("../repositories/OrderItemRepository")
 const CartItemRepo = require("../repositories/CartItemRepository")
 const ProductVariantRepo = require("../repositories/ProductVariantRepository")
@@ -72,8 +73,12 @@ class OrderService {
     if (!order) {
       throw new AppError(404, "Order not found")
     }
+    const items = await OrderItemRepo.getByOrderId(id)
 
-    return order
+    return {
+      ...order.toObject(),
+      items,
+    }
   }
   // old createOrder
   // async createOrder(data) {
@@ -112,40 +117,56 @@ class OrderService {
     //B4: tinh tong tien, tinh tien giam gia
     const amount = calculateOrderAmount(items)
 
+    // B5: lấy các id của product [list ProductId]
+    const productIds = items.map((item) => item.variant_id.product_id._id)
+
+    const productImages =
+      await ProductImageRepo.findMainImagesByProductIds(productIds)
+
+    // Tạo Map:
+    //
+    // productId -> image_url
+    //
+
+    const imageMap = new Map(
+      productImages.map((image) => [
+        image.product_id.toString(),
+        image.image_url,
+      ]),
+    )
     // B5: tao order voi cac field trong order model
     const order = await OrderRepo.create({
       user_id: userId,
       address_id,
       order_code: generateOrderCode(),
-
       subtotal: amount.subtotal,
       product_discount: amount.product_discount,
       voucher_discount: amount.voucher_discount,
       shipping_fee: amount.shipping_fee,
       total_amount: amount.total_amount,
-
       payment_method,
       payment_status: "pending",
       status: "pending",
-
-      note,
+      note: note || null,
     })
     // B6: tao orderItem [list]
     const orderItems = items.map((item) => {
       const variant = item.variant_id
-
+      const product = variant.product_id
+      const productImage = imageMap.get(product._id.toString())
       return {
         order_id: order._id,
+        product_id: product._id,
         variant_id: variant._id,
-        product_id: variant.product_id, // thêm dòng này
+        // SNAPSHOT
+        // =====================
+        product_name: product.name,
+        product_image: productImage || null,
         sku: variant.sku,
-        config_name: variant.config_name,
-
+        config_name: variant.config_name || null,
         price: variant.price,
         discount_price: variant.discount_price,
-
         quantity: item.quantity,
-
         subtotal: variant.discount_price * item.quantity,
       }
     })
@@ -243,7 +264,7 @@ class OrderService {
       throw new AppError(404, "Order not found")
     }
     if (order.status === "cancelled") {
-      throw new AppError(400, "Cancelled order cannot be paid")
+      throw new AppError(400, "Cancelled order cann ot be paid")
     }
     if (order.payment_status === "paid") {
       throw new AppError(400, "Order already paid")

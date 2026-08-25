@@ -12,7 +12,7 @@ const AddressSchema = new Schema(
     detail: { type: String, required: true, maxlength: 255 },
     is_default: { type: Boolean, default: false },
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 )
 
 AddressSchema.index({ user_id: 1 })

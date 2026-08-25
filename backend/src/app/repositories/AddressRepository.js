@@ -10,6 +10,9 @@ class AddressRepository {
   async addAddress(id, data) {
     return await Address.create({ ...data, user_id: id })
   }
+  async findAddressesByUserId(userId) {
+    return await Address.find({ user_id: userId })
+  }
   async countByUserId(userId) {
     return await Address.countDocuments({
       user_id: userId,

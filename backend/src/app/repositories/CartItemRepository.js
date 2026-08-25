@@ -6,7 +6,10 @@ class CartItemRepository {
     return await CartItem.find({
       _id: { $in: cartItemIds },
       cart_id: cartId,
-    }).populate({ path: "variant_id", populate: { path: "product_id" } })
+    }).populate({
+      path: "variant_id",
+      populate: { path: "product_id", select: "name" },
+    })
   }
   async getAll() {
     const [cartItems, total] = await Promise.all([

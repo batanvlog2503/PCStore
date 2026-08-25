@@ -48,6 +48,15 @@ class AddressService {
     return address
   }
 
+  async getMyAddress(userId) {
+    if (!userId) {
+      throw new AppError(400, "User ID are required")
+    }
+
+    const addresses = await AddressRepo.findAddressesByUserId(userId)
+
+    return addresses
+  }
   async setDefaultAddress(userId, addressId) {
     if (!userId || !addressId) {
       throw new AppError(400, "User ID and Address ID are required")

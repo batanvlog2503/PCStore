@@ -17,8 +17,9 @@ class OrderItemRepository {
 
   async getByOrderId(orderId) {
     return await OrderItem.find({ order_id: orderId })
+
       .populate("product_id", "name")
-      .populate("variant_id", "config_name price")
+      .populate("variant_id")
   }
 
   async create(data) {
