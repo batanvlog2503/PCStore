@@ -1,0 +1,23 @@
+ORDER CƠ BẢN ✅
+      ↓
+1. Hoàn thiện OrderItem + snapshot
+      ↓
+2. Transaction
+      ↓
+3. Chống race condition / overselling
+      ↓
+4. Authorization
+      ↓
+5. Cancel Order + hoàn stock
+      ↓
+6. Order status flow
+      ↓
+7. Voucher
+      ↓
+8. Shipping fee
+      ↓
+9. Payment online
+      ↓
+10. Order history / MyOrder
+      ↓
+11. Notification
