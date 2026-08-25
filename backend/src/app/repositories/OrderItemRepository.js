@@ -44,6 +44,10 @@ class OrderItemRepository {
   async count() {
     return await OrderItem.countDocuments()
   }
+
+  async createMany(items) {
+    return await OrderItem.insertMany(items)
+  }
 }
 
 module.exports = new OrderItemRepository()

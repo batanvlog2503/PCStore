@@ -2,36 +2,21 @@ import React, { useState, useMemo, useCallback, useEffect } from "react"
 import { MdDelete, MdCheckCircle, MdError } from "react-icons/md"
 import "./Cart.scss"
 import axiosInstance from "../../utils/axiosInstance"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 const formatVND = (value) => value.toLocaleString("vi-VN") + "đ"
-
-const TrustItem = ({ icon, title, subtitle }) => (
-  <div className="trust-item">
-    <span
-      className="trust-item__icon"
-      aria-hidden="true"
-    >
-      {icon}
-    </span>
-    <div className="trust-item__text">
-      <p className="trust-item__title">{title}</p>
-      <p className="trust-item__subtitle">{subtitle}</p>
-    </div>
-  </div>
-)
 
 export default function Cart() {
   const [items, setItems] = useState([])
   const [couponInput, setCouponInput] = useState("")
   const [couponMessage, setCouponMessage] = useState(null)
-
+  const navigate = useNavigate()
   const [itemToDelete, setItemToDelete] = useState(null) // item đang chờ xác nhận xoá
   const [deletingId, setDeletingId] = useState(null) // _id đang gọi API xoá (để hiện spinner)
   const [isLoading, setIsLoading] = useState(true)
 
   // Toast đơn giản, tự viết — không cần cài thêm thư viện ngoài
   const [toast, setToast] = useState(null) // { type: "success" | "error", message: string }
-
+  const [selectItemIds, setSelectItemIds] = useState([])
   const showToast = (type, message) => {
     setToast({ type, message })
   }
@@ -89,9 +74,9 @@ export default function Cart() {
       }),
     )
   }, [])
-
+  // cacsc cartItem đã checked nghĩa là đã pick
   const selectedItems = useMemo(() => items.filter((it) => it.checked), [items])
-
+  const selectedCartItemIds = selectedItems.map((item) => item._id)
   const subtotal = useMemo(
     () =>
       selectedItems.reduce(
@@ -163,7 +148,20 @@ export default function Cart() {
       </div>
     )
   }
+  const handleCheckout = async () => {
+    if (selectedItems.length === 0) {
+      alert("Vui lòng chọn ít nhất 1 sản phẩm")
+      return
+    }
+    // lưu các cartItem._id đã checked
+    const cartItemIds = selectedItems.map((item) => item._id)
 
+    navigate("/checkout", {
+      state: {
+        cartItemIds,
+      },
+    })
+  }
   return (
     <div className="cart-page">
       <div className="cart-page__container">
@@ -427,60 +425,14 @@ export default function Cart() {
                   type="button"
                   className="btn btn--checkout"
                   disabled={selectedItems.length === 0}
+                  onClick={handleCheckout}
                 >
                   Tiến hành đặt hàng
                 </button>
-
-                <ul className="order-summary__perks">
-                  <li>
-                    <div>
-                      <p>Miễn phí giao hàng</p>
-                      <small>Cho đơn hàng từ 2.000.000đ</small>
-                    </div>
-                  </li>
-                  <li>
-                    <div>
-                      <p>Đổi trả dễ dàng</p>
-                      <small>Trong 7 ngày nếu lỗi từ nhà sản xuất</small>
-                    </div>
-                  </li>
-                  <li>
-                    <div>
-                      <p>Thanh toán an toàn</p>
-                      <small>Bảo mật thông tin tuyệt đối</small>
-                    </div>
-                  </li>
-                </ul>
               </div>
             </aside>
           </div>
         )}
-
-        <section
-          className="trust-bar"
-          aria-label="Cam kết dịch vụ"
-        >
-          <TrustItem
-            icon="🚚"
-            title="Miễn phí giao hàng"
-            subtitle="Cho đơn hàng từ 2.000.000đ"
-          />
-          <TrustItem
-            icon="↻"
-            title="Đổi trả dễ dàng"
-            subtitle="Trong 7 ngày nếu lỗi từ nhà sản xuất"
-          />
-          <TrustItem
-            icon="🛡️"
-            title="Thanh toán an toàn"
-            subtitle="Bảo mật thông tin tuyệt đối"
-          />
-          <TrustItem
-            icon="🎧"
-            title="Hỗ trợ 24/7"
-            subtitle="Hotline: 0947.584.056"
-          />
-        </section>
       </div>
 
       {/* ================= MODAL XÁC NHẬN XOÁ ================= */}

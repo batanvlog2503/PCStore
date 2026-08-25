@@ -90,6 +90,17 @@ class ProductVariantRepository {
       { $project: { product: 0, mainImage: 0 } },
     ])
   }
+
+  async decreaseStock(variantId, quantity) {
+    return await ProductVariant.findByIdAndUpdate(
+      {
+        _id: variantId,
+        stock: { $gte: quantity }, // tranh stock bi am
+      },
+      { $inc: { stock: -quantity } },
+      { new: true },
+    )
+  }
 }
 
 module.exports = new ProductVariantRepository()

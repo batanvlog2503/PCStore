@@ -1,0 +1,382 @@
+// ==========================================================================
+// AddressSelectModal.scss — PC Store
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f9f9f9;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-red: #e5484d;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popInPanel {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUpSheet {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.address-select-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($color-black, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2500;
+  animation: fadeInBackdrop 0.25s ease-out;
+
+  .address-select-panel {
+    width: 100%;
+    max-width: 620px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background-color: $color-white;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: popInPanel 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid $color-border;
+    flex-shrink: 0;
+
+    h3 {
+      font-weight: 800;
+      font-size: 17px;
+      margin: 0;
+    }
+
+    .close-btn {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 50%;
+      background-color: $color-white-soft;
+      color: $color-gray;
+      font-size: 15px;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: rgba($color-yellow, 0.2);
+        color: $color-black;
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .address-select-body {
+    padding: 18px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .empty-state {
+      text-align: center;
+      color: $color-gray;
+      font-size: 13.5px;
+      padding: 24px 0;
+    }
+
+    .address-option {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1.5px solid $color-border;
+      cursor: pointer;
+      transition:
+        border-color $transition-fast,
+        background-color $transition-fast,
+        transform $transition-fast;
+      animation: fadeInUpOption 0.3s ease-out both;
+
+      @for $i from 1 through 8 {
+        &:nth-child(#{$i}) {
+          animation-delay: $i * 0.04s;
+        }
+      }
+
+      &:hover {
+        border-color: $color-yellow;
+        transform: translateY(-1px);
+      }
+
+      &.selected {
+        border-color: $color-red;
+        background-color: rgba($color-red, 0.04);
+
+        .radio-dot {
+          border-color: $color-red;
+
+          &::after {
+            transform: scale(1);
+          }
+        }
+      }
+
+      &.is-deleting {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .radio-dot {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+        border-radius: 50%;
+        border: 2px solid $color-border;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color $transition-fast;
+
+        &::after {
+          content: "";
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background-color: $color-red;
+          transform: scale(0);
+          transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+      }
+
+      .address-option-body {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        .default-tag {
+          display: inline-block;
+          margin-bottom: 6px;
+          padding: 2px 10px;
+          border-radius: 20px;
+          background-color: rgba($color-red, 0.12);
+          color: $color-red;
+          font-size: 10.5px;
+          font-weight: 800;
+        }
+
+        .receiver {
+          margin: 0 0 4px;
+          font-size: 14px;
+          font-weight: 700;
+          color: $color-black;
+        }
+
+        .detail {
+          margin: 0;
+          font-size: 12.5px;
+          color: $color-gray;
+          line-height: 1.5;
+
+          i {
+            color: $color-yellow-dark;
+            margin-right: 4px;
+          }
+        }
+      }
+
+      .address-option-actions {
+        flex-shrink: 0;
+        display: flex;
+        gap: 8px;
+
+        button {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 1.5px solid $color-border;
+          background-color: $color-white;
+          font-size: 12px;
+          cursor: pointer;
+          transition:
+            background-color $transition-fast,
+            color $transition-fast,
+            border-color $transition-fast;
+
+          &.edit-btn {
+            color: $color-gray;
+
+            &:hover {
+              background-color: $color-black;
+              border-color: $color-black;
+              color: $color-white;
+            }
+          }
+
+          &.delete-btn {
+            color: $color-red;
+            border-color: rgba($color-red, 0.3);
+
+            &:hover:not(:disabled) {
+              background-color: $color-red;
+              border-color: $color-red;
+              color: $color-white;
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+
+    .add-new-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1.5px dashed $color-border;
+      background-color: $color-white-soft;
+      color: $color-gray;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        border-color $transition-fast,
+        color $transition-fast,
+        background-color $transition-fast;
+
+      &:hover {
+        border-color: $color-yellow;
+        color: $color-black;
+        background-color: rgba($color-yellow, 0.08);
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 18px 24px;
+    border-top: 1px solid $color-border;
+    flex-shrink: 0;
+
+    button {
+      flex: 1 1 50%;
+      height: 46px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        box-shadow $transition-fast;
+    }
+
+    .cancel-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-black;
+
+      &:hover {
+        background-color: $color-white-soft;
+      }
+    }
+
+    .confirm-btn {
+      border: none;
+      background-color: $color-red;
+      color: $color-white;
+
+      &:hover:not(:disabled) {
+        background-color: darken($color-red, 8%);
+        box-shadow: 0 8px 18px rgba($color-red, 0.35);
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  @include respond($bp-md) {
+    align-items: flex-end;
+    padding: 0;
+
+    .address-select-panel {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 20px 20px 0 0;
+      animation: slideUpSheet 0.3s ease-out both;
+    }
+
+    .address-option {
+      flex-wrap: wrap;
+
+      .address-option-actions {
+        margin-left: auto;
+      }
+    }
+  }
+}
+
+@keyframes fadeInUpOption {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

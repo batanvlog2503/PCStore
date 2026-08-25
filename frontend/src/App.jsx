@@ -16,6 +16,8 @@ import { Register } from "./pages/Register/Register"
 import Profile from "./pages/Profile/Profile"
 import Product from "./pages/Product/Product"
 import Cart from "./pages/Cart/Cart"
+import Checkout from "./pages/Checkout/Checkout"
+import OrderSuccess from "./pages/OrderSuccess/OrderSuccess"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -39,6 +41,14 @@ const router = createBrowserRouter(
         <Route
           path="cart"
           element={<Cart></Cart>}
+        ></Route>
+        <Route
+          path="checkout"
+          element={<Checkout></Checkout>}
+        ></Route>
+        <Route
+          path="order-success/:orderId"
+          element={<OrderSuccess></OrderSuccess>}
         ></Route>
       </Route>
 

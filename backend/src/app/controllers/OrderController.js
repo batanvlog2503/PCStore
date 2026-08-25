@@ -53,12 +53,12 @@ class OrderController {
 
   async createOrder(req, res, next) {
     try {
-      const order = await OrderService.createOrder(req.body)
-
+      const userId = req.user._id
+      const result = await OrderService.createOrder(userId, req.body)
       return res.status(201).json({
         success: true,
         message: "Create order successfully",
-        order,
+        order: result,
       })
     } catch (err) {
       next(err)

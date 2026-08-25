@@ -1,0 +1,216 @@
+
+useMemo là hook react dùng để ghi nhớ memorize kết quả của một phép tính, để React không phải 
+tính lại ở nó mỗi lần component re-render
+
+1. Trước tiên: Hiểu vấn đề
+1. Trước tiên: hiểu vấn đề
+
+Ví dụ bạn có:
+
+const selectedItems = items.filter((item) => item.checked)
+
+
+const subtotal = selectedItems.reduce(
+  (sum, item) => sum + item.discount_price * item.quantity,
+  0
+)
+
+Mỗi lần Cart render lại, React sẽ chạy:
+
+items.filter(...)
+
+và:
+
+selectedItems.reduce(...)
+
+lại từ đầu.
+
+Ví dụ bạn chỉ bấm nút + tăng số lượng:
+
+quantity: 1 → 2
+
+Component render lại.
+
+React lại chạy:
+
+filter()
+reduce()
+
+2. useMemo giải quyế chuyện này như thế nào
+
+Bạn viết:
+
+const selectedItems = useMemo(
+  () => items.filter((item) => item.checked),
+  [items]
+)
+
+Ý nghĩa:
+
+"React ơi, hãy tính items.filter(...) và ghi nhớ kết quả này. Chỉ tính lại khi items thay đổi."
+
+hiểu đơn giản khi 1 state thay đổi thì react sẽ re-render
+nhưng khi dùng useMemo thì chỉ cần items 
+
+const result = useMemo(() => {// return something}, [dependencies])
+
+
+const subtotal = useMemo(() => selectedItems.reduce((sum, item) => sum + item.discount_price,0), [selectedItems])
+
+3. Ví dụ cực đơn giản
+
+Không dùng useMemo:
+
+const number = 1000000
+
+
+const result = number * number
+
+Mỗi lần component render:
+
+1000000 × 1000000
+1000000 × 1000000
+1000000 × 1000000
+...
+
+Dùng:
+
+const result = useMemo(() => {
+  return number * number
+}, [number])
+
+React ghi nhớ:
+
+number = 1000000
+      ↓
+tính
+      ↓
+1000000000000
+      ↓
+ghi nhớ
+
+Nếu number vẫn là 1000000, React dùng kết quả đã ghi nhớ.
+
+4. Dependency array [ ] cực kỳ quan trọng
+
+Đây là phần bạn cần hiểu kỹ nhất.
+
+Trường hợp 1
+useMemo(() => {
+  return calculateSomething()
+}, [items])
+
+Nghĩa:
+
+Chỉ tính lại khi items thay đổi.
+
+Trường hợp 2
+useMemo(() => {
+  return calculateSomething()
+}, [items, quantity])
+
+Nghĩa:
+
+Tính lại khi items HOẶC quantity thay đổi.
+7. Khi nào NÊN dùng useMemo?
+
+Thường nghĩ đến useMemo khi có phép tính tương đối tốn tài nguyên.
+
+Ví dụ:
+
+const filteredProducts = products
+  .filter(...)
+  .sort(...)
+  .map(...)
+
+  9. useMemo khác useState như nào?
+
+Đây là phần rất quan trọng.
+
+useState
+
+Dùng để lưu trạng thái.
+
+const [quantity, setQuantity] = useState(1)
+
+Bạn thay đổi:
+
+setQuantity(2)
+
+React render lại.
+
+useMemo
+
+Dùng để ghi nhớ kết quả tính toán.
+
+const subtotal = useMemo(() => {
+  return ...
+}, [selectedItems])
+
+Bạn không gọi:
+
+setSubtotal(...)
+
+React tự tính lại khi dependency thay đổi.
+
+10. useMemo khác useEffect
+
+Hai cái này cũng rất hay bị nhầm.
+
+useMemo
+
+Dùng:
+
+DỮ LIỆU
+ ↓
+TÍNH TOÁN
+ ↓
+KẾT QUẢ
+
+Ví dụ:
+
+const subtotal = useMemo(
+  () => calculateSubtotal(items),
+  [items]
+)
+useEffect
+
+Dùng cho side effect.
+
+Ví dụ gọi API:
+
+useEffect(() => {
+  getMyCart()
+}, [])
+
+Flow:
+
+Component render
+       ↓
+useEffect
+       ↓
+gọi API
+       ↓
+setItems
+       ↓
+render lại
+
+Không nên dùng useEffect để thay thế useMemo cho các phép tính đơn thuần.
+
+Ví dụ không cần:
+
+const [subtotal, setSubtotal] = useState(0)
+
+
+useEffect(() => {
+  setSubtotal(
+    items.reduce(...)
+  )
+}, [items])
+
+Trong trường hợp này tốt hơn:
+
+const subtotal = useMemo(
+  () => items.reduce(...),
+  [items]
+)

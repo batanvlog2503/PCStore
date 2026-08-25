@@ -1,0 +1,526 @@
+// ==========================================================================
+// OrderSuccess.scss — PC Store
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-green: #2fb344;
+$color-green-soft: #e8f7ea;
+$color-red: #e5484d;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+
+$font-main: "Segoe UI", "Roboto", Arial, sans-serif;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes checkDraw {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes confettiFly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: var(--fly-to) scale(1) rotate(180deg);
+  }
+}
+
+.order-success-page {
+  font-family: $font-main;
+  color: $color-black;
+  max-width: 940px;
+  margin: 24px auto 60px;
+  padding: 0 24px;
+
+  @include respond($bp-md) {
+    padding: 0 14px;
+  }
+}
+
+// ==========================================================================
+// Loading / Error
+// ==========================================================================
+.order-success-loading,
+.order-success-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 50vh;
+  text-align: center;
+  font-family: $font-main;
+
+  p {
+    color: $color-gray;
+    font-size: 14px;
+    max-width: 400px;
+  }
+}
+
+.order-success-loading .spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 5px solid $color-border;
+  border-top-color: $color-yellow;
+  border-right-color: $color-yellow;
+  animation: successSpin 0.8s linear infinite;
+}
+
+@keyframes successSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.order-success-error {
+  i {
+    font-size: 36px;
+    color: $color-red;
+  }
+
+  .back-home-btn {
+    padding: 10px 24px;
+    border-radius: 8px;
+    background-color: $color-black;
+    color: $color-white;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+}
+
+// ==========================================================================
+// Header: icon check + confetti
+// ==========================================================================
+.success-header {
+  text-align: center;
+  padding: 20px 0 8px;
+  animation: fadeIn 0.4s ease-out;
+
+  .success-icon-wrap {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 20px;
+
+    .success-icon {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background-color: $color-green-soft;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+      i {
+        font-size: 34px;
+        color: $color-green;
+      }
+    }
+
+    // Confetti — 6 chấm nhỏ bay ra các hướng khác nhau quanh icon
+    .confetti {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFly 0.9s ease-out 0.15s both;
+    }
+
+    .c1 {
+      background-color: $color-yellow;
+      --fly-to: translate(-55px, -50px);
+    }
+    .c2 {
+      background-color: #4dabf7;
+      --fly-to: translate(50px, -55px);
+      border-radius: 50%;
+    }
+    .c3 {
+      background-color: $color-red;
+      --fly-to: translate(-60px, 30px);
+      border-radius: 50%;
+    }
+    .c4 {
+      background-color: $color-green;
+      --fly-to: translate(58px, 35px);
+    }
+    .c5 {
+      background-color: $color-yellow-dark;
+      --fly-to: translate(0px, -68px);
+      border-radius: 50%;
+    }
+    .c6 {
+      background-color: #ae7cff;
+      --fly-to: translate(0px, 65px);
+    }
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 800;
+    animation: fadeInUp 0.4s ease-out 0.15s both;
+  }
+
+  p {
+    max-width: 460px;
+    margin: 0 auto 20px;
+    font-size: 13.5px;
+    color: $color-gray;
+    line-height: 1.6;
+    animation: fadeInUp 0.4s ease-out 0.2s both;
+  }
+
+  .order-code-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background-color: $color-green-soft;
+    animation: fadeInUp 0.4s ease-out 0.25s both;
+
+    span {
+      font-size: 13.5px;
+      color: $color-black;
+
+      strong {
+        color: $color-green;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    button {
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 50%;
+      background-color: rgba($color-green, 0.15);
+      color: $color-green;
+      font-size: 12px;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: $color-green;
+        color: $color-white;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Card: thông tin + chi tiết đơn hàng
+// ==========================================================================
+.success-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  background-color: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  margin: 28px 0 20px;
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease-out 0.3s both;
+
+  @include respond($bp-md) {
+    grid-template-columns: 1fr;
+  }
+
+  .info-col,
+  .detail-col {
+    padding: 24px 26px;
+
+    @include respond($bp-sm) {
+      padding: 18px;
+    }
+  }
+
+  .info-col {
+    border-right: 1px solid $color-border;
+
+    @include respond($bp-md) {
+      border-right: none;
+      border-bottom: 1px solid $color-border;
+    }
+  }
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    font-size: 14.5px;
+    font-weight: 800;
+
+    i {
+      color: $color-yellow-dark;
+    }
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+
+    &.align-top {
+      align-items: flex-start;
+    }
+
+    .label {
+      color: $color-gray;
+      flex-shrink: 0;
+    }
+
+    .value {
+      font-weight: 600;
+      text-align: right;
+
+      &.address {
+        line-height: 1.6;
+      }
+    }
+  }
+
+  .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid $color-border;
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      img {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid $color-border;
+        background-color: $color-white-soft;
+        flex-shrink: 0;
+      }
+
+      .item-text {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        .name {
+          margin: 0;
+          font-size: 13px;
+          font-weight: 700;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .config {
+          margin: 2px 0;
+          font-size: 11px;
+          color: $color-gray;
+        }
+
+        .qty {
+          font-size: 11px;
+          color: $color-gray;
+        }
+      }
+
+      .item-price {
+        flex-shrink: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: $color-red;
+      }
+    }
+  }
+
+  .totals {
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 10px;
+
+      &.discount {
+        color: $color-red;
+      }
+
+      &.total {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid $color-border;
+        font-size: 14.5px;
+        font-weight: 800;
+
+        span:last-child {
+          color: $color-red;
+          font-size: 17px;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Banner trạng thái xử lý
+// ==========================================================================
+.processing-banner {
+  display: flex;
+  gap: 14px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  background-color: #fff8e6;
+  border: 1px solid rgba($color-yellow-dark, 0.25);
+  margin-bottom: 24px;
+  animation: fadeInUp 0.4s ease-out 0.35s both;
+
+  i {
+    flex-shrink: 0;
+    font-size: 20px;
+    color: $color-yellow-dark;
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0 0 4px;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+
+  span {
+    font-size: 12.5px;
+    color: $color-gray;
+    line-height: 1.6;
+  }
+}
+
+// ==========================================================================
+// Nút hành động
+// ==========================================================================
+.success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  animation: fadeInUp 0.4s ease-out 0.4s both;
+
+  @include respond($bp-sm) {
+    flex-direction: column;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 26px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color $transition-fast,
+      transform $transition-fast,
+      box-shadow $transition-fast;
+  }
+
+  .continue-shopping-btn {
+    border: 1.5px solid $color-border;
+    background-color: $color-white;
+    color: $color-black;
+
+    &:hover {
+      background-color: $color-white-soft;
+      transform: translateY(-2px);
+    }
+  }
+
+  .view-orders-btn {
+    border: none;
+    background-color: $color-green;
+    color: $color-white;
+
+    &:hover {
+      background-color: darken($color-green, 8%);
+      box-shadow: 0 8px 18px rgba($color-green, 0.35);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

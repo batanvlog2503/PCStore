@@ -1,0 +1,23 @@
+Checkout
+   ↓
+cart_item_ids
+   ↓
+OrderService
+   ↓
+CartRepo.findByUserId(userId)
+   ↓
+CartItemRepo.findByIdsAndCart(ids, cartId)
+   ↓
+Kiểm tra đủ CartItem
+   ↓
+Kiểm tra stock
+   ↓
+Tính tiền
+   ↓
+Tạo Order
+   ↓
+Tạo OrderItem
+   ↓
+Trừ stock
+   ↓
+Xóa CartItem

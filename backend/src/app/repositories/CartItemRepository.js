@@ -2,6 +2,12 @@ const CartItem = require("../models/CartItem")
 const mongoose = require("mongoose")
 const ProductImage = require("../models/ProductImage")
 class CartItemRepository {
+  async findByIdsAndCart(cartItemIds, cartId) {
+    return await CartItem.find({
+      _id: { $in: cartItemIds },
+      cart_id: cartId,
+    }).populate({ path: "variant_id", populate: { path: "product_id" } })
+  }
   async getAll() {
     const [cartItems, total] = await Promise.all([
       CartItem.find()
@@ -161,6 +167,11 @@ class CartItemRepository {
         },
       },
     ])
+  }
+
+  async deleteManyByIds(ids) {
+    return await CartItem.deleteMany({ _id: { $in: ids } })
+    // $in là trong ids là được
   }
 }
 
