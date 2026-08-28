@@ -37,7 +37,7 @@ class MomoGateway {
     //Đây là JSON body gửi sang MoMo.
     const body = {
       partnerCode,
-      partnerName: "Your Store",
+      partnerName: "YourStore",
       storeId: "YourStore",
 
       requestId,
@@ -57,7 +57,7 @@ class MomoGateway {
 
       signature,
     }
-
+    console.log("Body: ", body)
     // gửi request sang momo
     //MOMO_CREATE_PAYMENT_URL=<production endpoint do MoMo cung cấp>
     const response = await axios.post(
@@ -69,6 +69,7 @@ class MomoGateway {
         },
       },
     )
+    console.log("MOMO:", response.data)
 
     return response.data
   }

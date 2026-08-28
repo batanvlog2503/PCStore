@@ -12,8 +12,7 @@ class PaymentService {
     if (!order) {
       throw new AppError(404, "Order not found")
     }
-    console.log("ORDER USER:", order.user_id._id.t)
-    console.log("CURRENT USER:", userId)
+
     // 2. Kiểm tra user sở hữu Order
     if (order.user_id._id.toString() !== userId.toString()) {
       throw new AppError(403, "You do not own this order")
@@ -30,43 +29,62 @@ class PaymentService {
     }
 
     // 5. Kiểm tra Payment đã tồn tại chưa
+    // 5. Kiểm tra Payment đã tồn tại chưa
     const existingPayment = await PaymentRepo.findByOrderId(orderId)
 
-    if (existingPayment && existingPayment.status === "paid") {
+    if (existingPayment?.status === "paid") {
       throw new AppError(400, "Order already paid")
+    }
+
+    if (existingPayment?.status === "pending") {
+      throw new AppError(
+        400,
+        "Đã có giao dịch đang xử lý cho đơn này, vui lòng đợi hoặc thử lại sau",
+      )
     }
 
     // 6. Tạo requestId
     const requestId = `PAY-${order._id}-${Date.now()}`
 
     // 7. Tạo Payment
-    const payment = await PaymentRepo.create({
-      order_id: order._id,
-      method: "momo",
-      status: "pending",
-      request_id: requestId,
-    })
+    const payment = existingPayment
+      ? await PaymentRepo.updateById(existingPayment._id, {
+          status: "pending",
+          request_id: requestId,
+        })
+      : await PaymentRepo.create({
+          order_id: order._id,
+          method: "momo",
+          status: "pending",
+          request_id: requestId,
+        })
 
     // 8. Gửi request sang MoMo
-    const momoResponse = await MomoGateway.createPayment({
-      orderId: order.order_code,
+    let momoResponse
+    try {
+      momoResponse = await MomoGateway.createPayment({
+        orderId: order.order_code,
+        amount: Math.round(order.total_amount),
+        orderInfo: `Thanh toan don hang ${order.order_code}`,
+        requestId,
+      })
 
-      amount: order.total_amount,
+      console.log("===== MOMO RESPONSE =====")
+      console.log(momoResponse)
+    } catch (err) {
+      console.log("===== MOMO ERROR =====")
+      console.log("STATUS:", err.response?.status)
+      console.log("DATA:", err.response?.data)
+      console.log("MESSAGE:", err.message)
 
-      orderInfo: `Thanh toan don hang ${order.order_code}`,
-
-      requestId,
-    })
-
-    // 9. MoMo tạo payment thất bại
-    if (momoResponse.resultCode !== 0) {
       await PaymentRepo.updateById(payment._id, {
         status: "failed",
       })
 
       throw new AppError(
-        400,
-        momoResponse.message || "Cannot create MoMo payment",
+        500,
+        err.response?.data?.message ||
+          "Không kết nối được tới cổng thanh toán MoMo",
       )
     }
 
