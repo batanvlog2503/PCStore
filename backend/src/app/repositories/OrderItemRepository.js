@@ -54,6 +54,12 @@ class OrderItemRepository {
   async findByOrderIds(orderIds) {
     return await OrderItem.find({ order_id: { $in: orderIds } })
   }
+  // khi xóa order thì tất cả các orderItem cũng xóa theo
+  async deleteByOrderId(orderId) {
+    return await OrderItem.deleteMany({
+      order_id: orderId,
+    })
+  }
 }
 
 module.exports = new OrderItemRepository()

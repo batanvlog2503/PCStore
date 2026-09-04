@@ -273,19 +273,44 @@ class OrderService {
   }
   // change status from completed to cancelled
   async cancelOrder(id) {
-    const order = await OrderRepo.findById(id)
+    const session = await mongoose.startSession()
 
-    if (!order) {
-      throw new AppError(404, "Order not found")
+    try {
+      session.startTransaction()
+
+      const order = await OrderRepo.findById(id, session)
+
+      if (!order) {
+        throw new AppError(404, "Order not found")
+      }
+
+      if (order.status !== "pending") {
+        throw new AppError(400, "Chỉ có thể hủy đơn đang chờ xác nhận")
+      }
+
+      const orderItems = await OrderItemRepo.getByOrderId(id)
+
+      for (const item of orderItems) {
+        await ProductVariantRepo.increaseStock(
+          item.variant_id._id,
+          item.quantity,
+          session,
+        )
+      }
+
+      await OrderRepo.update(id, { status: "cancelled" }, session)
+
+      await session.commitTransaction()
+
+      return {
+        message: "Hủy đơn hàng thành công",
+      }
+    } catch (error) {
+      await session.abortTransaction()
+      throw error
+    } finally {
+      await session.endSession()
     }
-
-    if (order.status === "completed") {
-      throw new AppError(400, "Completed order cannot be cancelled")
-    }
-
-    return await OrderRepo.updateById(id, {
-      status: "cancelled",
-    })
   }
   async updatePaymentStatus(id) {
     const order = await OrderRepo.findById(id)

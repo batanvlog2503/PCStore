@@ -90,7 +90,16 @@ class ProductVariantRepository {
       { $project: { product: 0, mainImage: 0 } },
     ])
   }
-
+  async increaseStock(variantId, quantity, session) {
+    return await ProductVariant.findByIdAndUpdate(
+      {
+        _id: variantId,
+        status: "active",
+      },
+      { $inc: { stock: quantity } },
+      { new: true, session },
+    )
+  }
   async decreaseStock(variantId, quantity, session) {
     const result = await ProductVariant.updateOne(
       {

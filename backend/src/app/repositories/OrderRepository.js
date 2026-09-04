@@ -58,10 +58,11 @@ class OrderRepository {
       totalPages: Math.ceil(total / limit),
     }
   }
-  async findById(id) {
+  async findById(id, session = null) {
     return await Order.findById(id)
       .populate("user_id", "email full_name")
       .populate("address_id")
+      .session(session)
     //   .populate("voucher_id", "code discount_value")
   }
 
@@ -75,7 +76,12 @@ class OrderRepository {
       new: true,
     })
   }
-
+  async update(id, data, session = null) {
+    return await Order.findByIdAndUpdate(id, data, {
+      new: true,
+      session,  
+    })
+  }
   async deleteById(id) {
     return await Order.findByIdAndDelete(id)
   }

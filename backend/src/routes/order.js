@@ -19,7 +19,7 @@ router.get("/my-orders", auth, OrderController.getMyOrders)
 router.get("/all", auth, OrderController.getAllOrders)
 router.get("/code/:code", auth, OrderController.getOrderByOrderCode)
 router.get("/:id", auth, OrderController.getOrderById)
-
+router.patch("/:id/cancel", auth, OrderController.cancelOrder)
 router.post("/add", auth, addOrderValidator, OrderController.createOrder)
 
 router.put(

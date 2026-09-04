@@ -23,6 +23,16 @@ class OrderController {
       next(err)
     }
   }
+
+  async cancelOrder(req, res, next) {
+    try {
+      const { id } = req.params
+      const result = await OrderService.cancelOrder(id)
+      return res.status(200).json({ success: true, message: result.message })
+    } catch (error) {
+      next(error)
+    }
+  }
   async getMyOrders(req, res, next) {
     try {
       const result = await OrderService.getMyOrders(req, req.user._id)
