@@ -1,5 +1,5 @@
 import React from "react"
-
+import { Outlet } from "react-router-dom"
 import Sidebar from "./Sidebar/Sidebar.jsx"
 import MyInfor from "./MyInfor/MyInfor.jsx"
 import MyOrder from "./MyOrder/MyOrder.jsx"
@@ -17,39 +17,14 @@ export const OPTIONS = {
   LOG: "log",
 }
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState(OPTIONS.INFO) // default
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case OPTIONS.INFO:
-        return <MyInfor />
-      case OPTIONS.ORDER:
-        return <MyOrder />
-      case OPTIONS.WISHLIST:
-        return <MyWishList />
-      case OPTIONS.ADDRESS:
-        return <MyAddress></MyAddress>
-      case OPTIONS.LOG:
-        return <MyLog />
-      default:
-        return null
-    }
-  }
   return (
     <div className="container-fluid profile p-0">
       <div className="sidebar left">
-        <Sidebar
-          activeTab={activeTab}
-          onSelect={setActiveTab}
-        ></Sidebar>
-        {/* activeTab là lưu cái option.info = "info" */}
+        <Sidebar />
       </div>
       <div className="information right">
-        <div
-          className="content-inner"
-          key={activeTab}
-        >
-          {renderContent()}
+        <div className="content-inner">
+          <Outlet />
         </div>
       </div>
     </div>

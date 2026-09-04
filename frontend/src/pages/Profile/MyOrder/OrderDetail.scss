@@ -1,0 +1,815 @@
+// ==========================================================================
+// OrderDetail.scss — PC Store / Profile
+// (đồng bộ design token với MyOrder.scss)
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-red: #e5484d;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+$color-blue: #4dabf7;
+$color-green: #2fb344;
+
+$font-main: "Segoe UI", "Roboto", Arial, sans-serif;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes odSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes odPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba($color-yellow-dark, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba($color-yellow-dark, 0);
+  }
+}
+
+@keyframes odLineGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.order-detail-page {
+  font-family: $font-main;
+  color: $color-black;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+  animation: fadeIn 0.35s ease-out;
+
+  @include respond($bp-sm) {
+    padding: 16px 12px 48px;
+  }
+}
+
+// ==========================================================================
+// Loading / Error
+// ==========================================================================
+.order-detail-loading,
+.order-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 50vh;
+  text-align: center;
+  font-family: $font-main;
+  animation: fadeIn 0.3s ease-out;
+
+  p {
+    font-size: 13.5px;
+    color: $color-gray;
+  }
+
+  .spinner {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 5px solid $color-border;
+    border-top-color: $color-yellow;
+    border-right-color: $color-yellow;
+    animation: odSpin 0.8s linear infinite;
+  }
+
+  i {
+    font-size: 38px;
+    color: $color-red;
+  }
+}
+
+.back-home-btn {
+  margin-top: 4px;
+  height: 40px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 8px;
+  background-color: $color-yellow;
+  color: $color-black;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+  transition:
+    background-color $transition-fast,
+    transform $transition-fast;
+
+  &:hover {
+    background-color: $color-yellow-dark;
+    transform: translateY(-1px);
+  }
+}
+
+// ==========================================================================
+// Header
+// ==========================================================================
+.detail-header {
+  background-color: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  animation: fadeInUp 0.35s ease-out;
+
+  @include respond($bp-sm) {
+    padding: 16px;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    color: $color-gray;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 18px;
+    transition: color $transition-fast;
+
+    &:hover {
+      color: $color-yellow-dark;
+    }
+  }
+
+  .header-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+
+    @include respond($bp-sm) {
+      flex-direction: column;
+    }
+
+    .header-title {
+      h2 {
+        margin: 0 0 10px;
+        font-size: 20px;
+        font-weight: 800;
+      }
+    }
+  }
+
+  .order-code-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: $color-white-soft;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: $color-gray;
+
+    strong {
+      color: $color-yellow-dark;
+    }
+
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: $color-black;
+      font-size: 13px;
+      padding: 0;
+      transition:
+        color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        color: $color-yellow-dark;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .status-badge {
+    display: inline-block;
+    width: fit-content;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.status-pending {
+      background-color: rgba($color-yellow, 0.18);
+      color: $color-yellow-dark;
+    }
+    &.status-shipping {
+      background-color: rgba($color-blue, 0.15);
+      color: darken($color-blue, 12%);
+    }
+    &.status-completed {
+      background-color: rgba($color-green, 0.15);
+      color: $color-green;
+    }
+    &.status-cancelled {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+}
+
+// ==========================================================================
+// Timeline trạng thái
+// ==========================================================================
+.status-timeline {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 6px;
+
+  &.cancelled {
+    justify-content: flex-start;
+
+    .timeline-step {
+      flex: none;
+      animation: fadeInUp 0.3s ease-out both;
+
+      .step-icon {
+        background-color: rgba($color-red, 0.12);
+        border-color: $color-red;
+        color: $color-red;
+        animation: none;
+      }
+
+      .step-label {
+        color: $color-red;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .timeline-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    animation: fadeInUp 0.4s ease-out both;
+
+    @for $i from 1 through 3 {
+      &:nth-child(#{$i}) {
+        animation-delay: $i * 0.08s;
+      }
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid $color-border;
+      background-color: $color-white;
+      color: $color-gray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      z-index: 1;
+      transition:
+        background-color $transition-fast,
+        border-color $transition-fast,
+        color $transition-fast;
+    }
+
+    .step-label {
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: $color-gray;
+      font-weight: 600;
+      transition: color $transition-fast;
+    }
+
+    .step-line {
+      position: absolute;
+      top: 17px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background-color: $color-border;
+      transform-origin: left;
+      z-index: 0;
+    }
+
+    &.done {
+      .step-icon {
+        background-color: $color-yellow;
+        border-color: $color-yellow;
+        color: $color-black;
+      }
+      .step-label {
+        color: $color-black;
+      }
+      .step-line {
+        background-color: $color-yellow;
+        animation: odLineGrow 0.5s ease-out both;
+      }
+    }
+
+    &.current .step-icon {
+      animation: odPulse 1.6s ease-in-out infinite;
+    }
+  }
+}
+
+// ==========================================================================
+// Card chính: thông tin + sản phẩm
+// ==========================================================================
+.detail-card {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  background-color: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: 0.05s;
+
+  @include respond($bp-lg) {
+    grid-template-columns: 1fr;
+  }
+
+  .info-col,
+  .items-col {
+    padding: 24px;
+
+    @include respond($bp-sm) {
+      padding: 16px;
+    }
+  }
+
+  .info-col {
+    border-right: 1px solid $color-border;
+    display: flex;
+    flex-direction: column;
+    background-color: $color-white-soft;
+
+    @include respond($bp-lg) {
+      border-right: none;
+      border-bottom: 1px solid $color-border;
+    }
+  }
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px;
+    font-size: 14.5px;
+    font-weight: 800;
+
+    i {
+      color: $color-yellow-dark;
+    }
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed $color-border;
+    font-size: 13px;
+
+    &.align-top {
+      align-items: flex-start;
+    }
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+
+    .label {
+      color: $color-gray;
+      flex-shrink: 0;
+    }
+
+    .value {
+      color: $color-black;
+      font-weight: 600;
+      text-align: right;
+
+      &.address {
+        line-height: 1.6;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .cancel-order-btn {
+    margin-top: 20px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 8px;
+    border: 1.5px solid rgba($color-red, 0.4);
+    background-color: $color-white;
+    color: $color-red;
+    font-weight: 700;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition:
+      background-color $transition-fast,
+      color $transition-fast;
+
+    &:hover {
+      background-color: $color-red;
+      color: $color-white;
+    }
+  }
+}
+
+// ==========================================================================
+// Danh sách sản phẩm
+// ==========================================================================
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: $color-border;
+    border-radius: 10px;
+  }
+
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeInUp 0.3s ease-out both;
+
+    img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid $color-border;
+      background-color: $color-white-soft;
+      flex-shrink: 0;
+    }
+
+    .item-text {
+      flex: 1 1 auto;
+      min-width: 0;
+
+      .name {
+        margin: 0 0 3px;
+        font-size: 13.5px;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .config {
+        margin: 0 0 3px;
+        font-size: 12px;
+        color: $color-gray;
+      }
+
+      .qty {
+        font-size: 12px;
+        color: $color-gray;
+      }
+    }
+
+    .item-price {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+
+      .price-new {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: $color-red;
+      }
+
+      .price-old {
+        font-size: 11px;
+        color: $color-gray;
+        text-decoration: line-through;
+      }
+    }
+  }
+}
+
+.totals {
+  border-top: 1px solid $color-border;
+  padding-top: 14px;
+
+  .totals-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: $color-gray;
+    padding: 5px 0;
+
+    &.discount {
+      color: $color-red;
+    }
+
+    &.total {
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed $color-border;
+      font-size: 16.5px;
+      font-weight: 800;
+      color: $color-black;
+
+      span:last-child {
+        color: $color-yellow-dark;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Hành động
+// ==========================================================================
+.detail-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: 0.1s;
+
+  @include respond($bp-sm) {
+    flex-direction: column;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 26px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    transition:
+      background-color $transition-fast,
+      transform $transition-fast;
+
+    @include respond($bp-sm) {
+      width: 100%;
+    }
+  }
+
+  .continue-shopping-btn {
+    background-color: $color-black;
+    color: $color-white;
+
+    &:hover {
+      background-color: lighten($color-black, 12%);
+      transform: translateY(-2px);
+    }
+  }
+
+  .reorder-btn {
+    border: 1.5px solid $color-yellow-dark;
+    background-color: $color-yellow;
+    color: $color-black;
+
+    &:hover {
+      background-color: $color-yellow-dark;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// ==========================================================================
+// Modal xác nhận huỷ đơn (đồng bộ với MyOrder.scss)
+// ==========================================================================
+@keyframes cancelModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cancelModalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($color-black, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2500;
+  animation: cancelModalFadeIn 0.2s ease-out;
+
+  .cancel-modal-panel {
+    width: 100%;
+    max-width: 400px;
+    background-color: $color-white;
+    border-radius: 16px;
+    padding: 32px 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: cancelModalPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    .cancel-modal-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+      font-size: 24px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: $color-gray;
+
+      strong {
+        color: $color-black;
+      }
+    }
+
+    .cancel-modal-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        flex: 1 1 50%;
+        height: 44px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        transition:
+          background-color $transition-fast,
+          transform $transition-fast;
+      }
+
+      .keep-btn {
+        border: 1.5px solid $color-border;
+        background-color: $color-white;
+        color: $color-black;
+
+        &:hover {
+          background-color: $color-white-soft;
+        }
+      }
+
+      .confirm-cancel-btn {
+        background-color: $color-red;
+        color: $color-white;
+
+        &:hover:not(:disabled) {
+          background-color: darken($color-red, 8%);
+          transform: translateY(-2px);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Responsive bổ sung
+// ==========================================================================
+@include respond($bp-sm) {
+  .status-timeline .timeline-step .step-label {
+    font-size: 11px;
+  }
+
+  .order-items .order-item {
+    img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .item-text .name {
+      font-size: 13px;
+    }
+
+    .item-price .price-new {
+      font-size: 13px;
+    }
+  }
+
+  .cancel-modal-backdrop .cancel-modal-panel {
+    padding: 24px 20px 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .order-code-badge {
+    font-size: 11.5px;
+  }
+
+  .status-badge {
+    font-size: 11px;
+  }
+
+  .status-timeline .timeline-step .step-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .status-timeline .timeline-step .step-line {
+    top: 14px;
+  }
+}

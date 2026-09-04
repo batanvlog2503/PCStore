@@ -271,7 +271,7 @@ const MyOrder = () => {
 
                 <div className="order-actions">
                   <Link
-                    to={`/order-success/${order._id}`}
+                    to={`/order/${order._id}`}
                     className="view-btn"
                   >
                     Xem chi tiết đơn hàng

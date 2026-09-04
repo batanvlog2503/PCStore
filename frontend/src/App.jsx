@@ -18,6 +18,12 @@ import Product from "./pages/Product/Product"
 import Cart from "./pages/Cart/Cart"
 import Checkout from "./pages/Checkout/Checkout"
 import OrderSuccess from "./pages/OrderSuccess/OrderSuccess"
+import OrderDetail from "./pages/Profile/MyOrder/OrderDetail"
+import MyInfor from "./pages/Profile/MyInfor/MyInfor"
+import MyOrder from "./pages/Profile/MyOrder/MyOrder"
+import MyWishList from "./pages/Profile/MyWishlist/MyWishlist"
+import MyAddress from "./pages/Profile/MyAddress/MyAddress"
+import MyLog from "./pages/Profile/MyLog/MyLog"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -37,7 +43,28 @@ const router = createBrowserRouter(
         <Route
           path="account"
           element={<Profile></Profile>}
-        ></Route>
+        >
+          <Route
+            index
+            element={<MyInfor />}
+          />
+          <Route
+            path="order"
+            element={<MyOrder />}
+          />
+          <Route
+            path="wishlist"
+            element={<MyWishList />}
+          />
+          <Route
+            path="address"
+            element={<MyAddress />}
+          />
+          <Route
+            path="log"
+            element={<MyLog />}
+          />
+        </Route>
         <Route
           path="cart"
           element={<Cart></Cart>}
@@ -50,6 +77,10 @@ const router = createBrowserRouter(
           path="order-success/:orderId"
           element={<OrderSuccess></OrderSuccess>}
         ></Route>
+        <Route
+          path="order/:orderId"
+          element={<OrderDetail />}
+        />
       </Route>
 
       {/* Login đứng riêng, KHÔNG bọc MainLayout */}

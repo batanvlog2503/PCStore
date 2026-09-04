@@ -1,6 +1,7 @@
 // ==========================================================================
 // Sidebar.scss — PC Store / Profile
 // Theme: Black / White / Yellow
+// (đã cập nhật để dùng NavLink — active nằm trên thẻ <a>, không phải <li>)
 // ==========================================================================
 
 $color-black: #0d0d0d;
@@ -63,29 +64,12 @@ $bp-md: 768px;
       margin: 10px 20px;
     }
 
+    // <li> giờ chỉ là khung chứa — không còn padding/màu/cursor ở đây nữa,
+    // toàn bộ phần "trông giống 1 mục menu" chuyển sang thẻ <a> (NavLink) bên trong
     li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      color: $color-text;
-      cursor: pointer;
       position: relative;
-      transition:
-        color $transition-fast,
-        background-color $transition-fast,
-        padding-left $transition-fast;
 
-      i {
-        width: 16px;
-        text-align: center;
-        color: #8a8a8a;
-        transition: color $transition-fast;
-      }
-
-      // vạch vàng chỉ báo bên trái — trượt vào khi active
+      // vạch vàng chỉ báo bên trái — trượt vào khi link bên trong active
       &::before {
         content: "";
         position: absolute;
@@ -96,45 +80,79 @@ $bp-md: 768px;
         background-color: $color-yellow;
         transform: scaleY(0);
         transition: transform $transition-medium;
+        z-index: 1;
       }
 
-      &:hover {
-        background-color: rgba($color-yellow, 0.08);
-        padding-left: 26px;
+      &:has(a.active)::before {
+        transform: scaleY(1);
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        color: $color-text;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          color $transition-fast,
+          background-color $transition-fast,
+          padding-left $transition-fast;
 
         i {
-          color: $color-yellow-dark;
+          width: 16px;
+          text-align: center;
+          color: #8a8a8a;
+          transition: color $transition-fast;
+        }
+
+        &:hover {
+          background-color: rgba($color-yellow, 0.08);
+          padding-left: 26px;
+
+          i {
+            color: $color-yellow-dark;
+          }
+        }
+
+        &.active {
+          color: $color-black;
+          background-color: rgba($color-yellow, 0.12);
+
+          i {
+            color: $color-yellow-dark;
+          }
         }
       }
 
-      &.active {
-        color: $color-black;
-        background-color: rgba($color-yellow, 0.12);
-
-        i {
-          color: $color-yellow-dark;
-        }
-
-        &::before {
-          transform: scaleY(1);
-        }
-      }
-
+      // Đăng xuất vẫn là <li onClick>, không phải NavLink, nên giữ style trực tiếp trên li
       &.logout {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 22px;
+        font-size: 14px;
+        font-weight: 600;
         color: $color-error;
+        cursor: pointer;
         margin-top: 4px;
+        transition:
+          color $transition-fast,
+          background-color $transition-fast,
+          padding-left $transition-fast;
 
         i {
+          width: 16px;
+          text-align: center;
           color: $color-error;
         }
 
         &:hover {
           background-color: rgba($color-error, 0.08);
           padding-left: 26px;
-
-          i {
-            color: $color-error;
-          }
         }
 
         &::before {
@@ -150,6 +168,7 @@ $bp-md: 768px;
 
     .list-feature {
       flex-direction: row;
+      align-items: center;
       overflow-x: auto;
       @include hide-scrollbar;
       padding: 0 10px;
@@ -160,28 +179,34 @@ $bp-md: 768px;
 
       li {
         flex: 0 0 auto;
-        white-space: nowrap;
-        padding: 10px 16px;
-        border-radius: 20px;
-
-        span {
-          display: inline;
-        }
 
         &::before {
           display: none;
         }
 
-        &.active {
-          background-color: $color-yellow;
-          color: $color-black;
+        a {
+          white-space: nowrap;
+          padding: 10px 16px;
+          border-radius: 20px;
 
-          i {
+          span {
+            display: inline;
+          }
+
+          &.active {
+            background-color: $color-yellow;
             color: $color-black;
+
+            i {
+              color: $color-black;
+            }
           }
         }
 
         &.logout {
+          white-space: nowrap;
+          padding: 10px 16px;
+          border-radius: 20px;
           margin-top: 0;
           margin-left: auto;
         }
@@ -190,12 +215,15 @@ $bp-md: 768px;
   }
 
   @include respond($bp-sm) {
-    .list-feature li {
-      font-size: 12.5px;
-      padding: 9px 12px;
+    .list-feature {
+      li a,
+      li.logout {
+        font-size: 12.5px;
+        padding: 9px 12px;
 
-      span {
-        display: none; // màn hình quá nhỏ: chỉ hiện icon cho gọn
+        span {
+          display: none; // màn hình quá nhỏ: chỉ hiện icon cho gọn
+        }
       }
     }
   }
