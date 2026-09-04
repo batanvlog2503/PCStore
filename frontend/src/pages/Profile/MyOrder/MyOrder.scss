@@ -1,0 +1,684 @@
+// ==========================================================================
+// MyOrder.scss — PC Store / Profile
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-red: #e5484d;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+$color-blue: #4dabf7;
+$color-green: #2fb344;
+
+$font-main: "Segoe UI", "Roboto", Arial, sans-serif;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.my-order {
+  font-family: $font-main;
+  color: $color-black;
+  animation: fadeIn 0.35s ease-out;
+}
+
+// ==========================================================================
+// Loading
+// ==========================================================================
+.my-order-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 40vh;
+
+  p {
+    font-size: 13.5px;
+    color: $color-gray;
+  }
+
+  .spinner {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 5px solid $color-border;
+    border-top-color: $color-yellow;
+    border-right-color: $color-yellow;
+    animation: myOrderSpin 0.8s linear infinite;
+  }
+}
+
+@keyframes myOrderSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==========================================================================
+// Header: tiêu đề + tìm kiếm
+// ==========================================================================
+.my-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  animation: fadeInUp 0.35s ease-out;
+
+  @include respond($bp-sm) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 0 0 260px;
+
+    @include respond($bp-sm) {
+      flex: 1 1 auto;
+    }
+
+    input {
+      width: 100%;
+      height: 40px;
+      padding: 0 38px 0 14px;
+      border-radius: 8px;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      font-size: 13px;
+      box-sizing: border-box;
+      transition:
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-yellow;
+        box-shadow: 0 0 0 3px rgba($color-yellow, 0.25);
+      }
+    }
+
+    i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-gray;
+      font-size: 13px;
+      pointer-events: none;
+    }
+  }
+}
+
+// ==========================================================================
+// Tabs trạng thái
+// ==========================================================================
+.order-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid $color-border;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  button {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    border: none;
+    background: none;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: $color-gray;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    transition: color $transition-fast;
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background-color: $color-yellow-dark;
+      transition: width 0.25s ease;
+    }
+
+    &:hover {
+      color: $color-black;
+    }
+
+    &.active {
+      color: $color-yellow-dark;
+
+      &::after {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Empty state
+// ==========================================================================
+.order-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: $color-gray;
+  animation: fadeIn 0.3s ease-out;
+
+  i {
+    font-size: 36px;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// ==========================================================================
+// Danh sách đơn hàng
+// ==========================================================================
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.order-card {
+  position: relative;
+  background-color: $color-white;
+  border: 1px solid $color-border;
+  border-radius: 14px;
+  overflow: hidden;
+  transition:
+    box-shadow $transition-fast,
+    transform $transition-fast;
+  animation: fadeInUp 0.35s ease-out both;
+
+  @for $i from 1 through 6 {
+    &:nth-child(#{$i}) {
+      animation-delay: $i * 0.05s;
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  }
+
+  &.is-cancelling {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .order-card-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba($color-white, 0.4);
+    z-index: 2;
+  }
+
+  .order-card-header {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr 0.8fr 1.2fr;
+    gap: 16px;
+    padding: 18px 22px;
+    background-color: $color-white-soft;
+    border-bottom: 1px solid $color-border;
+
+    @include respond($bp-lg) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @include respond($bp-sm) {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 16px 16px;
+    }
+
+    .order-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .order-code {
+        font-size: 13px;
+
+        strong {
+          color: $color-yellow-dark;
+        }
+      }
+
+      .order-date {
+        font-size: 12px;
+        color: $color-gray;
+      }
+
+      .order-products-summary {
+        font-size: 12px;
+        color: $color-black;
+        // cắt bớt nếu quá dài, tránh đẩy vỡ layout của cả header row
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+    }
+
+    .order-total,
+    .order-status,
+    .order-payment {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .label {
+        font-size: 11.5px;
+        color: $color-gray;
+      }
+
+      .value {
+        font-size: 13px;
+        font-weight: 600;
+      }
+    }
+
+    .order-total .value {
+      color: $color-yellow-dark;
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+
+      &.status-pending {
+        background-color: rgba($color-yellow, 0.18);
+        color: $color-yellow-dark;
+      }
+      &.status-shipping {
+        background-color: rgba($color-blue, 0.15);
+        color: darken($color-blue, 12%);
+      }
+      &.status-completed {
+        background-color: rgba($color-green, 0.15);
+        color: $color-green;
+      }
+      &.status-cancelled {
+        background-color: rgba($color-red, 0.12);
+        color: $color-red;
+      }
+    }
+  }
+
+  .order-items {
+    padding: 16px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    @include respond($bp-sm) {
+      padding: 14px 16px;
+    }
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      img {
+        width: 56px;
+        height: 56px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid $color-border;
+        background-color: $color-white-soft;
+        flex-shrink: 0;
+      }
+
+      .item-text {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        .name {
+          margin: 0 0 3px;
+          font-size: 13.5px;
+          font-weight: 700;
+        }
+
+        .config {
+          margin: 0 0 3px;
+          font-size: 12px;
+          color: $color-gray;
+        }
+
+        .qty {
+          font-size: 12px;
+          color: $color-gray;
+        }
+      }
+
+      .item-price {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+
+        .price-new {
+          font-size: 13.5px;
+          font-weight: 700;
+          color: $color-red;
+        }
+
+        .price-old {
+          font-size: 11px;
+          color: $color-gray;
+          text-decoration: line-through;
+        }
+      }
+    }
+  }
+
+  .order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px;
+    border-top: 1px solid $color-border;
+
+    @include respond($bp-sm) {
+      flex-direction: column;
+      padding: 14px 16px;
+    }
+
+    a,
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        transform $transition-fast;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .view-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-black;
+
+      &:hover {
+        background-color: $color-white-soft;
+      }
+    }
+
+    .cancel-btn {
+      border: 1.5px solid rgba($color-red, 0.4);
+      background-color: $color-white;
+      color: $color-red;
+
+      &:hover:not(:disabled) {
+        background-color: $color-red;
+        color: $color-white;
+      }
+    }
+
+    .track-btn {
+      border: 1.5px solid rgba($color-blue, 0.4);
+      background-color: $color-white;
+      color: darken($color-blue, 10%);
+
+      &:hover {
+        background-color: $color-blue;
+        color: $color-white;
+      }
+    }
+
+    .reorder-btn {
+      border: 1.5px solid $color-yellow-dark;
+      background-color: $color-yellow;
+      color: $color-black;
+
+      &:hover {
+        background-color: $color-yellow-dark;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Phân trang
+// ==========================================================================
+.order-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+
+  @include respond($bp-sm) {
+    flex-direction: column;
+  }
+
+  .page-info {
+    font-size: 12.5px;
+    color: $color-gray;
+  }
+
+  .page-controls {
+    display: flex;
+    gap: 6px;
+
+    button {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: $color-white-soft;
+      }
+
+      &.active {
+        background-color: $color-yellow;
+        border-color: $color-yellow;
+        color: $color-black;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// Modal xác nhận huỷ đơn
+// ==========================================================================
+@keyframes cancelModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cancelModalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($color-black, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2500;
+  animation: cancelModalFadeIn 0.2s ease-out;
+
+  .cancel-modal-panel {
+    width: 100%;
+    max-width: 400px;
+    background-color: $color-white;
+    border-radius: 16px;
+    padding: 32px 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    animation: cancelModalPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+    .cancel-modal-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+      font-size: 24px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0 0 24px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: $color-gray;
+
+      strong {
+        color: $color-black;
+      }
+    }
+
+    .cancel-modal-actions {
+      display: flex;
+      gap: 12px;
+
+      button {
+        flex: 1 1 50%;
+        height: 44px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background-color $transition-fast,
+          transform $transition-fast;
+      }
+
+      .keep-btn {
+        border: 1.5px solid $color-border;
+        background-color: $color-white;
+        color: $color-black;
+
+        &:hover {
+          background-color: $color-white-soft;
+        }
+      }
+
+      .confirm-cancel-btn {
+        border: none;
+        background-color: $color-red;
+        color: $color-white;
+
+        &:hover {
+          background-color: darken($color-red, 8%);
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}

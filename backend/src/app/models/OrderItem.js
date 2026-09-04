@@ -26,7 +26,6 @@ const OrderItemSchema = new Schema(
     // =========================
     // SNAPSHOT TẠI THỜI ĐIỂM MUA
     // =========================
-
     product_name: {
       type: String,
       required: true,

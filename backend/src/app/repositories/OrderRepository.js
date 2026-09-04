@@ -1,5 +1,7 @@
 const Order = require("../models/Order")
 const filterHelper = require("../../helpers/filterOrder")
+const filterMyOrder = require("../../helpers/filterMyOrder")
+const OrderItemRepo = require("../repositories/OrderItemRepository")
 class OrderRepository {
   async getAll(req) {
     const filter = filterHelper(req)
@@ -16,18 +18,44 @@ class OrderRepository {
       total,
     }
   }
-  async getMyOrders(userId) {
+  async getMyOrders(req, userId) {
+    const filter = filterMyOrder(req, userId)
+
+    const page = Math.max(Number(req.query.page) || 1, 1)
+
+    const limit = Math.max(Number(req.query.limit) || 4, 1)
+
     const [orders, total] = await Promise.all([
-      Order.find({ user_id: userId })
+      Order.find(filter)
+        .sort({ created_at: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
         .populate("user_id", "email full_name")
         .populate("address_id"),
-      // .populate("voucher_id", "code discount_value"),
-      Order.countDocuments({ user_id: userId }),
+
+      Order.countDocuments(filter),
     ])
+    const orderIds = orders.map((o) => o._id)
+    const allItems = await OrderItemRepo.findByOrderIds(orderIds)
+
+    const itemsByOrderId = {}
+    for (const item of allItems) {
+      const key = item.order_id.toString()
+      if (!itemsByOrderId[key]) itemsByOrderId[key] = []
+      itemsByOrderId[key].push(item)
+    }
+
+    const ordersWithItems = orders.map((order) => ({
+      ...order.toObject(),
+      items: itemsByOrderId[order._id.toString()] || [],
+    }))
 
     return {
-      orders,
+      orders: ordersWithItems,
       total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     }
   }
   async findById(id) {

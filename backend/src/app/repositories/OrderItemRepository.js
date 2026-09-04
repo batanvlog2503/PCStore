@@ -49,6 +49,11 @@ class OrderItemRepository {
   async createMany(data, session) {
     return await OrderItem.insertMany(data, { session })
   }
+
+  // Lấy TẤT CẢ items thuộc nhiều order cùng lúc (dùng cho danh sách nhiều đơn)
+  async findByOrderIds(orderIds) {
+    return await OrderItem.find({ order_id: { $in: orderIds } })
+  }
 }
 
 module.exports = new OrderItemRepository()

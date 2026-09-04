@@ -258,7 +258,7 @@ class OrderService {
     }
   }
 
-  async getMyOrders(userId) {
+  async getMyOrders(req, userId) {
     if (!userId) {
       throw new AppError(404, "User Id is required")
     }
@@ -269,7 +269,7 @@ class OrderService {
       throw new AppError(404, "User not found")
     }
 
-    return await OrderRepo.getMyOrders(userId)
+    return await OrderRepo.getMyOrders(req, userId)
   }
   // change status from completed to cancelled
   async cancelOrder(id) {
