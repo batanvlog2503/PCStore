@@ -38,10 +38,38 @@ const DashboardController = {
         data,
       })
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
+      next(error)
+    }
+  },
+
+  async getOrderStatusChart(req, res, next) {
+    try {
+      const data = await DashboardService.getOrderStatusChartService()
+
+      return res.status(200).json({
+        success: true,
+        message: "get order statistic successfully !!!",
+        data,
       })
+    } catch (error) {
+      next(error)
+    }
+  },
+
+  async getLatestProducts(req, res) {
+    try {
+      const page = Number(req.query.page) || 1
+      const limit = Number(req.query.limit) || 5
+
+      const data = await DashboardService.getLatestProducts(page, limit)
+
+      return res.status(200).json({
+        success: true,
+        message: "Get latest products successfully",
+        data,
+      })
+    } catch (error) {
+      next(error)
     }
   },
 }

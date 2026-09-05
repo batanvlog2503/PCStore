@@ -39,40 +39,64 @@ const calculateChange = (thisWeek, lastWeek) => {
 
 const DashboardRepository = {
   async getDashboard() {
-    const { startOfThisWeek, startOfLastWeek, endOfLastWeek } = getWeekRange()
+    const { startOfThisWeek, startOfLastWeek } = getWeekRange()
 
     // =========================
-    // 1. REVENUE
+    // 1. REVENUE + COMPLETED ORDERS
     // =========================
 
-    const revenueResult = await Order.aggregate([
+    const orderResult = await Order.aggregate([
       {
         $match: {
-          status: { $ne: "cancelled" },
-          created_at: {
-            $gte: startOfLastWeek,
-          },
+          status: "completed",
         },
       },
+
       {
         $group: {
           _id: null,
 
+          // Tổng doanh thu của tất cả đơn hoàn thành
           totalRevenue: {
             $sum: "$total_amount",
           },
+
+          // Tổng số đơn hoàn thành
+          totalOrders: {
+            $sum: 1,
+          },
+
+          // =========================
+          // TUẦN NÀY
+          // =========================
 
           revenueThisWeek: {
             $sum: {
               $cond: [
                 {
-                  $gte: ["$created_at", startOfThisWeek],
+                  $gte: ["$completed_at", startOfThisWeek],
                 },
                 "$total_amount",
                 0,
               ],
             },
           },
+
+          ordersThisWeek: {
+            $sum: {
+              $cond: [
+                {
+                  $gte: ["$completed_at", startOfThisWeek],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+
+          // =========================
+          // TUẦN TRƯỚC
+          // =========================
 
           revenueLastWeek: {
             $sum: {
@@ -80,30 +104,14 @@ const DashboardRepository = {
                 {
                   $and: [
                     {
-                      $gte: ["$created_at", startOfLastWeek],
+                      $gte: ["$completed_at", startOfLastWeek],
                     },
                     {
-                      $lt: ["$created_at", startOfThisWeek],
+                      $lt: ["$completed_at", startOfThisWeek],
                     },
                   ],
                 },
                 "$total_amount",
-                0,
-              ],
-            },
-          },
-
-          totalOrders: {
-            $sum: 1,
-          },
-
-          ordersThisWeek: {
-            $sum: {
-              $cond: [
-                {
-                  $gte: ["$created_at", startOfThisWeek],
-                },
-                1,
                 0,
               ],
             },
@@ -115,10 +123,10 @@ const DashboardRepository = {
                 {
                   $and: [
                     {
-                      $gte: ["$created_at", startOfLastWeek],
+                      $gte: ["$completed_at", startOfLastWeek],
                     },
                     {
-                      $lt: ["$created_at", startOfThisWeek],
+                      $lt: ["$completed_at", startOfThisWeek],
                     },
                   ],
                 },
@@ -131,11 +139,11 @@ const DashboardRepository = {
       },
     ])
 
-    const revenueData = revenueResult[0] || {
+    const orderData = orderResult[0] || {
       totalRevenue: 0,
+      totalOrders: 0,
       revenueThisWeek: 0,
       revenueLastWeek: 0,
-      totalOrders: 0,
       ordersThisWeek: 0,
       ordersLastWeek: 0,
     }
@@ -154,10 +162,12 @@ const DashboardRepository = {
         $group: {
           _id: null,
 
+          // Tổng tất cả khách hàng
           totalCustomers: {
             $sum: 1,
           },
 
+          // Khách hàng đăng ký tuần này
           customersThisWeek: {
             $sum: {
               $cond: [
@@ -170,6 +180,7 @@ const DashboardRepository = {
             },
           },
 
+          // Khách hàng đăng ký tuần trước
           customersLastWeek: {
             $sum: {
               $cond: [
@@ -212,6 +223,7 @@ const DashboardRepository = {
         $group: {
           _id: null,
 
+          // Tổng sản phẩm đang hoạt động
           totalProducts: {
             $sum: 1,
           },
@@ -260,7 +272,7 @@ const DashboardRepository = {
     // 4. REVIEWS
     // =========================
 
-    // Chưa có Review model
+    // Tạm thời vì chưa có Review model
     const newReviews = 15
 
     // =========================
@@ -268,21 +280,30 @@ const DashboardRepository = {
     // =========================
 
     return {
-      totalRevenue: revenueData.totalRevenue,
-      totalOrders: revenueData.totalOrders,
+      // Tổng toàn bộ hệ thống
+      totalRevenue: orderData.totalRevenue,
+
+      // Chỉ tính đơn completed
+      totalOrders: orderData.totalOrders,
+
+      // Tổng khách hàng
       totalCustomers: customerData.totalCustomers,
+
+      // Tổng sản phẩm active
       totalProducts: productData.totalProducts,
+
       newReviews,
 
+      // % thay đổi tuần này so với tuần trước
       changes: {
         revenue: calculateChange(
-          revenueData.revenueThisWeek,
-          revenueData.revenueLastWeek,
+          orderData.revenueThisWeek,
+          orderData.revenueLastWeek,
         ),
 
         orders: calculateChange(
-          revenueData.ordersThisWeek,
-          revenueData.ordersLastWeek,
+          orderData.ordersThisWeek,
+          orderData.ordersLastWeek,
         ),
 
         customers: calculateChange(
@@ -382,6 +403,50 @@ const DashboardRepository = {
         },
       },
     ])
+  },
+
+  async getOrderStatusStatistics() {
+    return await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+    ])
+  },
+
+  async getLatestProducts(page = 1, limit = 5) {
+    const skip = (page - 1) * limit
+
+    const [products, total] = await Promise.all([
+      Product.find({
+        status: "active",
+      })
+        .sort({
+          created_at: -1,
+        })
+        .skip(skip)
+        .limit(limit)
+        .populate("brand_id", "name")
+        .populate("category_id", "name")
+        .lean(),
+
+      Product.countDocuments({
+        status: "active",
+      }),
+    ])
+
+    return {
+      products,
+
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    }
   },
 }
 

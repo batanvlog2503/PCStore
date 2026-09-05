@@ -1,61 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import "./Dashboard.scss"
+import LatestProduct from "./LatestProduct.jsx"
 import axiosInstance from "../../utils/axiosInstance"
-
-const ORDER_STATUS = [
-  { label: "Chờ xác nhận", value: 48, percent: 19, color: "#f5a623" },
-  { label: "Đang giao", value: 96, percent: 39, color: "#2f6fed" },
-  { label: "Hoàn thành", value: 88, percent: 36, color: "#22c55e" },
-  { label: "Đã huỷ", value: 16, percent: 6, color: "#ef4444" },
-]
-
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "ASUS ROG Zephyrus G14 2024",
-    category: "Laptop Gaming",
-    brand: "ASUS",
-    price: "36.990.000đ",
-    stock: 15,
-    sold: 28,
-  },
-  {
-    id: 2,
-    name: "MacBook Air M3 13 inch 2024",
-    category: "Laptop Văn phòng",
-    brand: "Apple",
-    price: "28.990.000đ",
-    stock: 10,
-    sold: 35,
-  },
-  {
-    id: 3,
-    name: "Dell Inspiron 15 3530",
-    category: "Laptop Văn phòng",
-    brand: "Dell",
-    price: "15.990.000đ",
-    stock: 20,
-    sold: 42,
-  },
-  {
-    id: 4,
-    name: "Lenovo Legion 5 Pro 2024",
-    category: "Laptop Gaming",
-    brand: "Lenovo",
-    price: "32.490.000đ",
-    stock: 8,
-    sold: 19,
-  },
-  {
-    id: 5,
-    name: "Acer Aspire 5 A515-58M",
-    category: "Laptop Văn phòng",
-    brand: "Acer",
-    price: "13.490.000đ",
-    stock: 12,
-    sold: 27,
-  },
-]
 
 const TOP_PRODUCTS = [
   { rank: 1, name: "MacBook Air M3 13 inch", sold: 35 },
@@ -215,11 +161,14 @@ const Dashboard = () => {
   // orders chart
   const [ordersChart, setOrdersChart] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(true)
-
+  // orders statistic
+  const [orderStatusData, setOrderStatusData] = useState([])
+  const [loadingStatus, setLoadingStatus] = useState(true)
   useEffect(() => {
     getDashboard()
     getRevenueChart()
     getOrdersChart()
+    getOrderStatusChart()
   }, [])
 
   useEffect(() => {
@@ -277,6 +226,23 @@ const Dashboard = () => {
       console.error("Lỗi lấy biểu đồ đơn hàng:", error)
     } finally {
       setLoadingOrders(false)
+    }
+  }
+  const getOrderStatusChart = async () => {
+    try {
+      setLoadingStatus(true)
+
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/admin/order-statistic`, // đổi đúng URL API của bạn
+      )
+
+      if (response.data.success) {
+        setOrderStatusData(response.data.data || [])
+      }
+    } catch (error) {
+      console.error("Lỗi lấy thống kê trạng thái đơn hàng:", error)
+    } finally {
+      setLoadingStatus(false)
     }
   }
   // Nhãn ngày dùng chung cho cả 2 biểu đồ, tính từ revenueData
@@ -354,15 +320,17 @@ const Dashboard = () => {
   const orderYTicks = ordersChartData.yTicks
 
   const donutStyle = useMemo(() => {
+    if (orderStatusData.length === 0) return {}
+
     let cursor = 0
-    const stops = ORDER_STATUS.map((s) => {
+    const stops = orderStatusData.map((s) => {
       const start = (cursor / 100) * 360
       cursor += s.percent
       const end = (cursor / 100) * 360
       return `${s.color} ${start}deg ${end}deg`
     })
     return { background: `conic-gradient(${stops.join(", ")})` }
-  }, [])
+  }, [orderStatusData]) // thêm dependency, trước đây [] khiến donut không tự cập nhật
 
   return (
     <div className={`dashboard ${mounted ? "is-mounted" : ""}`}>
@@ -624,104 +592,39 @@ const Dashboard = () => {
           <div className="card-head">
             <h3>Đơn hàng theo trạng thái</h3>
           </div>
-          <div className="donut-wrap">
-            <div
-              className="donut"
-              style={donutStyle}
-            >
-              <div className="donut-hole"></div>
-            </div>
-            <ul className="donut-legend">
-              {ORDER_STATUS.map((s) => (
-                <li key={s.label}>
-                  <span
-                    className="dot"
-                    style={{ background: s.color }}
-                  ></span>
-                  {s.label} <b>{s.value}</b>{" "}
-                  <span className="muted">({s.percent}%)</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
 
-        {/* ===== PRODUCTS TABLE ===== */}
-        <div className="card area-table">
-          <div className="card-head">
-            <h3>Sản phẩm mới nhất</h3>
-            <div className="head-actions">
-              <button className="btn-outline">Xem tất cả</button>
+          {loadingStatus ? (
+            <div className="chart-loading">
+              <div className="spinner"></div>
+              <p>Đang tải dữ liệu trạng thái...</p>
             </div>
-          </div>
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Sản phẩm</th>
-                  <th>Danh mục</th>
-                  <th>Thương hiệu</th>
-                  <th>Giá bán</th>
-                  <th>Tồn kho</th>
-                  <th>Đã bán</th>
-                  <th>Trạng thái</th>
-                </tr>
-              </thead>
-              <tbody>
-                {PRODUCTS.map((p, i) => (
-                  <tr
-                    key={p.id}
-                    style={{ transitionDelay: `${i * 50}ms` }}
-                  >
-                    <td className="product-cell">
-                      <span className="thumb"></span>
-                      {p.name}
-                    </td>
-                    <td>{p.category}</td>
-                    <td>{p.brand}</td>
-                    <td>{p.price}</td>
-                    <td>{p.stock}</td>
-                    <td>{p.sold}</td>
-                    <td>
-                      <span className="badge success">Đang bán</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="pagination">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-            >
-              <i className="fa-solid fa-chevron-left"></i>
-            </button>
-            {[1, 2, 3].map((n) => (
-              <button
-                key={n}
-                className={page === n ? "active" : ""}
-                onClick={() => setPage(n)}
+          ) : orderStatusData.length > 0 ? (
+            <div className="donut-wrap">
+              <div
+                className="donut"
+                style={donutStyle}
               >
-                {n}
-              </button>
-            ))}
-            <span className="dots">...</span>
-            <button
-              className={page === totalPages ? "active" : ""}
-              onClick={() => setPage(totalPages)}
-            >
-              {totalPages}
-            </button>
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            >
-              <i className="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
+                <div className="donut-hole"></div>
+              </div>
+              <ul className="donut-legend">
+                {orderStatusData.map((s) => (
+                  <li key={s.status}>
+                    <span
+                      className="dot"
+                      style={{ background: s.color }}
+                    ></span>
+                    {s.label} <b>{s.value}</b>{" "}
+                    <span className="muted">({s.percent}%)</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="chart-empty">Chưa có đơn hàng nào</p>
+          )}
         </div>
+
+        <LatestProduct></LatestProduct>
 
         {/* ===== SIDE WIDGETS ===== */}
         <div className="card area-side">

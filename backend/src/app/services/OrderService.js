@@ -7,6 +7,8 @@ const ProductImageRepo = require("../repositories/ProductImageRepository")
 const OrderItemRepo = require("../repositories/OrderItemRepository")
 const CartItemRepo = require("../repositories/CartItemRepository")
 const ProductVariantRepo = require("../repositories/ProductVariantRepository")
+const Product = require("../models/Product")
+const OrderItem = require("../models/OrderItem")
 const validateStock = (items) => {
   for (const item of items) {
     const variant = item.variant_id // đã populate
@@ -261,42 +263,70 @@ class OrderService {
     if (!id) {
       throw new AppError(400, "id not found")
     }
+
     if (!status) {
       throw new AppError(400, "Status not found")
     }
+
     const allowedStatus = [
-      "completed",
-      "cancelled",
       "pending",
       "confirmed",
       "shipping",
+      "completed",
+      "cancelled",
     ]
 
     if (!allowedStatus.includes(status)) {
       throw new AppError(400, "Status is wrong value !!!")
     }
 
+    // Lấy đơn hàng hiện tại
+    const order = await OrderRepo.findById(id)
+
+    if (!order) {
+      throw new AppError(404, "Order not found")
+    }
+    const oldStatus = order.status
+
+    if (oldStatus === "completed" && status !== "completed") {
+      throw new AppError(
+        400,
+        "Đơn hàng đã hoàn thành không thể thay đổi trạng thái",
+      )
+    }
     const updateData = {
       status,
     }
-
     if (status === "completed") {
       updateData.completed_at = new Date()
       updateData.cancelled_at = null
     }
-
     if (status === "cancelled") {
       updateData.cancelled_at = new Date()
       updateData.completed_at = null
     }
 
-    if (
-      status === "pending" ||
-      status === "confirmed" ||
-      status === "shipping"
-    ) {
+    if (["pending", "confirmed", "shipping"].includes(status)) {
       updateData.completed_at = null
       updateData.cancelled_at = null
+    }
+
+    // =========================
+    // NẾU COMPLETED VÀ CHƯA CỘNG SOLD
+    // =========================
+
+    if (status === "completed" && oldStatus !== "completed") {
+      const orderItems = await OrderItem.find({
+        order_id: order._id,
+      }).lean()
+
+      for (const item of orderItems) {
+        await Product.findByIdAndUpdate(item.product_id, {
+          $inc: {
+            sold_count: item.quantity,
+          },
+        })
+      }
     }
 
     return await OrderRepo.updateById(id, updateData)

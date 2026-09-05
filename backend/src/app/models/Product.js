@@ -16,6 +16,11 @@ const ProductSchema = new Schema(
     rating_avg: { type: Number, default: 0, min: 0, max: 5 },
     sold_count: { type: Number, default: 0, min: 0 },
     status: { type: String, enum: ["active", "hidden"], default: "active" },
+    // ẢNH ĐẠI DIỆN SẢN PHẨM
+    thumbnail: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 )

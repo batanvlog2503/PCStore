@@ -25,4 +25,17 @@ router.get(
   authorize("admin"),
   DashboardController.getOrdersChart,
 )
+router.get(
+  "/order-statistic",
+  auth,
+  authorize("admin"),
+  DashboardController.getOrderStatusChart,
+)
+
+router.get(
+  "/latest-products",
+  auth,
+  authorize("admin"),
+  DashboardController.getLatestProducts,
+)
 module.exports = router

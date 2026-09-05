@@ -268,9 +268,26 @@ $shadow:
     stroke-width: 1;
   }
 
+  // ============ Trục X (nhãn ngày) — áp dụng cho cả biểu đồ doanh thu và đơn hàng ============
   .axis-label {
-    font-size: 10px;
-    fill: $text-muted;
+    font-size: 13px; // tăng từ ~10-11px lên 13px
+    font-weight: 600;
+    fill: #4b5563;
+    letter-spacing: 0.2px;
+  }
+
+  // ============ Trục Y (nhãn giá trị) — phóng to tương ứng cho đồng bộ ============
+  .axis-y-label {
+    font-size: 12px; // tăng từ 10px
+    font-weight: 500;
+    fill: #6b7280;
+  }
+
+  // ============ Số liệu trên đỉnh cột (biểu đồ đơn hàng) ============
+  .bar-value-label {
+    font-size: 12.5px; // tăng nhẹ để cân đối với trục X mới
+    font-weight: 700;
+    fill: #1f2937;
   }
 
   .area-path {
