@@ -21,7 +21,7 @@ router.get("/code/:code", auth, OrderController.getOrderByOrderCode)
 router.get("/:id", auth, OrderController.getOrderById)
 router.patch("/:id/cancel", auth, OrderController.cancelOrder)
 router.post("/add", auth, addOrderValidator, OrderController.createOrder)
-
+router.patch("/update/:id/status", auth, OrderController.updateOrderStatus)
 router.put(
   "/update/:id",
   auth,

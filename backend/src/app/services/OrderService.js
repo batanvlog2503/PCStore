@@ -257,7 +257,50 @@ class OrderService {
       message: "Delete order successfully",
     }
   }
+  async updateOrderStatus(id, status) {
+    if (!id) {
+      throw new AppError(400, "id not found")
+    }
+    if (!status) {
+      throw new AppError(400, "Status not found")
+    }
+    const allowedStatus = [
+      "completed",
+      "cancelled",
+      "pending",
+      "confirmed",
+      "shipping",
+    ]
 
+    if (!allowedStatus.includes(status)) {
+      throw new AppError(400, "Status is wrong value !!!")
+    }
+
+    const updateData = {
+      status,
+    }
+
+    if (status === "completed") {
+      updateData.completed_at = new Date()
+      updateData.cancelled_at = null
+    }
+
+    if (status === "cancelled") {
+      updateData.cancelled_at = new Date()
+      updateData.completed_at = null
+    }
+
+    if (
+      status === "pending" ||
+      status === "confirmed" ||
+      status === "shipping"
+    ) {
+      updateData.completed_at = null
+      updateData.cancelled_at = null
+    }
+
+    return await OrderRepo.updateById(id, updateData)
+  }
   async getMyOrders(req, userId) {
     if (!userId) {
       throw new AppError(404, "User Id is required")

@@ -25,6 +25,11 @@ import MyOrder from "./pages/Profile/MyOrder/MyOrder"
 import MyWishList from "./pages/Profile/MyWishlist/MyWishlist"
 import MyAddress from "./pages/Profile/MyAddress/MyAddress"
 import MyLog from "./pages/Profile/MyLog/MyLog"
+
+// Admin
+
+import AdminLayout from "./layouts/AdminLayout/AdminLayout"
+import Dashboard from "./admin/Dashboard/Dashboard"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -107,6 +112,34 @@ const router = createBrowserRouter(
         path="/register"
         element={<Register />}
       />
+      <Route element={<ProtectRoute allowedRoles={["admin"]} />}>
+        <Route
+          path="/admin"
+          element={<AdminLayout />}
+        >
+          <Route
+            index
+            element={<Dashboard />}
+          />
+          {/* <Route
+            path="products"
+            element={<ProductList />}
+          />
+          <Route
+            path="products/new"
+            element={<ProductForm />}
+          />
+          <Route
+            path="categories"
+            element={<CategoryList />}
+          />
+          <Route
+            path="orders"
+            element={<AdminOrders />}
+          /> */}
+          {/* customers, vouchers, reviews, settings làm tiếp sau */}
+        </Route>
+      </Route>
     </>,
   ),
 )

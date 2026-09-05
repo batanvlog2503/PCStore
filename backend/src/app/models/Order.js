@@ -106,6 +106,15 @@ const OrderSchema = new Schema(
       default: null,
       maxlength: 500,
     },
+    completed_at: {
+      type: Date,
+      default: null,
+    },
+
+    cancelled_at: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: {

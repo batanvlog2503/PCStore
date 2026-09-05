@@ -14,6 +14,7 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     try {
       const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/auth/login`,
@@ -22,18 +23,26 @@ export const Login = () => {
 
       const accessToken = response.data.accessToken
       const refreshToken = response.data.refreshToken
-      console.log(response.data.user)
-      if (response.data.accessToken) {
-        console.log("Have an Access Token")
-      }
       const userData = response.data.user
+
+      console.log("User đăng nhập:", userData)
+      console.log("Role:", userData.role)
+
       if (response.data.success) {
-        console.log("Login SuccessFully", response.data.message)
+        console.log("Login Successfully:", response.data.message)
+
         localStorage.setItem("accessToken", accessToken)
         localStorage.setItem("refreshToken", refreshToken)
         localStorage.setItem("user", JSON.stringify(userData))
+
         alert("Login Successfully")
-        navigate("/")
+
+        // Kiểm tra role của user lấy từ API
+        if (userData.role === "admin") {
+          navigate("/admin")
+        } else {
+          navigate("/")
+        }
       }
     } catch (error) {
       alert(error.response?.data.message || "Error Submit Login")

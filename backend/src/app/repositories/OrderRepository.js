@@ -79,7 +79,7 @@ class OrderRepository {
   async update(id, data, session = null) {
     return await Order.findByIdAndUpdate(id, data, {
       new: true,
-      session,  
+      session,
     })
   }
   async deleteById(id) {
