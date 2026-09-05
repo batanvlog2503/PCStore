@@ -9,6 +9,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom"
+import ProtectRoute from "./utils/ProtectRoute"
 import { Home } from "./pages/Home/Home"
 import { MainLayout } from "./layouts/MainLayout/MainLayout"
 import { Login } from "./pages/Login/Login"
@@ -27,7 +28,7 @@ import MyLog from "./pages/Profile/MyLog/MyLog"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      {/* Các trang dùng chung Header/Footer -> nằm trong MainLayout */}
+      {/* MainLayout */}
       <Route
         path="/"
         element={<MainLayout />}
@@ -36,58 +37,72 @@ const router = createBrowserRouter(
           index
           element={<Home />}
         />
+
         <Route
           path="product/:id"
-          element={<Product></Product>}
-        ></Route>
-        <Route
-          path="account"
-          element={<Profile></Profile>}
-        >
-          <Route
-            index
-            element={<MyInfor />}
-          />
-          <Route
-            path="order"
-            element={<MyOrder />}
-          />
-          <Route
-            path="wishlist"
-            element={<MyWishList />}
-          />
-          <Route
-            path="address"
-            element={<MyAddress />}
-          />
-          <Route
-            path="log"
-            element={<MyLog />}
-          />
-        </Route>
+          element={<Product />}
+        />
+
         <Route
           path="cart"
-          element={<Cart></Cart>}
-        ></Route>
-        <Route
-          path="checkout"
-          element={<Checkout></Checkout>}
-        ></Route>
+          element={<Cart />}
+        />
+
         <Route
           path="order-success/:orderId"
-          element={<OrderSuccess></OrderSuccess>}
-        ></Route>
-        <Route
-          path="order/:orderId"
-          element={<OrderDetail />}
+          element={<OrderSuccess />}
         />
+
+        {/* Route yêu cầu đăng nhập */}
+        <Route element={<ProtectRoute />}>
+          <Route
+            path="account"
+            element={<Profile />}
+          >
+            <Route
+              index
+              element={<MyInfor />}
+            />
+
+            <Route
+              path="order"
+              element={<MyOrder />}
+            />
+
+            <Route
+              path="wishlist"
+              element={<MyWishList />}
+            />
+
+            <Route
+              path="address"
+              element={<MyAddress />}
+            />
+
+            <Route
+              path="log"
+              element={<MyLog />}
+            />
+          </Route>
+
+          <Route
+            path="checkout"
+            element={<Checkout />}
+          />
+
+          <Route
+            path="order/:orderId"
+            element={<OrderDetail />}
+          />
+        </Route>
       </Route>
 
-      {/* Login đứng riêng, KHÔNG bọc MainLayout */}
+      {/* Auth */}
       <Route
         path="/login"
         element={<Login />}
       />
+
       <Route
         path="/register"
         element={<Register />}
@@ -100,3 +115,12 @@ function App() {
 }
 
 export default App
+// Admin
+//     <Route element={<ProtectRoute allowedRoles={["admin"]} />}>
+//       <Route
+//         path="/admin"
+//         element={<AdminLayout />}
+//       >
+//         {/* Admin routes */}
+//       </Route>
+//     </Route>
