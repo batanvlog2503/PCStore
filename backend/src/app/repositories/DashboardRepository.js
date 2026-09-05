@@ -448,6 +448,18 @@ const DashboardRepository = {
       totalPages: Math.ceil(total / limit),
     }
   },
+  async getTopProducts(limit = 5) {
+    return await Product.find({
+      status: "active",
+    })
+      .sort({
+        sold_count: -1,
+      })
+      .limit(Number(limit))
+      .populate("brand_id", "name")
+      .populate("category_id", "name")
+      .lean()
+  },
 }
 
 module.exports = DashboardRepository

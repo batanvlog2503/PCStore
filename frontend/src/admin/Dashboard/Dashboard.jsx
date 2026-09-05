@@ -2,14 +2,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import "./Dashboard.scss"
 import LatestProduct from "./LatestProduct.jsx"
 import axiosInstance from "../../utils/axiosInstance"
-
-const TOP_PRODUCTS = [
-  { rank: 1, name: "MacBook Air M3 13 inch", sold: 35 },
-  { rank: 2, name: "Dell Inspiron 15 3530", sold: 42 },
-  { rank: 3, name: "ASUS ROG Zephyrus G14", sold: 28 },
-  { rank: 4, name: "Lenovo Legion 5 Pro", sold: 19 },
-  { rank: 5, name: "Acer Aspire 5 A515-58M", sold: 27 },
-]
+import TopProducts from "./TopProducts.jsx"
 
 const ACTIVITIES = [
   {
@@ -628,20 +621,7 @@ const Dashboard = () => {
 
         {/* ===== SIDE WIDGETS ===== */}
         <div className="card area-side">
-          <div className="card-head">
-            <h3>Top sản phẩm bán chạy</h3>
-          </div>
-          <ul className="top-products">
-            {TOP_PRODUCTS.map((p) => (
-              <li key={p.rank}>
-                <span className="rank">{p.rank}</span>
-                <span className="thumb small"></span>
-                <span className="name">{p.name}</span>
-                <span className="sold">Đã bán: {p.sold}</span>
-              </li>
-            ))}
-          </ul>
-
+          <TopProducts></TopProducts>
           <div className="card-head activity-head">
             <h3>Hoạt động gần đây</h3>
           </div>

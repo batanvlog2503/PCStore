@@ -113,6 +113,11 @@ const DashboardService = {
   async getLatestProducts(page, limit) {
     return await DashboardRepo.getLatestProducts(page, limit)
   },
+  async getTopProducts(limit = 5) {
+    const products = await DashboardRepo.getTopProducts(limit)
+
+    return products
+  },
 }
 
 module.exports = DashboardService

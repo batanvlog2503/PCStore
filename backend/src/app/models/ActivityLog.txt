@@ -1,0 +1,171 @@
+Cách 2 — Tạo Activity hoặc ActivityLog riêng ⭐ Khuyên dùng
+
+Đây là cách chuyên nghiệp hơn.
+
+Tạo collection:
+
+ActivityLog
+
+Ví dụ schema:
+
+const mongoose = require("mongoose")
+const { Schema } = mongoose
+
+const ActivityLogSchema = new Schema(
+  {
+    type: {
+      type: String,
+      enum: [
+        "order",
+        "product",
+        "user",
+      ],
+      required: true,
+    },
+
+    action: {
+      type: String,
+      required: true,
+    },
+
+    message: {
+      type: String,
+      required: true,
+    },
+
+    icon: {
+      type: String,
+      default: null,
+    },
+
+    tone: {
+      type: String,
+      default: "blue",
+    },
+
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    reference_id: {
+      type: Schema.Types.ObjectId,
+      default: null,
+    },
+  },
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: false,
+    },
+  },
+)
+
+module.exports = mongoose.model("ActivityLog", ActivityLogSchema)
+Ví dụ khi Order chuyển completed
+
+Trong updateOrderStatus:
+
+await ActivityLog.create({
+  type: "order",
+
+  action: "completed",
+
+  message: `Đơn hàng #${order.order_code} đã hoàn thành`,
+
+  icon: "fa-solid fa-circle-check",
+
+  tone: "green",
+
+  user_id: order.user_id,
+
+  reference_id: order._id,
+})
+
+Khi cancelled:
+
+await ActivityLog.create({
+  type: "order",
+
+  action: "cancelled",
+
+  message: `Đơn hàng #${order.order_code} đã bị huỷ`,
+
+  icon: "fa-solid fa-circle-xmark",
+
+  tone: "red",
+
+  user_id: order.user_id,
+
+  reference_id: order._id,
+})
+API Recent Activities
+
+Repository rất đơn giản:
+
+async getRecentActivities(limit = 5) {
+  return await ActivityLog.find()
+    .sort({
+      created_at: -1,
+    })
+    .limit(Number(limit))
+    .lean()
+}
+
+API:
+
+GET /admin/recent-activities?limit=5
+
+Response:
+
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "...",
+      "type": "order",
+      "action": "completed",
+      "message": "Đơn hàng #DH10045 đã hoàn thành",
+      "icon": "fa-solid fa-circle-check",
+      "tone": "green",
+      "created_at": "2026-09-05T..."
+    },
+    {
+      "_id": "...",
+      "type": "order",
+      "action": "cancelled",
+      "message": "Đơn hàng #DH10044 đã bị huỷ",
+      "icon": "fa-solid fa-circle-xmark",
+      "tone": "red",
+      "created_at": "2026-09-05T..."
+    }
+  ]
+}
+Kết luận cho project của bạn
+
+Mình khuyên:
+
+Dashboard
+│
+├── Dashboard statistics
+├── Revenue chart
+├── Orders chart
+├── Order status
+├── Latest products
+├── Top products
+└── Recent activities ⭐ ActivityLog
+
+👉 Recent Activities nên có một ActivityLog riêng. Vì nó đúng bản chất là lịch sử sự kiện, đặc biệt sau này bạn có thể log:
+
+Admin thêm sản phẩm
+Admin sửa sản phẩm
+Khách đặt hàng
+Admin xác nhận đơn
+Đơn đang giao
+Đơn hoàn thành
+Đơn bị huỷ
+Khách hàng đăng ký
+
+Nếu bạn muốn, bước tiếp theo mình có thể 
+viết luôn Model → Repository → Service → Controller → Route API Recent Activities theo đúng cấu trúc project hiện tại của bạn.

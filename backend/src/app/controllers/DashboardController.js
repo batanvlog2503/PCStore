@@ -72,6 +72,22 @@ const DashboardController = {
       next(error)
     }
   },
+
+  async getTopProducts(req, res, next) {
+    try {
+      const { limit = 5 } = req.query
+
+      const products = await DashboardService.getTopProducts(limit)
+
+      return res.status(200).json({
+        success: true,
+        message: "Get top products successfully",
+        products,
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 
 module.exports = DashboardController

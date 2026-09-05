@@ -1,16 +1,8 @@
 import React, { useEffect, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance"
 
-const LIMIT = 5
-//  {
-//     id: 4,
-//     name: "Lenovo Legion 5 Pro 2024",
-//     category: "Laptop Gaming",
-//     brand: "Lenovo",
-//     price: "32.490.000đ",
-//     stock: 8,
-//     sold: 19,
-//   },
+const LIMIT = 6
+
 const LatestProduct = () => {
   console.log("LatestProduct COMPONENT RENDER")
   const [products, setProducts] = useState([])

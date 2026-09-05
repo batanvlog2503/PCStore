@@ -38,4 +38,10 @@ router.get(
   authorize("admin"),
   DashboardController.getLatestProducts,
 )
+router.get(
+  "/top-products",
+  auth,
+  authorize("admin"),
+  DashboardController.getTopProducts,
+)
 module.exports = router
