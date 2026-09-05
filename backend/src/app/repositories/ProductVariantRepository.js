@@ -51,8 +51,10 @@ class ProductVariantRepository {
   }
 
   // ProductVariantRepository.js
-  async getAllWithProductAndImage() {
-    return await ProductVariant.aggregate([
+  async getAllWithProductAndImage(page = 1, limit = 40) {
+    const skip = (page - 1) * limit
+
+    const result = await ProductVariant.aggregate([
       // 1. Join sang Product để lấy tên, slug
       {
         $lookup: {
@@ -88,7 +90,21 @@ class ProductVariantRepository {
         },
       },
       { $project: { product: 0, mainImage: 0 } },
+      { $sort: { created_at: -1 } },
+
+      // 4. Lấy dữ liệu trang hiện tại + đếm tổng số, chỉ trong 1 lần query
+      {
+        $facet: {
+          data: [{ $skip: skip }, { $limit: limit }],
+          totalCount: [{ $count: "count" }],
+        },
+      },
     ])
+
+    const variants = result[0]?.data || []
+    const total = result[0]?.totalCount[0]?.count || 0
+
+    return { variants, total }
   }
   async increaseStock(variantId, quantity, session) {
     return await ProductVariant.findByIdAndUpdate(

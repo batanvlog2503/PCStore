@@ -12,8 +12,18 @@ class ProductVariantService {
     }
     return await ProductVariantRepo.findById(id)
   }
-  async getAllVariantsAndImage() {
-    return await ProductVariantRepo.getAllWithProductAndImage()
+
+  async getAllVariantsAndImage(page = 1, limit = 40) {
+    const { variants, total } =
+      await ProductVariantRepo.getAllWithProductAndImage(page, limit)
+
+    return {
+      variants,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    }
   }
   async getAllId() {
     return await ProductVariantRepo.getAllId()

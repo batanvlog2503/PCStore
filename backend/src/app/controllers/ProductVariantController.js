@@ -30,12 +30,18 @@ class ProductVariantController {
   }
   async getAllVariantsAndImage(req, res, next) {
     try {
-      const variants = await ProductVariantService.getAllVariantsAndImage()
+      const page = Math.max(Number(req.query.page) || 1, 1)
+      const limit = Math.max(Number(req.query.limit) || 40, 1)
+
+      const result = await ProductVariantService.getAllVariantsAndImage(
+        page,
+        limit,
+      )
 
       return res.status(200).json({
         success: true,
         message: "get all id variants successfully !!!",
-        variants,
+        ...result, // variants, total, page, limit, totalPages
       })
     } catch (err) {
       next(err)

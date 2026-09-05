@@ -6,7 +6,20 @@ import { useNavigate } from "react-router-dom"
 
 const ADS_SET_A = ["/quangcao1.png", "/quangcao2.png"]
 const ADS_SET_B = ["/quangcao3.png", "/quangcao4.png"]
-
+const criteria = [
+  "Bộ lọc",
+  "Sẵn hàng",
+  "Hàng mới về",
+  "Xem theo giá",
+  "Hãng sản xuất",
+  "Nhu cầu sử dụng",
+  "CPU",
+  "Dung lượng Ram",
+  "Ổ cứng",
+  "Độ phân giải",
+  "Card đồ họa",
+  "Kích thước màn hình",
+]
 export const Home = () => {
   const navigate = useNavigate()
   const formatDateTime = (date) => {
@@ -33,6 +46,12 @@ export const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [cardsPerView, setCardsPerView] = useState(3)
 
+  // pagination'
+
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const LIMIT = 40
   const getVouchers = async () => {
     try {
       const response = await axiosInstance.get(
@@ -55,45 +74,39 @@ export const Home = () => {
     }
   }
 
-  const getProductVariants = async () => {
+  const getProductVariants = async (pageNumber = 1) => {
     try {
+      if (pageNumber > 1) setIsLoadingMore(true)
+
       const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/product-variant/image/all`,
+        { params: { page: pageNumber, limit: LIMIT } },
       )
-      // Backend giờ trả kèm sẵn image_url/product_name/product_slug
-      // (join qua aggregation), không cần gọi thêm API ảnh riêng
-      setVariants(response.data.variants)
+
+      // response.data: { success, message, variants, total, page, limit, totalPages }
+      setVariants((prev) =>
+        pageNumber === 1
+          ? response.data.variants
+          : [...prev, ...response.data.variants],
+      )
+      setTotalPages(response.data.totalPages)
+      setPage(response.data.page)
     } catch (error) {
-      alert(error.response.data.message)
+      alert(error.response?.data?.message || "Không tải được sản phẩm")
+    } finally {
+      setIsLoadingMore(false)
     }
   }
 
   useEffect(() => {
     getBrands()
     getVouchers()
-    getProductVariants()
+    getProductVariants(1) // trang đầu tiên (40 sản phẩm)
     const timer = setInterval(() => {
       setIsSetA((prev) => !prev)
     }, 2500)
     return () => clearInterval(timer)
   }, [])
-
-  useEffect(() => {
-    const updateCardsPerView = () => {
-      const width = window.innerWidth
-      if (width <= 576) setCardsPerView(1)
-      else if (width <= 768) setCardsPerView(2)
-      else setCardsPerView(3)
-    }
-    updateCardsPerView()
-    window.addEventListener("resize", updateCardsPerView)
-    return () => window.removeEventListener("resize", updateCardsPerView)
-  }, [])
-
-  useEffect(() => {
-    const maxIndex = Math.max(0, vouchers.length - cardsPerView)
-    setCurrentIndex((prev) => Math.min(prev, maxIndex))
-  }, [cardsPerView, vouchers.length])
 
   const maxIndex = Math.max(0, vouchers.length - cardsPerView)
   const handlePrevVoucher = () =>
@@ -102,7 +115,11 @@ export const Home = () => {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1))
 
   const currentAds = isSetA ? ADS_SET_A : ADS_SET_B
-
+  const handleLoadMore = () => {
+    if (page < totalPages && !isLoadingMore) {
+      getProductVariants(page + 1)
+    }
+  }
   return (
     <div className="container home p-0">
       <p className="type">Thể loại / </p>
@@ -230,18 +247,9 @@ export const Home = () => {
         <h3 className="title-criteria">Chọn theo tiêu chí</h3>
         <div className="list-criteria">
           <ul className="row">
-            <li>Bộ lọc</li>
-            <li>Sẵn hàng</li>
-            <li>Hàng mới về </li>
-            <li>Xem theo giá</li>
-            <li>Hãng sản xuất</li>
-            <li>Nhu cầu sử dụng</li>
-            <li>CPU</li>
-            <li>Dung lượng Ram</li>
-            <li>Ổ cứng</li>
-            <li>Độ phân giải</li>
-            <li>Card đồ họa</li>
-            <li>Kích thước màn hình</li>
+            {criteria.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
           </ul>
         </div>
       </div>
@@ -333,6 +341,25 @@ export const Home = () => {
               )
             })}
           </ul>
+          {/* Chỉ hiện nút khi còn trang tiếp theo */}
+          {page < totalPages && (
+            <div className="load-more-wrap">
+              <button
+                className="load-more-btn"
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore ? (
+                  <i className="fa-solid fa-spinner fa-spin"></i>
+                ) : (
+                  <>
+                    Xem thêm sản phẩm{" "}
+                    <i className="fa-solid fa-chevron-down"></i>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="question-and-answer">
