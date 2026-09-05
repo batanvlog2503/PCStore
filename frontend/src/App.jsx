@@ -30,6 +30,7 @@ import MyLog from "./pages/Profile/MyLog/MyLog"
 
 import AdminLayout from "./layouts/AdminLayout/AdminLayout"
 import Dashboard from "./admin/Dashboard/Dashboard"
+import ManagementUser from "./admin/User/ManagementUser"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -120,6 +121,10 @@ const router = createBrowserRouter(
           <Route
             index
             element={<Dashboard />}
+          />
+          <Route
+            path="manage-user"
+            element={<ManagementUser />}
           />
           {/* <Route
             path="products"

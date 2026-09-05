@@ -165,7 +165,78 @@ class UserController {
     }
   }
 
-  
+  // admin
+  //http://localhost:3000/admin/all-users?search=nguyen&role=user&status=active&page=1&limit=10
+  async getAllUsers(req, res, next) {
+    try {
+      const result = await UserService.filterAllUsers(req)
+
+      return res.status(200).json({
+        success: true,
+        message: "Get all users successfully",
+        ...result,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async getUserStats(req, res, next) {
+    try {
+      const data = await UserService.getUserStats()
+
+      return res.status(200).json({
+        success: true,
+        message: "Get user statistics successfully",
+        data,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async adminAddUser(req, res, next) {
+    try {
+      const user = await UserService.adminAddUser(req.body)
+
+      return res.status(201).json({
+        success: true,
+        message: "Add user successfully",
+        user,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async updateUserStatus(req, res, next) {
+    try {
+      const { id } = req.params
+      const { status } = req.body
+
+      const user = await UserService.updateUserStatus(id, status)
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật trạng thái người dùng thành công",
+        user,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async updateUser(req, res, next) {
+    try {
+      const { id } = req.params
+
+      const updatedUser = await UserService.updateUser(id, req.body)
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật người dùng thành công",
+        user: updatedUser,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new UserController()
