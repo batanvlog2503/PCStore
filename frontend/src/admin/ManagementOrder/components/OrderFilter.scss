@@ -1,0 +1,204 @@
+// ==========================================================================
+// OrderFilter.scss — TechStore Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+$color-purple: #7c5cff;
+$color-purple-dark: #6845f0;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.order-filter {
+  background-color: $color-white;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  margin-bottom: 20px;
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: 0.08s;
+
+  .order-filter-head {
+    margin-bottom: 16px;
+
+    h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+  }
+
+  .order-filter-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr auto;
+    gap: 14px;
+    align-items: end;
+
+    @include respond($bp-lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include respond($bp-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond($bp-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: $color-muted;
+    }
+
+    select {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color $transition-fast;
+      width: 100%;
+
+      &:hover,
+      &:focus {
+        border-color: $color-purple;
+        outline: none;
+      }
+    }
+  }
+
+  .search-input,
+  .date-input {
+    position: relative;
+
+    input {
+      width: 100%;
+      height: 42px;
+      padding: 0 38px 0 14px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      font-size: 13px;
+      box-sizing: border-box;
+      transition:
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-purple;
+        background-color: $color-white;
+        box-shadow: 0 0 0 3px rgba($color-purple, 0.15);
+      }
+    }
+
+    i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-muted;
+      font-size: 13px;
+      pointer-events: none;
+    }
+  }
+
+  .date-input input[type="date"] {
+    color: $color-text;
+
+    &::-webkit-calendar-picker-indicator {
+      opacity: 0;
+      position: absolute;
+      right: 0;
+      width: 38px;
+      height: 42px;
+      cursor: pointer;
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 10px;
+
+    @include respond($bp-sm) {
+      flex-direction: column;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        box-shadow $transition-fast;
+    }
+
+    .search-btn {
+      border: none;
+      background-color: $color-purple;
+      color: $color-white;
+
+      &:hover {
+        background-color: $color-purple-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba($color-purple, 0.35);
+      }
+    }
+
+    .reset-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+
+      &:hover {
+        background-color: $color-bg;
+      }
+    }
+  }
+}

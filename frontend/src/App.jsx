@@ -31,6 +31,7 @@ import MyLog from "./pages/Profile/MyLog/MyLog"
 import AdminLayout from "./layouts/AdminLayout/AdminLayout"
 import Dashboard from "./admin/Dashboard/Dashboard"
 import ManagementUser from "./admin/User/ManagementUser"
+import ManagementOrder from "./admin/ManagementOrder/ManagementOrder"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -126,6 +127,11 @@ const router = createBrowserRouter(
             path="manage-user"
             element={<ManagementUser />}
           />
+
+          <Route
+            path="orders"
+            element={<ManagementOrder />}
+          />
           {/* <Route
             path="products"
             element={<ProductList />}
@@ -138,10 +144,7 @@ const router = createBrowserRouter(
             path="categories"
             element={<CategoryList />}
           />
-          <Route
-            path="orders"
-            element={<AdminOrders />}
-          /> */}
+         
           {/* customers, vouchers, reviews, settings làm tiếp sau */}
         </Route>
       </Route>

@@ -1,0 +1,249 @@
+// ==========================================================================
+// OrderStatusModal.scss — TechStore Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+
+$color-purple: #7c5cff;
+$color-purple-dark: #6845f0;
+$color-green: #22c55e;
+$color-orange: #f5a623;
+$color-blue: #2f6fed;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$transition-fast: 0.2s ease-in-out;
+
+@keyframes osmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes osmPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.order-status-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 15, 20, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  animation: osmFadeIn 0.2s ease-out;
+}
+
+.order-status-modal-panel {
+  width: 100%;
+  max-width: 440px;
+  background-color: $color-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(15, 15, 20, 0.25);
+  animation: osmPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+
+  .osm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid $color-border;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+    }
+  }
+
+  .osm-close-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: $color-bg;
+    border-radius: 50%;
+    color: $color-muted;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color $transition-fast,
+      color $transition-fast;
+
+    &:hover:not(:disabled) {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .osm-body {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .osm-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+
+    .label {
+      color: $color-muted;
+    }
+
+    .value {
+      font-weight: 700;
+    }
+  }
+
+  .osm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: $color-muted;
+    }
+
+    select,
+    textarea {
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      transition:
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-purple;
+        background-color: $color-white;
+        box-shadow: 0 0 0 3px rgba($color-purple, 0.15);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+  }
+
+  .osm-hint {
+    font-size: 11.5px;
+    color: $color-orange;
+  }
+
+  .osm-status-badge {
+    display: inline-block;
+    width: fit-content;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+
+    &.status-pending {
+      background-color: rgba($color-orange, 0.14);
+      color: darken($color-orange, 10%);
+    }
+    &.status-shipping {
+      background-color: rgba($color-blue, 0.12);
+      color: darken($color-blue, 8%);
+    }
+    &.status-completed {
+      background-color: rgba($color-green, 0.12);
+      color: darken($color-green, 6%);
+    }
+    &.status-cancelled {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .osm-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+
+    button {
+      flex: 1;
+      height: 42px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        opacity $transition-fast;
+    }
+
+    .osm-cancel-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+
+      &:hover:not(:disabled) {
+        background-color: $color-bg;
+      }
+    }
+
+    .osm-submit-btn {
+      border: none;
+      background-color: $color-purple;
+      color: $color-white;
+
+      &:hover:not(:disabled) {
+        background-color: $color-purple-dark;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+  }
+}

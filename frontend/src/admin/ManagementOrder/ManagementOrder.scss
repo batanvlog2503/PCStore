@@ -1,0 +1,256 @@
+// ==========================================================================
+// ManagementOrder.scss — TechStore Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+
+$color-purple: #7c5cff;
+$color-purple-dark: #6845f0;
+$color-green: #22c55e;
+$color-orange: #f5a623;
+$color-blue: #2f6fed;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-xs: 420px;
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes moSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.management-order {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+  animation: fadeIn 0.3s ease-out;
+
+  // ==========================================================================
+  // Header
+  // ==========================================================================
+  .mo-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    animation: fadeInUp 0.35s ease-out both;
+
+    @include respond($bp-md) {
+      flex-direction: column;
+    }
+  }
+
+  .mo-header-text {
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13.5px;
+      color: $color-muted;
+    }
+  }
+
+  .mo-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+
+    @include respond($bp-sm) {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 20px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        box-shadow $transition-fast;
+    }
+  }
+
+  .mo-export-btn {
+    border: 1.5px solid $color-border;
+    background-color: $color-white;
+    color: $color-text;
+
+    &:hover {
+      background-color: $color-bg;
+    }
+  }
+
+  .mo-refresh-btn {
+    border: none;
+    background-color: $color-purple;
+    color: $color-white;
+
+    &:hover {
+      background-color: $color-purple-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba($color-purple, 0.35);
+
+      i {
+        animation: moSpin 0.6s ease-in-out;
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Stat cards
+  // ==========================================================================
+  .mo-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+
+    @include respond($bp-xl) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include respond($bp-sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond($bp-xs) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mo-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 18px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.45s ease-out,
+      transform 0.45s ease-out,
+      box-shadow $transition-fast;
+    min-width: 0;
+  }
+
+  &.is-mounted .mo-stat-card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mo-stat-card:hover {
+    box-shadow: 0 10px 26px rgba(31, 35, 48, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .mo-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+
+    &.tone-purple {
+      background-color: rgba($color-purple, 0.12);
+      color: $color-purple;
+    }
+    &.tone-orange {
+      background-color: rgba($color-orange, 0.14);
+      color: $color-orange;
+    }
+    &.tone-blue {
+      background-color: rgba($color-blue, 0.12);
+      color: $color-blue;
+    }
+    &.tone-green {
+      background-color: rgba($color-green, 0.12);
+      color: $color-green;
+    }
+    &.tone-red {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .mo-stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .mo-stat-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: $color-text;
+    }
+
+    .mo-stat-value {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .mo-stat-sub {
+      font-size: 11px;
+      color: $color-muted;
+    }
+  }
+}

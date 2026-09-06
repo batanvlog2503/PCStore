@@ -1,0 +1,367 @@
+// ==========================================================================
+// ModalOrderDetail.scss — TechStore Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+
+$color-purple: #7c5cff;
+$color-purple-dark: #6845f0;
+$color-green: #22c55e;
+$color-orange: #f5a623;
+$color-blue: #2f6fed;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-sm: 576px;
+$bp-md: 768px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes modFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.order-detail-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 15, 20, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+  animation: modFadeIn 0.2s ease-out;
+
+  @include respond($bp-sm) {
+    padding: 0;
+    align-items: flex-end;
+  }
+}
+
+.order-detail-modal-panel {
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  background-color: $color-white;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(15, 15, 20, 0.25);
+  animation: modPopIn 0.3s cubic-bezier(0.34, 1.1, 0.64, 1) both;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+
+  @include respond($bp-sm) {
+    max-height: 92vh;
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+
+  .mod-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid $color-border;
+    flex-shrink: 0;
+
+    h3 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+    }
+  }
+
+  .mod-close-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: $color-bg;
+    border-radius: 50%;
+    color: $color-muted;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color $transition-fast,
+      color $transition-fast;
+
+    &:hover {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .mod-body {
+    padding: 22px 24px;
+    overflow-y: auto;
+    flex: 1;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: $color-border;
+      border-radius: 10px;
+    }
+  }
+
+  // ===== Tổng quan đơn hàng =====
+  .mod-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed $color-border;
+
+    @include respond($bp-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .label {
+      font-size: 11.5px;
+      color: $color-muted;
+    }
+
+    .value {
+      font-size: 13.5px;
+      font-weight: 700;
+
+      &.code {
+        color: $color-purple;
+      }
+    }
+  }
+
+  .mod-status-badge {
+    display: inline-block;
+    width: fit-content;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+
+    &.status-pending {
+      background-color: rgba($color-orange, 0.14);
+      color: darken($color-orange, 10%);
+    }
+    &.status-shipping {
+      background-color: rgba($color-blue, 0.12);
+      color: darken($color-blue, 8%);
+    }
+    &.status-completed {
+      background-color: rgba($color-green, 0.12);
+      color: darken($color-green, 6%);
+    }
+    &.status-cancelled {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  // ===== Section chung (khách hàng / sản phẩm) =====
+  .mod-section {
+    margin-bottom: 22px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    h4 {
+      margin: 0 0 12px;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: $color-text;
+    }
+  }
+
+  .mod-customer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    background-color: $color-bg;
+    border-radius: $radius-md;
+    padding: 16px;
+
+    @include respond($bp-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .customer-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.full {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      font-size: 11.5px;
+      color: $color-muted;
+    }
+
+    .value {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+  }
+
+  // ===== Bảng sản phẩm =====
+  .mod-items-scroll {
+    overflow-x: auto;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 480px;
+    }
+
+    thead {
+      background-color: $color-bg;
+
+      th {
+        text-align: left;
+        padding: 10px 14px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: $color-muted;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+    }
+
+    tbody tr {
+      border-top: 1px solid $color-border;
+
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        white-space: nowrap;
+
+        &.strong {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: normal;
+      min-width: 160px;
+
+      img,
+      .thumb-fallback {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        object-fit: contain;
+        background-color: $color-bg;
+        border: 1px solid $color-border;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .mod-totals {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed $color-border;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: $color-muted;
+
+      &.discount {
+        color: $color-red;
+      }
+
+      &.total {
+        margin-top: 4px;
+        padding-top: 10px;
+        border-top: 1px solid $color-border;
+        font-size: 16px;
+        font-weight: 800;
+        color: $color-text;
+
+        span:last-child {
+          color: $color-red;
+        }
+      }
+    }
+  }
+
+  .mod-footer {
+    padding: 16px 24px;
+    border-top: 1px solid $color-border;
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+
+    .mod-close-action {
+      height: 42px;
+      padding: 0 26px;
+      border: none;
+      border-radius: $radius-md;
+      background-color: $color-purple;
+      color: $color-white;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: $color-purple-dark;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
