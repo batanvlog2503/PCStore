@@ -147,24 +147,32 @@ $ap-danger: #ef4444;
 }
 
 // ================= GRID / FIELD =================
+// ================= GRID / FIELD (đã chỉnh) =================
 .ap-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 28px; // ⬅️ tăng gap ngang giữa 2 cột
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
 
 .ap-grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(
+    3,
+    minmax(0, 1fr)
+  ); // ⬅️ minmax(0,1fr) chống tràn
+  column-gap: 24px; // ⬅️ khoảng cách giữa các cột
+  row-gap: 20px; // ⬅️ khoảng cách giữa các hàng
+  margin-bottom: 24px;
 
   @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 18px;
   }
 
   @media (max-width: 480px) {
@@ -175,14 +183,15 @@ $ap-danger: #ef4444;
 .ap-field-col {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px; // ⬅️ tăng khoảng cách giữa các field dọc
 }
 
 .ap-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px; // ⬅️ khoảng cách label - input
   position: relative;
+  min-width: 0; // ⬅️ chống input đẩy tràn grid
 
   label {
     font-size: 13px;
@@ -199,7 +208,7 @@ $ap-danger: #ef4444;
   textarea {
     border: 1px solid $ap-border;
     border-radius: $ap-radius-sm;
-    padding: 10px 12px;
+    padding: 11px 14px; // ⬅️ tăng padding cho input "thở" hơn
     font-size: 13.5px;
     color: $ap-text;
     background: $ap-bg;
@@ -208,7 +217,12 @@ $ap-danger: #ef4444;
       border-color 0.18s ease,
       box-shadow 0.18s ease;
     width: 100%;
+    box-sizing: border-box; // ⬅️ đảm bảo padding không làm tràn cột
     font-family: inherit;
+
+    &:hover {
+      border-color: #c7cbd1;
+    }
 
     &:focus {
       border-color: $ap-primary;
@@ -474,7 +488,58 @@ $ap-danger: #ef4444;
     }
   }
 }
+.ap-hint {
+  font-weight: 400;
+  color: $ap-text-muted;
+  font-size: 12px;
+}
 
+.ap-album-item {
+  &.is-main {
+    border-color: $ap-primary;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+  }
+
+  .star-btn {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #facc15;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      background 0.15s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.75);
+      transform: scale(1.1);
+    }
+  }
+}
+
+.ap-main-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  background: $ap-primary;
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  animation: ap-pop 0.2s ease-out;
+}
 // ================= VARIANTS =================
 .ap-add-variant {
   display: inline-flex;

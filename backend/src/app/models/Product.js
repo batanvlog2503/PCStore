@@ -21,7 +21,7 @@ const ProductSchema = new Schema(
       default: "active",
     },
     // ẢNH ĐẠI DIỆN SẢN PHẨM
-    thumbnail: {
+    image_url: {
       type: String,
       default: "",
     },

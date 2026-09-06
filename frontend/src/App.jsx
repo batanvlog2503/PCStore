@@ -33,6 +33,7 @@ import Dashboard from "./admin/Dashboard/Dashboard"
 import ManagementUser from "./admin/User/ManagementUser"
 import ManagementOrder from "./admin/ManagementOrder/ManagementOrder"
 import ManagementProduct from "./admin/ManagementProduct.jsx/ManagementProduct"
+import AddProduct from "./admin/ManagementProduct.jsx/AddProduct/AddProduct"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -136,6 +137,10 @@ const router = createBrowserRouter(
           <Route
             path="products"
             element={<ManagementProduct />}
+          />
+          <Route
+            path="products/new"
+            element={<AddProduct />}
           />
           {/* <Route
             path="products"

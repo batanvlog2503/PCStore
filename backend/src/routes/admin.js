@@ -7,6 +7,8 @@ const UserController = require("../app/controllers/UserController")
 const authorize = require("../app/middlewares/authorize")
 const OrderItemController = require("../app/controllers/OrderItemController")
 const ProductController = require("../app/controllers/ProductController")
+const BrandController = require("../app/controllers/BrandController")
+const CategoryController = require("../app/controllers/CategoryController")
 router.get(
   "/dashboard",
   auth,
@@ -107,5 +109,19 @@ router.delete(
   auth,
   authorize("admin"),
   ProductController.softDeleteProduct,
+)
+
+router.get(
+  "/brands/all",
+  auth,
+  authorize("admin"),
+  BrandController.getAllBrands,
+)
+
+router.get(
+  "/categories/all",
+  auth,
+  authorize("admin"),
+  CategoryController.getAllCategories,
 )
 module.exports = router
