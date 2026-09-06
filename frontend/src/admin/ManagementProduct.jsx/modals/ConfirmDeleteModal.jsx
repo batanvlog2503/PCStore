@@ -1,13 +1,6 @@
 import React from "react"
 import "./ConfirmDeleteModal.scss"
 
-/**
- * Props:
- * - product: sản phẩm đang muốn xoá ({ _id, name, sku, image })
- * - onClose(): đóng modal
- * - onConfirm(): xác nhận xoá
- * - loading: boolean — đang gọi API xoá
- */
 const ConfirmDeleteModal = ({ product, onClose, onConfirm, loading }) => {
   if (!product) return null
 

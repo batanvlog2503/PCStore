@@ -154,6 +154,22 @@ class ProductController {
       next(err)
     }
   }
+
+  async softDeleteProduct(req, res, next) {
+    try {
+      const { id } = req.params
+
+      const result = await ProductService.deleteProduct(id)
+
+      return res.status(200).json({
+        success: true,
+        message: "Xóa sản phẩm thành công",
+        data: result,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new ProductController()

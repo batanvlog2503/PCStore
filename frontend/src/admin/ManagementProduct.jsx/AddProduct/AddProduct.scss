@@ -1,0 +1,660 @@
+// ================= VARIABLES =================
+$ap-radius: 14px;
+$ap-radius-sm: 8px;
+$ap-border: #e5e7eb;
+$ap-text: #1f2937;
+$ap-text-muted: #6b7280;
+$ap-bg: #ffffff;
+$ap-bg-soft: #f9fafb;
+$ap-primary: #4f46e5;
+$ap-primary-dark: #4338ca;
+$ap-danger: #ef4444;
+
+// ================= ANIMATIONS =================
+@keyframes ap-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ap-pop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ap-pulse-border {
+  0%,
+  100% {
+    border-color: $ap-border;
+  }
+  50% {
+    border-color: $ap-primary;
+  }
+}
+
+.add-product {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+// ================= HEADER =================
+.ap-breadcrumb {
+  font-size: 13px;
+  color: $ap-text-muted;
+  opacity: 0;
+  animation: ap-fade-up 0.4s ease-out forwards;
+}
+
+.ap-header {
+  opacity: 0;
+  animation: ap-fade-up 0.4s ease-out 0.05s forwards;
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: $ap-text;
+    margin: 4px 0 4px;
+  }
+
+  p {
+    font-size: 14px;
+    color: $ap-text-muted;
+    margin: 0;
+  }
+}
+
+// ================= CARD =================
+.ap-card {
+  background: $ap-bg;
+  border-radius: $ap-radius;
+  border: 1px solid $ap-border;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.4s ease-out,
+    transform 0.4s ease-out;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+    border-radius: 12px;
+  }
+}
+
+.add-product.is-mounted .ap-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ap-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: $ap-text;
+    margin: 0;
+  }
+
+  &.with-action {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+.ap-card-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ap-badge {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: $ap-primary;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// ================= GRID / FIELD =================
+.ap-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-field-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ap-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $ap-text;
+
+    .req {
+      color: $ap-danger;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    border: 1px solid $ap-border;
+    border-radius: $ap-radius-sm;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    color: $ap-text;
+    background: $ap-bg;
+    outline: none;
+    transition:
+      border-color 0.18s ease,
+      box-shadow 0.18s ease;
+    width: 100%;
+    font-family: inherit;
+
+    &:focus {
+      border-color: $ap-primary;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+
+    &.is-error {
+      border-color: $ap-danger;
+      animation: ap-pulse-border 1.2s ease-in-out 1;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  textarea {
+    min-height: 160px;
+    resize: vertical;
+  }
+}
+
+.ap-error {
+  font-size: 12px;
+  color: $ap-danger;
+}
+
+.ap-char-count {
+  align-self: flex-end;
+  font-size: 12px;
+  color: $ap-text-muted;
+}
+
+.ap-input-suffix {
+  position: relative;
+
+  input {
+    padding-right: 32px;
+  }
+
+  span {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: $ap-text-muted;
+  }
+}
+
+// ================= SWITCH =================
+.ap-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.ap-switch {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: #d1d5db;
+  position: relative;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+
+  &.is-on {
+    background: $ap-primary;
+  }
+}
+
+.ap-switch-dot {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  .ap-switch.is-on & {
+    transform: translateX(18px);
+  }
+}
+
+.ap-switch-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  font-weight: 600;
+  color: $ap-text;
+
+  small {
+    font-weight: 400;
+    color: $ap-text-muted;
+  }
+}
+
+// ================= IMAGES =================
+.ap-image-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-thumb-col label,
+.ap-album-col label {
+  font-size: 13px;
+  font-weight: 600;
+  color: $ap-text;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.ap-thumb-drop {
+  border: 2px dashed $ap-border;
+  border-radius: $ap-radius-sm;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  cursor: pointer;
+  padding: 20px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  overflow: hidden;
+  position: relative;
+  background: $ap-bg-soft;
+
+  &:hover {
+    border-color: $ap-primary;
+    background: #f5f4ff;
+  }
+
+  &.is-error {
+    border-color: $ap-danger;
+  }
+
+  i {
+    font-size: 26px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: 13px;
+    font-weight: 600;
+    color: $ap-text;
+    margin: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: $ap-text-muted;
+  }
+
+  small {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+
+  &.has-image {
+    padding: 0;
+    border-style: solid;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: ap-pop 0.3s ease-out;
+    }
+  }
+}
+
+.ap-album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+.ap-album-add {
+  aspect-ratio: 1 / 1;
+  border: 2px dashed $ap-border;
+  border-radius: $ap-radius-sm;
+  background: $ap-bg-soft;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  color: $ap-text-muted;
+  font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    border-color: $ap-primary;
+    color: $ap-primary;
+    transform: translateY(-2px);
+  }
+}
+
+.ap-album-item {
+  aspect-ratio: 1 / 1;
+  border-radius: $ap-radius-sm;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid $ap-border;
+  animation: ap-pop 0.25s ease-out;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.08);
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
+
+    &:hover {
+      background: $ap-danger;
+      transform: scale(1.1);
+    }
+  }
+}
+
+// ================= VARIANTS =================
+.ap-add-variant {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid $ap-primary;
+  color: $ap-primary;
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: $ap-radius-sm;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    background: #eef2ff;
+  }
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.ap-variant-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 18px;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+  }
+}
+
+.ap-variant-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid $ap-border;
+  background: $ap-bg-soft;
+  font-size: 13px;
+  font-weight: 600;
+  color: $ap-text-muted;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+
+  i.fa-grip-vertical {
+    font-size: 11px;
+    color: #d1d5db;
+  }
+
+  &:hover {
+    background: #f0f0f2;
+  }
+
+  &.is-active {
+    background: #eef2ff;
+    border-color: $ap-primary;
+    color: $ap-primary;
+  }
+
+  .tab-remove {
+    margin-left: 4px;
+    color: $ap-danger;
+    display: flex;
+    align-items: center;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.ap-variant-panel {
+  display: none;
+  animation: ap-fade-up 0.3s ease-out;
+
+  &.is-active {
+    display: block;
+  }
+}
+
+.ap-subtitle {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: $ap-text-muted;
+  margin: 4px 0 12px;
+  padding-top: 8px;
+  border-top: 1px dashed $ap-border;
+
+  &:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// ================= FOOTER =================
+.ap-footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  background: $ap-bg;
+  border: 1px solid $ap-border;
+  border-radius: $ap-radius;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  animation: ap-fade-up 0.4s ease-out 0.2s forwards;
+
+  @media (max-width: 480px) {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.ap-cancel-btn,
+.ap-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.18s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.ap-cancel-btn {
+  background: $ap-bg-soft;
+  color: $ap-text;
+
+  &:hover {
+    background: #f0f0f2;
+  }
+}
+
+.ap-submit-btn {
+  background: $ap-primary;
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: $ap-primary-dark;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+  }
+}

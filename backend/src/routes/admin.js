@@ -101,4 +101,11 @@ router.get(
   authorize("admin"),
   ProductController.adminGetProductDetail,
 )
+
+router.delete(
+  "/products/:id/soft-delete",
+  auth,
+  authorize("admin"),
+  ProductController.softDeleteProduct,
+)
 module.exports = router

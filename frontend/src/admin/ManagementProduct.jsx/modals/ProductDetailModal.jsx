@@ -8,12 +8,6 @@ const STATUS_LABEL = {
   deleted: "Đã xoá",
 }
 
-/**
- * Props:
- * - product: sản phẩm (ít nhất cần _id) — dùng để mở modal và fetch chi tiết
- * - onClose(): đóng modal
- * - onEdit(product): chuyển sang chỉnh sửa ngay từ modal xem chi tiết
- */
 const ProductDetailModal = ({ product, onClose, onEdit }) => {
   const [detail, setDetail] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -158,9 +152,7 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
                     {STATUS_LABEL[data.status] || data.status}
                   </span>
                   <h4>{data.name}</h4>
-                  <span className="pdm-sku">
-                    Mã SP: {data.variants.config_name}
-                  </span>
+                  <span className="pdm-sku">{variants.length} phiên bản</span>
 
                   <div className="pdm-price-row">
                     {data.discount_price != null &&
@@ -189,13 +181,13 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
                 </div>
                 <div className="info-item">
                   <span className="label">Tồn kho</span>
-                  <span className="value">
-                    {data.totalStock ?? data.stock ?? 0} sản phẩm
-                  </span>
+                  <span className="value">{data.totalStock} sản phẩm</span>
                 </div>
                 <div className="info-item">
                   <span className="label">Kho hàng</span>
-                  <span className="value">{data.warehouse || "—"}</span>
+                  <span className="value">
+                    {STATUS_LABEL[data.status] || "—"}
+                  </span>
                 </div>
                 <div className="info-item">
                   <span className="label">Ngày tạo</span>
@@ -225,7 +217,6 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
                     <table className="pdm-variants-table">
                       <thead>
                         <tr>
-                          <th>Ảnh</th>
                           <th>Phiên bản</th>
                           <th>Config</th>
                           <th>Giá</th>
@@ -236,18 +227,6 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
                       <tbody>
                         {variants.map((v) => (
                           <tr key={v._id}>
-                            <td>
-                              <div className="pdm-variant-thumb">
-                                {v.image ? (
-                                  <img
-                                    src={v.image}
-                                    alt={getVariantName(v)}
-                                  />
-                                ) : (
-                                  <i className="fa-solid fa-image"></i>
-                                )}
-                              </div>
-                            </td>
                             <td>{v.sku}</td>
                             <td>{v.config_name || "—"}</td>
                             <td>{formatPrice(v.price)}</td>

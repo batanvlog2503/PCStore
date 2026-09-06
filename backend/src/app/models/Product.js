@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const { Schema } = mongoose
-
+const mongooseDelete = require("mongoose-delete")
 // Chỉ chứa thông tin mô tả — price/stock nằm ở ProductVariant
 const ProductSchema = new Schema(
   {
@@ -17,7 +17,7 @@ const ProductSchema = new Schema(
     sold_count: { type: Number, default: 0, min: 0 },
     status: {
       type: String,
-      enum: ["active", "hidden", "deleted"],
+      enum: ["active", "hidden"],
       default: "active",
     },
     // ẢNH ĐẠI DIỆN SẢN PHẨM
@@ -31,5 +31,9 @@ const ProductSchema = new Schema(
 
 ProductSchema.index({ category_id: 1 })
 ProductSchema.index({ brand_id: 1 })
-
+ProductSchema.plugin(mongooseDelete, {
+  deletedAt: true,
+  deletedBy: true,
+  overrideMethods: "all",
+})
 module.exports = mongoose.model("Product", ProductSchema)

@@ -301,11 +301,14 @@ class ProductService {
       ProductImageRepo.findByProductId(productId),
       ProductVariantRepo.findByProductId(productId),
     ])
-
+    const totalStock = variants.reduce((total, variant) => {
+      return total + (variant.stock || 0)
+    }, 0)
     return {
       _id: product._id,
       name: product.name,
-
+      totalStock,
+      created_at: product.created_at,
       category: product.category_id
         ? {
             _id: product.category_id._id,
@@ -341,6 +344,16 @@ class ProductService {
       hidden,
       deleted,
     }
+  }
+
+  async deleteProduct(productId) {
+    const product = await ProductRepo.findById(productId)
+
+    if (!product) {
+      throw new AppError(404, "Product not found")
+    }
+
+    return await ProductRepo.softDelete(productId)
   }
 }
 

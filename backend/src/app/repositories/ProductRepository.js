@@ -89,6 +89,11 @@ class ProductRepository {
       .populate("category_id", "name slug")
       .populate("brand_id", "name logo_url")
   }
+
+  // Soft delete
+  async softDelete(productId) {
+    return await Product.deleteById(productId)
+  }
 }
 
 module.exports = new ProductRepository()

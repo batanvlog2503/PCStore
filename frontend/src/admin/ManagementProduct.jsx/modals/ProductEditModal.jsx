@@ -26,13 +26,6 @@ const EMPTY_FORM = {
   description: "",
 }
 
-/**
- * Props:
- * - product: sản phẩm đang sửa (null nếu không mở modal)
- * - onClose(): đóng modal
- * - onSubmit(formData): lưu thay đổi
- * - submitting: boolean — đang gọi API lưu
- */
 const ProductEditModal = ({ product, onClose, onSubmit, submitting }) => {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
@@ -248,4 +241,3 @@ const ProductEditModal = ({ product, onClose, onSubmit, submitting }) => {
 }
 
 export default ProductEditModal
-    

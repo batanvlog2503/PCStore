@@ -183,9 +183,9 @@ const ManagementProduct = () => {
     try {
       setDeleting(true)
 
-      // await axiosInstance.delete(
-      //   `${import.meta.env.VITE_APP_URL}/admin/products/${deleteProduct._id}`,
-      // )
+      const response = await axiosInstance.delete(
+        `${import.meta.env.VITE_APP_URL}/admin/products/${deleteProduct._id}/soft-delete`,
+      )
 
       setProducts((prev) => prev.filter((p) => p._id !== deleteProduct._id))
       setTotal((prev) => prev - 1)
