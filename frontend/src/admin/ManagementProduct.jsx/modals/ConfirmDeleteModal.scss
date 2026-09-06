@@ -1,0 +1,153 @@
+// ==========================================================================
+// ConfirmDeleteModal.scss — PC Store Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$transition-fast: 0.2s ease-in-out;
+
+@keyframes cdmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cdmPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cdmShake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+
+.confirm-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 15, 20, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2500;
+  animation: cdmFadeIn 0.2s ease-out;
+}
+
+.confirm-delete-panel {
+  width: 100%;
+  max-width: 400px;
+  background-color: $color-white;
+  border-radius: $radius-lg;
+  padding: 30px 26px 24px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 15, 20, 0.25);
+  animation: cdmPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+
+  .cdm-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background-color: rgba($color-red, 0.12);
+    color: $color-red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    animation: cdmShake 0.5s ease-in-out 0.3s;
+  }
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0 0 24px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: $color-muted;
+
+    strong {
+      color: $color-text;
+    }
+  }
+
+  .cdm-actions {
+    display: flex;
+    gap: 12px;
+
+    button {
+      flex: 1;
+      height: 44px;
+      border-radius: $radius-md;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        opacity $transition-fast;
+    }
+
+    .cdm-cancel-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+
+      &:hover:not(:disabled) {
+        background-color: $color-bg;
+      }
+    }
+
+    .cdm-confirm-btn {
+      border: none;
+      background-color: $color-red;
+      color: $color-white;
+
+      &:hover:not(:disabled) {
+        background-color: darken($color-red, 8%);
+        transform: translateY(-2px);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+  }
+}

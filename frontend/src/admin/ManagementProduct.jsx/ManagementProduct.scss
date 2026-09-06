@@ -1,0 +1,735 @@
+// ==========================================================================
+// ManagementProduct.scss — PC Store Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+
+$color-purple: #7c5cff;
+$color-purple-dark: #6845f0;
+$color-green: #22c55e;
+$color-orange: #f5a623;
+$color-blue: #2f6fed;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$radius-sm: 6px;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-xs: 420px;
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mpFadeInUpRow {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mpSkeletonPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.management-product {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+  animation: fadeIn 0.3s ease-out;
+
+  // ==========================================================================
+  // Header
+  // ==========================================================================
+  .mp-header {
+    margin-bottom: 22px;
+    animation: fadeInUp 0.35s ease-out both;
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13.5px;
+      color: $color-muted;
+    }
+  }
+
+  // ==========================================================================
+  // Stat cards
+  // ==========================================================================
+  .mp-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 22px;
+
+    @include respond($bp-lg) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond($bp-xs) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mp-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 18px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.45s ease-out,
+      transform 0.45s ease-out,
+      box-shadow $transition-fast;
+    min-width: 0;
+
+    &:hover {
+      box-shadow: 0 10px 26px rgba(31, 35, 48, 0.08);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.is-mounted .mp-stat-card {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mp-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+
+    &.tone-purple {
+      background-color: rgba($color-purple, 0.12);
+      color: $color-purple;
+    }
+    &.tone-green {
+      background-color: rgba($color-green, 0.12);
+      color: $color-green;
+    }
+    &.tone-orange {
+      background-color: rgba($color-orange, 0.14);
+      color: $color-orange;
+    }
+    &.tone-red {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .mp-stat-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    .mp-stat-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: $color-text;
+    }
+
+    .mp-stat-value {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .mp-stat-sub {
+      font-size: 11px;
+      color: $color-muted;
+    }
+  }
+
+  // ==========================================================================
+  // Filter card
+  // ==========================================================================
+  .mp-filter-card {
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.4s ease-out both;
+    animation-delay: 0.08s;
+
+    h4 {
+      margin: 0 0 16px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+  }
+
+  .mp-filter-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1.2fr auto;
+    gap: 14px;
+    align-items: end;
+
+    @include respond($bp-xl) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include respond($bp-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond($bp-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+
+    label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: $color-muted;
+    }
+
+    select {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      font-size: 13px;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color $transition-fast;
+
+      &:hover,
+      &:focus {
+        border-color: $color-purple;
+        outline: none;
+      }
+    }
+  }
+
+  .search-field {
+    justify-content: flex-end;
+  }
+
+  .search-input {
+    position: relative;
+
+    input {
+      width: 100%;
+      height: 42px;
+      padding: 0 38px 0 14px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      font-size: 13px;
+      box-sizing: border-box;
+      transition:
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-purple;
+        background-color: $color-white;
+        box-shadow: 0 0 0 3px rgba($color-purple, 0.15);
+      }
+    }
+
+    i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-muted;
+      font-size: 13px;
+      pointer-events: none;
+    }
+  }
+
+  .price-range-field {
+    .price-range {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      input {
+        width: 100%;
+        height: 42px;
+        padding: 0 12px;
+        border-radius: $radius-md;
+        border: 1.5px solid $color-border;
+        background-color: $color-bg;
+        font-size: 13px;
+        min-width: 0;
+        transition:
+          border-color $transition-fast,
+          box-shadow $transition-fast;
+
+        &:focus {
+          outline: none;
+          border-color: $color-purple;
+          background-color: $color-white;
+          box-shadow: 0 0 0 3px rgba($color-purple, 0.15);
+        }
+      }
+
+      .dash {
+        color: $color-muted;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 10px;
+
+    @include respond($bp-sm) {
+      flex-direction: column;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        box-shadow $transition-fast;
+    }
+
+    .search-btn {
+      border: none;
+      background-color: $color-purple;
+      color: $color-white;
+
+      &:hover {
+        background-color: $color-purple-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba($color-purple, 0.35);
+      }
+    }
+
+    .reset-btn {
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+
+      &:hover {
+        background-color: $color-bg;
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Table card
+  // ==========================================================================
+  .mp-table-card {
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out both;
+    animation-delay: 0.15s;
+  }
+
+  .mp-table-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 4px;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    h4 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-text;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: $color-bg;
+      }
+    }
+  }
+
+  .mp-table-scroll {
+    overflow-x: auto;
+    padding-top: 12px;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    thead {
+      background-color: $color-bg;
+
+      th {
+        text-align: left;
+        padding: 12px 14px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: $color-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+      }
+
+      .col-checkbox {
+        width: 40px;
+      }
+
+      .col-index {
+        width: 40px;
+      }
+
+      .col-actions {
+        text-align: right;
+      }
+    }
+
+    tbody tr {
+      border-top: 1px solid $color-border;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: mpFadeInUpRow 0.35s ease-out forwards;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: rgba($color-purple, 0.035);
+      }
+
+      td {
+        padding: 12px 14px;
+        font-size: 13.5px;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: $color-purple;
+      cursor: pointer;
+    }
+  }
+
+  .mp-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-sm;
+    background-color: $color-bg;
+    border: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    i {
+      color: $color-muted;
+      font-size: 15px;
+    }
+  }
+
+  .product-cell {
+    white-space: normal !important;
+    min-width: 180px;
+
+    .name {
+      margin: 0;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .sku {
+      font-size: 11.5px;
+      color: $color-muted;
+    }
+  }
+
+  .discount-cell {
+    color: $color-red;
+    font-weight: 700;
+  }
+
+  .date-cell {
+    color: $color-muted;
+  }
+
+  .mp-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.status-active {
+      background-color: rgba($color-green, 0.12);
+      color: darken($color-green, 6%);
+    }
+    &.status-hidden {
+      background-color: rgba($color-orange, 0.14);
+      color: darken($color-orange, 10%);
+    }
+    &.status-deleted {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .mp-row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .mp-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-sm;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-muted;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        border-color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: $color-purple;
+        border-color: $color-purple;
+        color: $color-white;
+        transform: translateY(-1px);
+      }
+
+      &.is-danger:hover {
+        background-color: $color-red;
+        border-color: $color-red;
+      }
+    }
+  }
+
+  .mp-empty {
+    text-align: center;
+    padding: 56px 0;
+    color: $color-muted;
+    white-space: normal;
+
+    i {
+      font-size: 30px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13.5px;
+    }
+  }
+
+  // ===== Skeleton loading =====
+  .mp-skeleton-line {
+    display: inline-block;
+    height: 11px;
+    background-color: $color-border;
+    border-radius: 6px;
+    animation: mpSkeletonPulse 1.2s ease-in-out infinite;
+
+    &.w-70 {
+      width: 70%;
+    }
+  }
+
+  // ==========================================================================
+  // Table footer / pagination
+  // ==========================================================================
+  .mp-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-top: 1px solid $color-border;
+    flex-wrap: wrap;
+
+    @include respond($bp-sm) {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+  }
+
+  .page-size-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: $color-muted;
+
+    @include respond($bp-sm) {
+      justify-content: center;
+    }
+
+    select {
+      height: 32px;
+      padding: 0 8px;
+      border-radius: $radius-sm;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      font-size: 12.5px;
+      cursor: pointer;
+
+      &:hover,
+      &:focus {
+        border-color: $color-purple;
+        outline: none;
+      }
+    }
+  }
+
+  .range-info {
+    font-size: 12.5px;
+    color: $color-muted;
+    white-space: nowrap;
+  }
+
+  .page-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    @include respond($bp-sm) {
+      justify-content: center;
+    }
+
+    button {
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-sm;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        border-color $transition-fast;
+
+      &:hover:not(:disabled) {
+        background-color: $color-bg;
+      }
+
+      &.active {
+        background-color: $color-purple;
+        border-color: $color-purple;
+        color: $color-white;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    .dots {
+      padding: 0 4px;
+      color: $color-muted;
+      font-size: 13px;
+    }
+  }
+}

@@ -31,16 +31,32 @@ class ProductRepository {
       total,
     }
   }
-  //   async search(keyword) {
-  //     return await Product.find({
-  //       name: {
-  //         $regex: keyword,
-  //         $options: "i",
-  //       },
-  //     })
-  //   }
+  async adminFindAllProducts({ filter, skip, limit }) {
+    return Product.find(filter)
+      .populate({
+        path: "category_id",
+        select: "name",
+      })
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+  }
+
+  async countProducts(filter) {
+    return Product.countDocuments(filter)
+  }
+  async countProductStats(status) {
+    return Product.countDocuments(status)
+  }
   async getIdAndNameProduct() {
     return await Product.find().select("_id name")
+  }
+
+  async findProductById(productId) {
+    return await Product.findById(productId)
+      .populate("category_id", "_id name")
+      .lean()
   }
   async findById(id) {
     return await Product.findById(id)

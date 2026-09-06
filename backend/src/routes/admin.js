@@ -6,6 +6,7 @@ const DashboardController = require("../app/controllers/DashboardController")
 const UserController = require("../app/controllers/UserController")
 const authorize = require("../app/middlewares/authorize")
 const OrderItemController = require("../app/controllers/OrderItemController")
+const ProductController = require("../app/controllers/ProductController")
 router.get(
   "/dashboard",
   auth,
@@ -78,5 +79,26 @@ router.patch(
   auth,
   authorize("admin"),
   OrderController.updateOrderStatus,
+)
+
+router.get(
+  "/products/all",
+  auth,
+  authorize("admin"),
+  ProductController.adminGetProducts,
+)
+
+router.get(
+  "/products/all/stats",
+  auth,
+  authorize("admin"),
+  ProductController.adminGetProductStats,
+)
+
+router.get(
+  "/products/:productId",
+  auth,
+  authorize("admin"),
+  ProductController.adminGetProductDetail,
 )
 module.exports = router

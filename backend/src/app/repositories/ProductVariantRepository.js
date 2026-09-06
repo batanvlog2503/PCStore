@@ -27,11 +27,23 @@ class ProductVariantRepository {
     ])
     return { total, variants }
   }
-
+  async findByProductIds(productIds) {
+    return await ProductVariant.find({
+      product_id: {
+        $in: productIds,
+      },
+    }).lean()
+  }
   async findById(id) {
     return await ProductVariant.findById(id)
   }
-
+  async findByProductId(productId) {
+    return await ProductVariant.find({
+      product_id: productId,
+    })
+      .select("_id config_name sku price discount_price stock")
+      .lean()
+  }
   async findBySku(sku) {
     return await ProductVariant.findOne({ sku })
   }

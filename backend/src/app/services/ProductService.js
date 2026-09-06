@@ -7,6 +7,7 @@ const ProductVariantRepo = require("../repositories/ProductVariantRepository")
 const ProductImageRepo = require("../repositories/ProductImageRepository")
 const ProductVariant = require("../models/ProductVariant")
 const ProductImage = require("../models/ProductImage")
+const filterAllProducts = require("../../helpers/filterAllProducts")
 class ProductService {
   async getAllProducts(req) {
     return await ProductRepo.getAll(req)
@@ -138,6 +139,207 @@ class ProductService {
 
     return {
       message: "Delete product successfully",
+    }
+  }
+
+  // admin
+  async adminGetProducts(req) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      category,
+      status,
+      priceFrom,
+      priceTo,
+    } = req.query
+
+    const currentPage = Math.max(Number(page), 1)
+    const currentLimit = Math.max(Number(limit), 1)
+
+    const skip = (currentPage - 1) * currentLimit
+
+    const filter = filterAllProducts(req)
+
+    const [products, total] = await Promise.all([
+      ProductRepo.adminFindAllProducts({
+        filter,
+        skip,
+        limit: currentLimit,
+      }),
+
+      ProductRepo.countProducts(filter),
+    ])
+    // danh sách sản phẩm Product
+    const productIds = products.map((product) => product._id)
+
+    if (productIds.length === 0) {
+      return {
+        products: [],
+        total,
+        page: currentPage,
+        limit: currentLimit,
+        totalPages: 0,
+      }
+    }
+
+    // lấy tất cả all variants + main image
+    // lấy hết image cùng với varants của prduct_id đó
+    const [variants, mainImages] = await Promise.all([
+      ProductVariantRepo.findByProductIds(productIds),
+
+      ProductImageRepo.findMainImagesByProductIds(productIds),
+    ])
+
+    // mainImages là 1 mảng ảnh chính
+
+    const variantsMap = new Map()
+
+    variants.forEach((variant) => {
+      const productId = variant.product_id.toString()
+
+      if (!variantsMap.has(productId)) {
+        variantsMap.set(productId, [])
+      }
+
+      variantsMap.get(productId).push(variant) // kiểu mỗi sản phẩm có nhiều variant
+      //     variantsMap = {
+      // product1: [
+      //   {
+      //     _id: "v1",
+      //     sku: "PC4060-I5",
+      //   },
+      //   {
+      //     _id: "v2",
+      //     sku: "PC4060-I7",
+      //   },
+      // ],
+    })
+
+    // GROUP MAIN IMAGE
+
+    const imageMap = new Map()
+
+    mainImages.forEach((image) => {
+      imageMap.set(image.product_id.toString(), image.image_url)
+    })
+
+    let result = products.map((product) => {
+      const productId = product._id.toString()
+
+      const productVariants = variantsMap.get(productId) || []
+      // lấy key là productId và value là array dãy variants
+      const prices = productVariants
+        .map((variant) => variant.discount_price)
+        .filter((price) => price != null)
+
+      const minPrice = prices.length > 0 ? Math.min(...prices) : null
+      const totalStock = productVariants.reduce((total, variant) => {
+        return total + (variant.stock || 0)
+      }, 0)
+      return {
+        _id: product._id,
+
+        name: product.name,
+        created_at: product.created_at,
+        min_price: minPrice,
+        totalStock,
+        category: product.category_id
+          ? {
+              _id: product.category_id._id,
+              name: product.category_id.name,
+            }
+          : null,
+
+        status: product.status,
+
+        image_url: imageMap.get(productId) || null,
+
+        variants: productVariants,
+      }
+    })
+
+    if (priceFrom || priceTo) {
+      result = result.filter((product) => {
+        const prices = product.variants.map((variant) => variant.discount_price)
+
+        if (prices.length === 0) return false
+
+        const minPrice = Math.min(...prices)
+
+        if (priceFrom && minPrice < Number(priceFrom)) {
+          return false
+        }
+        //priceFrom < minPrice < priceTo
+        if (priceTo && minPrice > Number(priceTo)) {
+          return false
+        }
+
+        return true
+      })
+    }
+
+    return {
+      total,
+
+      page: currentPage,
+
+      limit: currentLimit,
+
+      totalPages: Math.ceil(total / currentLimit),
+      products: result,
+    }
+  }
+  async adminGetProductDetail(productId) {
+    const product = await ProductRepo.findById(productId)
+
+    if (!product) {
+      throw new Error("Không tìm thấy sản phẩm")
+    }
+
+    const [images, variants] = await Promise.all([
+      ProductImageRepo.findByProductId(productId),
+      ProductVariantRepo.findByProductId(productId),
+    ])
+
+    return {
+      _id: product._id,
+      name: product.name,
+
+      category: product.category_id
+        ? {
+            _id: product.category_id._id,
+            name: product.category_id.name,
+          }
+        : null,
+
+      status: product.status,
+
+      images,
+
+      variants: variants.map((variant) => ({
+        _id: variant._id,
+        config_name: variant.config_name,
+        sku: variant.sku,
+        price: variant.price,
+        discount_price: variant.discount_price,
+        stock: variant.stock,
+      })),
+    }
+  }
+  async getProductStats() {
+    const [total, active, hidden, deleted] = await Promise.all([
+      ProductRepo.countProducts({}),
+      ProductRepo.countProducts({ status: "active" }),
+      ProductRepo.countProducts({ status: "hidden" }),
+      ProductRepo.countProducts({ status: "deleted" }),
+    ])
+
+    return {
+      total,
+      active,
+      hidden,
+      deleted,
     }
   }
 }

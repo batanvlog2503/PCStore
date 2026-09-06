@@ -32,6 +32,7 @@ import AdminLayout from "./layouts/AdminLayout/AdminLayout"
 import Dashboard from "./admin/Dashboard/Dashboard"
 import ManagementUser from "./admin/User/ManagementUser"
 import ManagementOrder from "./admin/ManagementOrder/ManagementOrder"
+import ManagementProduct from "./admin/ManagementProduct.jsx/ManagementProduct"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -127,10 +128,14 @@ const router = createBrowserRouter(
             path="manage-user"
             element={<ManagementUser />}
           />
-
           <Route
             path="orders"
             element={<ManagementOrder />}
+          />
+
+          <Route
+            path="products"
+            element={<ManagementProduct />}
           />
           {/* <Route
             path="products"

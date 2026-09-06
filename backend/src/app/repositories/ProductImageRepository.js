@@ -47,6 +47,15 @@ class ProductImageRepository {
       is_main: true,
     }).select("product_id image_url")
   }
+  async findByProductId(productId) {
+    return await ProductImage.find({
+      product_id: productId,
+    })
+      .sort({
+        is_main: -1,
+      })
+      .lean()
+  }
 }
 
 module.exports = new ProductImageRepository()

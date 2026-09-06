@@ -15,7 +15,11 @@ const ProductSchema = new Schema(
     description: { type: String },
     rating_avg: { type: Number, default: 0, min: 0, max: 5 },
     sold_count: { type: Number, default: 0, min: 0 },
-    status: { type: String, enum: ["active", "hidden"], default: "active" },
+    status: {
+      type: String,
+      enum: ["active", "hidden", "deleted"],
+      default: "active",
+    },
     // ẢNH ĐẠI DIỆN SẢN PHẨM
     thumbnail: {
       type: String,

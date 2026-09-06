@@ -15,6 +15,47 @@ class ProductController {
       next(err)
     }
   }
+  async adminGetProductDetail(req, res, next) {
+    try {
+      const { productId } = req.params
+
+      const product = await ProductService.adminGetProductDetail(productId)
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy chi tiết sản phẩm thành công",
+        data: product,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async adminGetProducts(req, res, next) {
+    try {
+      const result = await ProductService.adminGetProducts(req)
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy danh sách sản phẩm thành công",
+        data: result,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+  async adminGetProductStats(req, res, next) {
+    try {
+      const stats = await ProductService.getProductStats(req)
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy thống kê sản phẩm thành công",
+        data: stats,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
   async getProductDetail(req, res, next) {
     try {
       const result = await ProductService.getProductDetail(req.params.productId)
