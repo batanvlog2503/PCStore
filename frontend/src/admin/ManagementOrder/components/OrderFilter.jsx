@@ -13,16 +13,8 @@ const PAYMENT_OPTIONS = [
   { value: "all", label: "Tất cả phương thức" },
   { value: "cod", label: "COD" },
   { value: "bank", label: "Chuyển khoản" },
-  { value: "e_wallet", label: "Ví điện tử" },
 ]
 
-/**
- * Props:
- * - filters: { search, status, payment, fromDate, toDate }
- * - onChange(field, value): cập nhật 1 field trong filters (chưa submit)
- * - onSearch(): áp dụng bộ lọc hiện tại
- * - onReset(): xoá hết bộ lọc
- */
 const OrderFilter = ({ filters, onChange, onSearch, onReset }) => {
   const handleSubmit = (e) => {
     e.preventDefault()

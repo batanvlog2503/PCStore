@@ -17,20 +17,11 @@ const NEXT_STATUS_OPTIONS = {
   cancelled: [],
 }
 
-/**
- * Props:
- * - order: đơn hàng đang cập nhật ({ _id, order_code, customer_name, status })
- * - onClose(): đóng modal
- * - onSubmit({ orderId, newStatus, note }): xác nhận cập nhật
- * - submitting: boolean — đang gọi API
- */
 const OrderStatusModal = ({ order, onClose, onSubmit, submitting }) => {
   const [newStatus, setNewStatus] = useState("")
-  const [note, setNote] = useState("")
 
   useEffect(() => {
     setNewStatus("")
-    setNote("")
   }, [order])
 
   if (!order) return null
@@ -40,7 +31,7 @@ const OrderStatusModal = ({ order, onClose, onSubmit, submitting }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!newStatus) return
-    onSubmit({ orderId: order._id, newStatus, note })
+    onSubmit({ orderId: order._id, newStatus })
   }
 
   return (
@@ -73,7 +64,7 @@ const OrderStatusModal = ({ order, onClose, onSubmit, submitting }) => {
           </div>
           <div className="osm-info-row">
             <span className="label">Khách hàng:</span>
-            <span className="value">{order.customer_name}</span>
+            <span className="value">{order?.user_id?.username}</span>
           </div>
 
           <div className="osm-field">
@@ -106,17 +97,6 @@ const OrderStatusModal = ({ order, onClose, onSubmit, submitting }) => {
                 Đơn hàng ở trạng thái này không thể cập nhật thêm.
               </span>
             )}
-          </div>
-
-          <div className="osm-field">
-            <label htmlFor="note">Ghi chú (không bắt buộc)</label>
-            <textarea
-              id="note"
-              rows={3}
-              placeholder="Nhập ghi chú..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
           </div>
 
           <div className="osm-actions">

@@ -12,20 +12,10 @@ export const STATUS_LABEL = {
 const PAYMENT_LABEL = {
   cod: "COD",
   bank: "Chuyển khoản",
-  e_wallet: "Ví điện tử",
 }
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50]
 
-/**
- * Props:
- * - orders: mảng đơn hàng của trang hiện tại
- * - loading: boolean
- * - page, limit, total: dùng để tính phân trang + dòng "Hiển thị..."
- * - onPageChange(nextPage)
- * - onLimitChange(nextLimit)
- * - onView(order) / onEdit(order) / onDelete(order): các action ở cột "Thao tác"
- */
 const OrderTable = ({
   orders,
   loading,
@@ -36,7 +26,7 @@ const OrderTable = ({
   onLimitChange,
   onView,
   onEdit,
-  onDelete,
+  onCancel,
 }) => {
   const formatPrice = (price) => {
     if (price == null) return ""
@@ -134,22 +124,16 @@ const OrderTable = ({
                 >
                   <td className="col-index">{(page - 1) * limit + i + 1}</td>
                   <td>
-                    <Link
-                      to={`/admin/orders/${order._id}`}
+                    <button
                       className="order-code-link"
-                      onClick={(e) => {
-                        // Nếu component cha muốn tự xử lý (mở modal) thay vì điều hướng route
-                        if (onView) {
-                          e.preventDefault()
-                          onView(order)
-                        }
-                      }}
+                      onClick={() => onView(order)}
+                      style={{ border: "none" }}
                     >
                       {order.order_code}
-                    </Link>
+                    </button>
                   </td>
-                  <td>{order.customer_name}</td>
-                  <td>{order.phone}</td>
+                  <td>{order?.user_id?.username}</td>
+                  <td>{order?.user_id?.phone}</td>
                   <td className="price-cell">
                     {formatPrice(order.total_amount)}
                   </td>
@@ -183,10 +167,13 @@ const OrderTable = ({
                       </button>
                       <button
                         className="ot-icon-btn is-danger"
-                        title="Xoá đơn hàng"
-                        onClick={() => onDelete && onDelete(order)}
+                        title="Hủy đơn hàng"
+                        onClick={() => onCancel && onCancel(order)}
+                        disabled={["completed", "cancelled"].includes(
+                          order.status,
+                        )}
                       >
-                        <i className="fa-regular fa-trash-can"></i>
+                        <i className="fa-solid fa-ban"></i>
                       </button>
                     </div>
                   </td>

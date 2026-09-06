@@ -1,5 +1,5 @@
 const OrderItemService = require("../services/OrderItemService")
-
+const OrderItem = require("../models/OrderItem")
 class OrderItemController {
   async getAllOrderItems(req, res, next) {
     try {
@@ -15,7 +15,29 @@ class OrderItemController {
       next(error)
     }
   }
+  async getOrderItems(req, res, next) {
+    try {
+      const { id } = req.params
 
+      const [items, total] = await Promise.all([
+        OrderItem.find({
+          order_id: id,
+        }).lean(),
+
+        OrderItem.countDocuments({
+          order_id: id,
+        }),
+      ])
+      return res.status(200).json({
+        success: true,
+        message: "Get all order items successfully",
+        total,
+        items,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
   async getOrderItemById(req, res, next) {
     try {
       const item = await OrderItemService.getOrderItemById(req.params.id)

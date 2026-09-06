@@ -1,11 +1,11 @@
 const express = require("express")
 const auth = require("../app/middlewares/auth")
 const router = express.Router()
-
+const OrderController = require("../app/controllers/OrderController")
 const DashboardController = require("../app/controllers/DashboardController")
 const UserController = require("../app/controllers/UserController")
 const authorize = require("../app/middlewares/authorize")
-
+const OrderItemController = require("../app/controllers/OrderItemController")
 router.get(
   "/dashboard",
   auth,
@@ -65,5 +65,18 @@ router.patch(
   auth,
   authorize("admin"),
   UserController.updateUser,
+)
+router.get(
+  "/orders/:id/items",
+  auth,
+  authorize("admin"),
+  OrderItemController.getOrderItems,
+)
+router.get("/orders", auth, authorize("admin"), OrderController.getAllOrders)
+router.patch(
+  "/orders/:id/status",
+  auth,
+  authorize("admin"),
+  OrderController.updateOrderStatus,
 )
 module.exports = router

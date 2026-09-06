@@ -11,16 +11,15 @@ const OrderService = require("../services/OrderService")
 class OrderController {
   async getAllOrders(req, res, next) {
     try {
-      const { orders, total } = await OrderService.getAllOrders(req)
+      const orders = await OrderService.getAllOrders(req)
 
       return res.status(200).json({
         success: true,
         message: "Get all orders successfully",
-        total,
-        orders,
+        ...orders,
       })
-    } catch (err) {
-      next(err)
+    } catch (error) {
+      next(error)
     }
   }
 

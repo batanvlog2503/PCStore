@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import "./ModalOrderDetail.scss"
-
+import axiosInstance from "../../utils/axiosInstance"
 const STATUS_LABEL = {
   pending: "Chờ xác nhận",
   shipping: "Đang giao",
@@ -11,16 +11,11 @@ const STATUS_LABEL = {
 const PAYMENT_LABEL = {
   cod: "COD",
   bank: "Chuyển khoản",
-  e_wallet: "Ví điện tử",
 }
 
-/**
- * Props:
- * - order: đơn hàng đầy đủ, gồm customer{}, address{}, items[]
- * - onClose(): đóng modal
- */
 const ModalOrderDetail = ({ order, onClose }) => {
-  if (!order) return null
+  const [items, setItems] = useState([])
+  const [loadingItems, setLoadingItems] = useState(true)
 
   const formatPrice = (price) => {
     if (price == null) return ""
@@ -38,12 +33,27 @@ const ModalOrderDetail = ({ order, onClose }) => {
     })
   }
 
-  const items = order.items || []
-  const subtotal =
-    order.subtotal ?? items.reduce((sum, it) => sum + it.price * it.quantity, 0)
-  const shippingFee = order.shipping_fee || 0
-  const discount = order.discount || 0
+  useEffect(() => {
+    getOrderItems()
+  }, [order?._id])
+  if (!order) return null
 
+  const getOrderItems = async () => {
+    try {
+      setLoadingItems(true)
+
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/admin/orders/${order?._id}/items`,
+      )
+
+      setItems(response.data.items || [])
+    } catch (error) {
+      console.error("Không thể lấy sản phẩm trong đơn hàng:", error)
+      setItems([])
+    } finally {
+      setLoadingItems(false)
+    }
+  }
   return (
     <div
       className="order-detail-modal-backdrop"
@@ -94,26 +104,32 @@ const ModalOrderDetail = ({ order, onClose }) => {
             <div className="mod-customer-grid">
               <div className="customer-item">
                 <span className="label">Họ và tên</span>
-                <span className="value">{order.customer_name}</span>
+                <span className="value">{order?.user_id?.username}</span>
               </div>
               <div className="customer-item">
                 <span className="label">Số điện thoại</span>
-                <span className="value">{order.phone}</span>
+                <span className="value">{order?.user_id?.phone}</span>
               </div>
               <div className="customer-item">
                 <span className="label">Email</span>
-                <span className="value">{order.email}</span>
+                <span className="value">{order?.user_id?.email}</span>
               </div>
               <div className="customer-item full">
                 <span className="label">Địa chỉ</span>
-                <span className="value">{order.address}</span>
+                <span className="value">
+                  {[
+                    order.address_id?.detail,
+                    order.address_id?.ward,
+                    order.address_id?.district,
+                    order.address_id?.province,
+                  ].join(", ")}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* ===== Sản phẩm ===== */}
           <div className="mod-section">
-            <h4>Sản phẩm</h4>
+            <h4>Sản phẩm ({items.length})</h4>
             <div className="mod-items-scroll">
               <table>
                 <thead>
@@ -126,27 +142,43 @@ const ModalOrderDetail = ({ order, onClose }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((it) => (
-                    <tr key={it._id}>
-                      <td className="product-cell">
-                        {it.image_url ? (
-                          <img
-                            src={it.image_url}
-                            alt={it.product_name}
-                          />
-                        ) : (
-                          <span className="thumb-fallback"></span>
-                        )}
-                        {it.product_name}
-                      </td>
-                      <td>{it.config_name || "—"}</td>
-                      <td>{formatPrice(it.price)}</td>
-                      <td>{it.quantity}</td>
-                      <td className="strong">
-                        {formatPrice(it.price * it.quantity)}
-                      </td>
+                  {loadingItems && (
+                    <tr>
+                      <td colSpan="5">Đang tải sản phẩm...</td>
                     </tr>
-                  ))}
+                  )}
+
+                  {!loadingItems && items.length === 0 && (
+                    <tr>
+                      <td colSpan="5">Không có sản phẩm</td>
+                    </tr>
+                  )}
+
+                  {!loadingItems &&
+                    items.map((it) => (
+                      <tr key={it._id}>
+                        <td className="product-cell">
+                          {it?.product_image ? (
+                            <img
+                              src={it.product_image}
+                              alt={it.product_name}
+                            />
+                          ) : (
+                            <span className="thumb-fallback"></span>
+                          )}
+
+                          {it.product_name}
+                        </td>
+
+                        <td>{it.config_name || "—"}</td>
+
+                        <td>{formatPrice(it.discount_price)}</td>
+
+                        <td>{it.quantity}</td>
+
+                        <td className="strong">{formatPrice(it.subtotal)}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -154,16 +186,16 @@ const ModalOrderDetail = ({ order, onClose }) => {
             <div className="mod-totals">
               <div className="totals-row">
                 <span>Tạm tính</span>
-                <span>{formatPrice(subtotal)}</span>
+                <span>{formatPrice(order.subtotal)}</span>
               </div>
               <div className="totals-row">
                 <span>Phí vận chuyển</span>
-                <span>{formatPrice(shippingFee)}</span>
+                <span>{formatPrice(order.shipping_fee)}</span>
               </div>
-              {discount > 0 && (
+              {order?.product_discount > 0 && (
                 <div className="totals-row discount">
                   <span>Giảm giá</span>
-                  <span>-{formatPrice(discount)}</span>
+                  <span>-{formatPrice(order?.product_discount)}</span>
                 </div>
               )}
               <div className="totals-row total">

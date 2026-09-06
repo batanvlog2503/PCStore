@@ -18,6 +18,49 @@ class OrderRepository {
       total,
     }
   }
+
+  async findAll(filter, skip, limit) {
+    return await Order.find(filter)
+      .populate("user_id", "username email phone")
+      .populate("address_id")
+      .sort({
+        created_at: -1,
+      })
+      .skip(skip)
+      .limit(limit)
+      .lean()
+  }
+
+  async countDocuments(filter) {
+    return await Order.countDocuments(filter)
+  }
+  async getOrderStats() {
+    const result = await Order.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+    ])
+
+    const stats = {
+      total: 0,
+      pending: 0,
+      shipping: 0,
+      completed: 0,
+      cancelled: 0,
+    }
+
+    result.forEach((item) => {
+      stats[item._id] = item.count
+      stats.total += item.count
+    })
+
+    return stats
+  }
   async getMyOrders(req, userId) {
     const filter = filterMyOrder(req, userId)
 

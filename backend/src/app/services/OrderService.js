@@ -9,6 +9,8 @@ const CartItemRepo = require("../repositories/CartItemRepository")
 const ProductVariantRepo = require("../repositories/ProductVariantRepository")
 const Product = require("../models/Product")
 const OrderItem = require("../models/OrderItem")
+const User = require("../models/User")
+const filterAllOrders = require("../../helpers/filterAllOrders")
 const validateStock = (items) => {
   for (const item of items) {
     const variant = item.variant_id // đã populate
@@ -66,10 +68,80 @@ const generateOrderCode = () => {
   return `ORD-${Date.now()}`
 }
 class OrderService {
+  // async getAllOrders(req) {
+  //   return await OrderRepo.getAll(req)
+  // }
   async getAllOrders(req) {
-    return await OrderRepo.getAll(req)
-  }
+    const { search, page = 1, limit = 10 } = req.query
 
+    const currentPage = Number(page)
+    const currentLimit = Number(limit)
+
+    const skip = (currentPage - 1) * currentLimit
+    const filter = filterAllOrders(req)
+
+    if (search) {
+      const keyword = search.trim()
+
+      // Tìm user theo username/email/phone
+      const users = await User.find({
+        $or: [
+          {
+            username: {
+              $regex: keyword,
+              $options: "i",
+            },
+          },
+          {
+            email: {
+              $regex: keyword,
+              $options: "i",
+            },
+          },
+          {
+            phone: {
+              $regex: keyword,
+              $options: "i",
+            },
+          },
+        ],
+      }).select("_id")
+
+      const userIds = users.map((user) => user._id)
+
+      // Search order_code HOẶC user_id
+      filter.$or = [
+        {
+          order_code: {
+            $regex: keyword,
+            $options: "i",
+          },
+        },
+        {
+          user_id: {
+            $in: userIds, // lọc những đơn hàng của userId đó đã
+          },
+        },
+      ]
+    }
+
+    const [orders, total] = await Promise.all([
+      OrderRepo.findAll(filter, skip, currentLimit),
+
+      OrderRepo.countDocuments(filter),
+    ])
+
+    const stats = await OrderRepo.getOrderStats()
+
+    return {
+      total,
+      page: currentPage,
+      limit: currentLimit,
+      totalPages: Math.ceil(total / currentLimit),
+      stats,
+      orders,
+    }
+  }
   async getOrderById(id) {
     const order = await OrderRepo.findById(id)
 
@@ -424,7 +496,6 @@ class OrderService {
   }
 
   // admin
-
 }
 
 module.exports = new OrderService()
