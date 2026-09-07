@@ -1,0 +1,284 @@
+$ink: #1c1c1c;
+$muted: #767676;
+$border: #e6e6e6;
+$accent: #1f7a5c;
+$accent-soft: #e8f4ee;
+$danger: #c0392b;
+$bg: #f4f5f7;
+
+$radius: 10px;
+$font-sans: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+$font-mono: "SFMono-Regular", Menlo, Consolas, monospace;
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.payment-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: $bg;
+  font-family: $font-sans;
+  color: $ink;
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+.receipt {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 28px;
+  animation: fade-in 0.35s ease-out both;
+
+  &--error {
+    text-align: center;
+    padding: 40px 28px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: $muted;
+    }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #a26b00;
+  background: #fff4e0;
+  border: 1px solid #f0d9a6;
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.qr-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.qr-frame {
+  flex: 0 0 auto;
+  width: 152px;
+  height: 152px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 8px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.qr-details {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid $border;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    color: $muted;
+    flex-shrink: 0;
+  }
+
+  &__value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: right;
+
+    &--mono {
+      font-family: $font-mono;
+    }
+
+    &--amount {
+      color: $accent;
+      font-size: 1rem;
+    }
+  }
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &__hint {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: $accent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+.hint-text {
+  font-size: 0.8rem;
+  color: $muted;
+  line-height: 1.5;
+  margin: 18px 0 0;
+}
+
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: $accent-soft;
+  border-radius: 8px;
+  font-size: 0.82rem;
+
+  &__time {
+    font-family: $font-mono;
+    font-size: 1rem;
+    font-weight: 700;
+    color: $accent;
+
+    &--urgent {
+      color: $danger;
+    }
+  }
+}
+
+.checking-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 0.76rem;
+  color: $muted;
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $accent;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+}
+
+.expired-block {
+  text-align: center;
+  padding: 24px 0 8px;
+
+  p {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $danger;
+  }
+
+  &__sub {
+    font-size: 0.82rem !important;
+    font-weight: 400 !important;
+    color: $muted !important;
+  }
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  margin: 8px auto 14px;
+  border: 3px solid $border;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.status-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: $muted;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .receipt {
+    padding: 32px;
+  }
+}

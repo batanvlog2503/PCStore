@@ -54,7 +54,10 @@ const OrderSuccess = () => {
   useEffect(() => {
     getOrder()
   }, [orderId])
+  const isBankPaid =
+    order?.payment_method === "bank" && order?.payment_status === "paid"
 
+  const remainingAmount = isBankPaid ? 0 : Number(order?.total_amount || 0)
   const handleCopyCode = () => {
     if (!order?.order_code) return
     navigator.clipboard.writeText(order.order_code) // copy vào clipboard vào hẹ thống
@@ -139,6 +142,19 @@ const OrderSuccess = () => {
             <span className="label">Hình thức thanh toán</span>
             <span className="value">
               {PAYMENT_LABELS[order.payment_method] || order.payment_method}
+            </span>
+          </div>
+          <div className="info-row">
+            <span className="label">Trạng thái thanh toán</span>
+
+            <span
+              className={
+                isBankPaid
+                  ? "value payment-status payment-status--paid"
+                  : "value payment-status payment-status--pending"
+              }
+            >
+              {isBankPaid ? "✓ Đã thanh toán" : "Chưa thanh toán"}
             </span>
           </div>
           <div className="info-row">
@@ -231,12 +247,58 @@ const OrderSuccess = () => {
               </span>
             </div>
             <div className="totals-row total">
-              <span>Tổng thanh toán</span>
+              <span>Tổng đơn hàng</span>
               <span>{formatPrice(order.total_amount)}</span>
+            </div>
+
+            {isBankPaid && (
+              <div className="totals-row paid">
+                <span>Đã thanh toán</span>
+                <span>-{formatPrice(order.total_amount)}</span>
+              </div>
+            )}
+
+            <div
+              className={
+                isBankPaid
+                  ? "totals-row remaining remaining--paid"
+                  : "totals-row remaining"
+              }
+            >
+              <span>Còn phải thanh toán</span>
+              <span>{formatPrice(remainingAmount)}</span>
             </div>
           </div>
         </div>
       </div>
+      {isBankPaid ? (
+        <div className="payment-success-banner">
+          <i className="fa-solid fa-circle-check"></i>
+
+          <div>
+            <p>Thanh toán thành công</p>
+
+            <span>
+              Chúng tôi đã nhận được thanh toán cho đơn hàng này. Đơn hàng đang
+              được xử lý.
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="processing-banner">
+          <i className="fa-regular fa-clock"></i>
+
+          <div>
+            <p>Đơn hàng của bạn đang được xử lý</p>
+
+            <span>
+              Chúng tôi sẽ nhanh chóng xác nhận đơn hàng và liên hệ với bạn để
+              thông báo chi tiết. Bạn có thể theo dõi trạng thái đơn hàng trong
+              mục "Đơn hàng của tôi".
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* ================= BANNER TRẠNG THÁI ================= */}
       <div className="processing-banner">
@@ -261,7 +323,9 @@ const OrderSuccess = () => {
         </button>
         <button
           className="view-orders-btn"
-          onClick={() => navigate("/profile", { state: { tab: "orders" } })}
+          onClick={() =>
+            navigate("/account/order", { state: { tab: "orders" } })
+          }
         >
           <i className="fa-solid fa-list-ul"></i> Xem đơn hàng của tôi
         </button>

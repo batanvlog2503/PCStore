@@ -114,10 +114,17 @@ class OrderRepository {
     return order
   }
 
-  async updateById(id, data) {
-    return await Order.findByIdAndUpdate(id, data, {
-      new: true,
-    })
+  async updateById(orderId, data) {
+    return Order.findByIdAndUpdate(
+      orderId,
+      {
+        $set: data,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
   }
   async update(id, data, session = null) {
     return await Order.findByIdAndUpdate(id, data, {

@@ -1,10 +1,11 @@
 const mongoose = require("mongoose")
+
 const { Schema } = mongoose
 
 const OrderSchema = new Schema(
   {
     // =========================
-    // 1. Người đặt hàng
+    // Người đặt hàng
     // =========================
     user_id: {
       type: Schema.Types.ObjectId,
@@ -13,7 +14,7 @@ const OrderSchema = new Schema(
     },
 
     // =========================
-    // 2. Địa chỉ giao hàng
+    // Địa chỉ giao hàng
     // =========================
     address_id: {
       type: Schema.Types.ObjectId,
@@ -28,7 +29,7 @@ const OrderSchema = new Schema(
     },
 
     // =========================
-    // 4. Mã đơn hàng
+    // Mã đơn hàng
     // =========================
     order_code: {
       type: String,
@@ -38,7 +39,7 @@ const OrderSchema = new Schema(
     },
 
     // =========================
-    // 5. Tiền hàng trước giảm giá
+    // Tiền hàng
     // =========================
     subtotal: {
       type: Number,
@@ -46,36 +47,24 @@ const OrderSchema = new Schema(
       min: 0,
     },
 
-    // =========================
-    // 6. Tổng giảm giá từ sản phẩm
-    // =========================
     product_discount: {
       type: Number,
       default: 0,
       min: 0,
     },
 
-    // =========================
-    // 7. Giảm giá voucher
-    // =========================
     voucher_discount: {
       type: Number,
       default: 0,
       min: 0,
     },
 
-    // =========================
-    // 8. Phí vận chuyển
-    // =========================
     shipping_fee: {
       type: Number,
       default: 0,
       min: 0,
     },
 
-    // =========================
-    // 9. Tổng tiền cuối cùng
-    // =========================
     total_amount: {
       type: Number,
       required: true,
@@ -83,7 +72,7 @@ const OrderSchema = new Schema(
     },
 
     // =========================
-    // 10. Trạng thái đơn
+    // Trạng thái đơn hàng
     // =========================
     status: {
       type: String,
@@ -91,21 +80,48 @@ const OrderSchema = new Schema(
       default: "pending",
     },
 
+    // =========================
+    // Thanh toán
+    // =========================
     payment_method: {
       type: String,
       enum: ["cod", "bank"],
       required: true,
     },
+
     payment_status: {
       type: String,
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
+
+    // Mã giao dịch ngân hàng
+    payment_reference: {
+      type: String,
+      default: null,
+    },
+
+    // ID giao dịch từ SePay
+    sepay_transaction_id: {
+      type: Number,
+      default: null,
+    },
+
+    // Thời gian thanh toán thành công
+    paid_at: {
+      type: Date,
+      default: null,
+    },
+
+    // =========================
+    // Ghi chú
+    // =========================
     note: {
       type: String,
       default: null,
       maxlength: 500,
     },
+
     completed_at: {
       type: Date,
       default: null,
@@ -119,7 +135,7 @@ const OrderSchema = new Schema(
   {
     timestamps: {
       createdAt: "created_at",
-      updatedAt: false,
+      updatedAt: "updated_at",
     },
   },
 )

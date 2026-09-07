@@ -28,7 +28,9 @@ const validateStock = (items) => {
     }
   }
 }
-
+const generateOrderCode = () => {
+  return `DH${Date.now()}`
+}
 const validateCartItems = (items, cartItemIds) => {
   if (!items.length) {
     throw new AppError(404, "Cart items not found")
@@ -64,9 +66,6 @@ const calculateOrderAmount = (items) => {
   }
 }
 
-const generateOrderCode = () => {
-  return `ORD-${Date.now()}`
-}
 class OrderService {
   // async getAllOrders(req) {
   //   return await OrderRepo.getAll(req)

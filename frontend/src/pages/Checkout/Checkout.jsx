@@ -213,9 +213,7 @@ const Checkout = () => {
       }
       // BANK / SePay
       if (paymentMethod === "bank") {
-        navigate(
-          `/order/payment?id=${order._id}&totalAmount=${order.total_amount}`,
-        )
+        navigate(`/order/payment?id=${order._id}`)
         return
       }
     } catch (error) {
