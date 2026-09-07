@@ -34,6 +34,7 @@ import ManagementUser from "./admin/User/ManagementUser"
 import ManagementOrder from "./admin/ManagementOrder/ManagementOrder"
 import ManagementProduct from "./admin/ManagementProduct.jsx/ManagementProduct"
 import AddProduct from "./admin/ManagementProduct.jsx/AddProduct/AddProduct"
+import EditProduct from "./admin/ManagementProduct.jsx/EditProduct/EditProduct"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -141,6 +142,10 @@ const router = createBrowserRouter(
           <Route
             path="products/new"
             element={<AddProduct />}
+          />
+          <Route
+            path="products/edit/:productId"
+            element={<EditProduct />}
           />
           {/* <Route
             path="products"

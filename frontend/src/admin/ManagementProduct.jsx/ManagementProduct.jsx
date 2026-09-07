@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import "./ManagementProduct.scss"
 import axiosInstance from "../../utils/axiosInstance"
-
+import { useNavigate } from "react-router-dom"
 import ProductDetailModal from "./modals/ProductDetailModal.jsx"
 import ProductEditModal from "./modals/ProductEditModal.jsx"
 import ConfirmDeleteModal from "./modals/ConfirmDeleteModal.jsx"
@@ -44,6 +44,7 @@ const INITIAL_FILTERS = {
 // ================= MOCK
 
 const ManagementProduct = () => {
+  const navigate = useNavigate()
   const [mounted, setMounted] = useState(false)
 
   const [products, setProducts] = useState([])
@@ -546,7 +547,9 @@ const ManagementProduct = () => {
                           <button
                             className="mp-icon-btn"
                             title="Chỉnh sửa"
-                            onClick={() => handleEdit(p)}
+                            onClick={() =>
+                              navigate(`/admin/products/edit/${p._id}`)
+                            }
                           >
                             <i className="fa-regular fa-pen-to-square"></i>
                           </button>

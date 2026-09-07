@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
 import "./EditProduct.scss"
-import axiosInstance from "../../utils/axiosInstance"
+import axiosInstance from "../../../utils/axiosInstance"
 
 // ================= CONST =================
 const PRODUCT_STATUS_OPTIONS = [
@@ -150,11 +150,6 @@ const EditProduct = () => {
   const [variantErrors, setVariantErrors] = useState({})
   const [savingVariant, setSavingVariant] = useState(false)
   const [copied, setCopied] = useState(false)
-
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setMounted(true))
-    return () => cancelAnimationFrame(t)
-  }, [])
 
   const getData = async () => {
     try {
