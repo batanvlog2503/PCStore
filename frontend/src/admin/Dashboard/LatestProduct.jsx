@@ -25,6 +25,7 @@ const LatestProduct = () => {
       )
       console.log("LATEST PRODUCTS RESPONSE:", response.data)
       if (response.data.success) {
+        console.log("Products:", response.data.data.products)
         setProducts(response.data.data.products || [])
         setTotalPages(response.data.data.totalPages || 1)
         setPage(response.data.data.page || pageNumber)
@@ -126,9 +127,9 @@ const LatestProduct = () => {
                     {p.name}
                   </td>
                   <td>{p.category_id?.name || "—"}</td>
-                  <td>{p.brand_id?.name || "—"}</td>
+                  <td>{p?.brand_id?.name || "—"}</td>
 
-                  <td>{p.sold_count || 0}</td>
+                  <td>{p?.sold_count || 0}</td>
                   <td>
                     <span
                       className={`badge ${p.status === "active" ? "success" : "muted"}`}

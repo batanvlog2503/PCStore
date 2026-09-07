@@ -306,8 +306,13 @@ export const Home = () => {
                     </div>
 
                     <div className="product-info">
-                      <h5 className="product-name">{variant.product_name}</h5>
-                      <p className="config-name">{variant.config_name}</p>
+                      <h5 className="product-name">
+                        {variant.product_name} {variant.sku}
+                      </h5>
+
+                      <p className="config-name">
+                        Cấu hình: {variant.config_name}
+                      </p>
 
                       <div className="price-row">
                         {hasDiscount ? (
@@ -326,7 +331,7 @@ export const Home = () => {
                         )}
                       </div>
 
-                      <span
+                      {/* <span
                         className={`stock-tag ${
                           variant.stock === 0 ? "out" : ""
                         }`}
@@ -334,7 +339,7 @@ export const Home = () => {
                         {variant.stock > 0
                           ? `Còn ${variant.stock} sản phẩm`
                           : "Hết hàng"}
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                 </li>

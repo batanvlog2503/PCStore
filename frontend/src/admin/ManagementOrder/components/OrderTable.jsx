@@ -7,6 +7,7 @@ export const STATUS_LABEL = {
   shipping: "Đang giao",
   completed: "Hoàn thành",
   cancelled: "Đã huỷ",
+  confirmed: "Đã xác nhận",
 }
 
 const PAYMENT_LABEL = {

@@ -8,6 +8,7 @@ const OrderItemRepo = require("../repositories/OrderItemRepository")
 const CartItemRepo = require("../repositories/CartItemRepository")
 const ProductVariantRepo = require("../repositories/ProductVariantRepository")
 const Product = require("../models/Product")
+const ProductVariant = require("../models/ProductVariant")
 const OrderItem = require("../models/OrderItem")
 const User = require("../models/User")
 const filterAllOrders = require("../../helpers/filterAllOrders")
@@ -228,7 +229,7 @@ class OrderService {
           total_amount: amount.total_amount,
           payment_method,
           payment_status: "pending",
-          status: "pending",
+          status: "confirmed",
 
           note: note || null,
         },
@@ -391,12 +392,45 @@ class OrderService {
         order_id: order._id,
       }).lean()
 
-      for (const item of orderItems) {
-        await Product.findByIdAndUpdate(item.product_id, {
-          $inc: {
-            sold_count: item.quantity,
-          },
-        })
+      if (status === "completed" && oldStatus !== "completed") {
+        console.log("=== COMPLETED ORDER ===")
+        console.log("Order ID:", order._id)
+
+        const orderItems = await OrderItem.find({
+          order_id: order._id,
+        }).lean()
+
+        console.log("ORDER ITEMS:", orderItems)
+
+        for (const item of orderItems) {
+          console.log(
+            "Updating product:",
+            item.product_id,
+            "Quantity:",
+            item.quantity,
+          )
+
+          const product = await Product.findByIdAndUpdate(
+            item.product_id,
+            {
+              $inc: {
+                sold_count: item.quantity,
+              },
+            },
+            {
+              new: true,
+            },
+          )
+          console.log("Product SOLD COUNT:", product.sold_count)
+          // Nếu có variant
+          if (item.variant_id) {
+            await ProductVariant.findByIdAndUpdate(item.variant_id, {
+              $inc: {
+                stock: -item.quantity,
+              },
+            })
+          }
+        }
       }
     }
 

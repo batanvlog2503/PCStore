@@ -225,14 +225,6 @@ const Checkout = () => {
     }
   }
 
-  // frontend gửi khi tạo order
-  // const {
-  //   cart_item_ids,
-  //   address_id,
-  //   payment_method,
-  //   note,
-  // } = data
-  // Không có cartItemIds (vào thẳng URL /checkout, hoặc F5 mất state) -> đá về giỏ hàng
   if (!cartItemIds || cartItemIds.length === 0) {
     return (
       <Navigate
