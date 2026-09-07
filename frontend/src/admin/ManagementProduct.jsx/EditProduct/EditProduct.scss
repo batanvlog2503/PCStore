@@ -1,0 +1,851 @@
+// ==========================================================================
+// EditProduct.scss — TechStore Admin
+// ==========================================================================
+
+$color-white: #ffffff;
+$color-bg: #f5f6fb;
+$color-text: #1f2330;
+$color-muted: #8a8fa3;
+$color-border: #ececf4;
+
+$color-blue: #2f6fed;
+$color-blue-dark: #1f56d6;
+$color-green: #22c55e;
+$color-orange: #f5a623;
+$color-red: #ef4444;
+
+$radius-lg: 16px;
+$radius-md: 10px;
+$radius-sm: 6px;
+$transition-fast: 0.2s ease-in-out;
+
+$bp-xs: 420px;
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes epSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes epShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes epPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// ==========================================================================
+// Loading state
+// ==========================================================================
+.edit-product-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 60vh;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 4px solid $color-border;
+    border-top-color: $color-blue;
+    animation: epSpin 0.8s linear infinite;
+  }
+
+  p {
+    font-size: 13.5px;
+    color: $color-muted;
+  }
+}
+
+// ==========================================================================
+// Page shell
+// ==========================================================================
+.edit-product {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  color: $color-text;
+  animation: fadeIn 0.3s ease-out;
+
+  .ep-breadcrumb {
+    font-size: 12.5px;
+    color: $color-muted;
+    margin: 0 0 14px;
+    animation: fadeInUp 0.3s ease-out both;
+
+    a {
+      color: $color-muted;
+      text-decoration: none;
+
+      &:hover {
+        color: $color-blue;
+      }
+    }
+
+    i {
+      font-size: 9px;
+      margin: 0 6px;
+    }
+
+    span {
+      color: $color-text;
+      font-weight: 600;
+    }
+  }
+
+  // ==========================================================================
+  // Header
+  // ==========================================================================
+  .ep-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.35s ease-out both;
+    animation-delay: 0.03s;
+  }
+
+  .ep-header-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    h1 {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 800;
+    }
+  }
+
+  .ep-back-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: $radius-md;
+    border: 1.5px solid $color-border;
+    background-color: $color-white;
+    color: $color-text;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      background-color: $color-bg;
+      transform: translateX(-2px);
+    }
+  }
+
+  .ep-header-actions {
+    display: flex;
+    gap: 10px;
+
+    @include respond($bp-xs) {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 20px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        box-shadow $transition-fast,
+        opacity $transition-fast;
+    }
+  }
+
+  .ep-save-btn {
+    border: none;
+    background-color: $color-blue;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+      background-color: $color-blue-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba($color-blue, 0.35);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  .ep-cancel-btn {
+    border: 1.5px solid $color-border;
+    background-color: $color-white;
+    color: $color-text;
+
+    &:hover {
+      background-color: $color-bg;
+    }
+  }
+
+  // ==========================================================================
+  // Generic card
+  // ==========================================================================
+  .ep-card {
+    background-color: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 22px;
+    animation: fadeInUp 0.4s ease-out both;
+  }
+
+  .ep-card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    &.with-action {
+      justify-content: space-between;
+      flex-wrap: wrap;
+
+      .ep-card-head-left {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15.5px;
+      font-weight: 800;
+    }
+  }
+
+  .ep-card-sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: $color-muted;
+    line-height: 1.5;
+  }
+
+  .ep-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-sm;
+    background-color: rgba($color-blue, 0.1);
+    color: $color-blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  // ==========================================================================
+  // Top grid: thông tin + hình ảnh
+  // ==========================================================================
+  .ep-top-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+
+    @include respond($bp-lg) {
+      grid-template-columns: 1fr;
+    }
+
+    .ep-card {
+      animation-delay: 0.06s;
+    }
+  }
+
+  // ==========================================================================
+  // Form fields (dùng chung cho product info + variant form)
+  // ==========================================================================
+  .ep-form,
+  .ep-variant-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 18px;
+
+    @include respond($bp-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .ep-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+
+    &.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: $color-text;
+
+      .required {
+        color: $color-red;
+      }
+    }
+
+    .section-label {
+      margin-top: 4px;
+      padding-top: 12px;
+      border-top: 1px dashed $color-border;
+      color: $color-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-size: 11px;
+    }
+
+    input,
+    select,
+    textarea {
+      height: 42px;
+      padding: 0 14px;
+      border-radius: $radius-md;
+      border: 1.5px solid $color-border;
+      background-color: $color-bg;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: $color-text;
+      transition:
+        border-color $transition-fast,
+        box-shadow $transition-fast;
+
+      &:focus {
+        outline: none;
+        border-color: $color-blue;
+        background-color: $color-white;
+        box-shadow: 0 0 0 3px rgba($color-blue, 0.15);
+      }
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    textarea {
+      height: auto;
+      padding: 10px 14px;
+      resize: vertical;
+      min-height: 110px;
+    }
+  }
+
+  .ep-char-count {
+    align-self: flex-end;
+    font-size: 11px;
+    color: $color-muted;
+  }
+
+  .ep-error {
+    font-size: 11px;
+    color: $color-red;
+    animation: epShake 0.3s ease-in-out;
+  }
+
+  .ep-slug-input {
+    position: relative;
+
+    input {
+      width: 100%;
+      padding-right: 40px;
+      box-sizing: border-box;
+    }
+
+    button {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: none;
+      color: $color-blue;
+      cursor: pointer;
+      font-size: 13px;
+
+      &:hover {
+        color: $color-blue-dark;
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Image gallery
+  // ==========================================================================
+  .ep-image-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+
+    @include respond($bp-md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include respond($bp-xs) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .ep-image-tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: $radius-md;
+    border: 1.5px solid $color-border;
+    background-color: $color-bg;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      border-color $transition-fast,
+      transform $transition-fast;
+
+    &:hover {
+      border-color: $color-blue;
+      transform: translateY(-2px);
+    }
+
+    &.is-main {
+      border-color: $color-blue;
+      border-width: 2px;
+      cursor: default;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .placeholder-icon {
+      font-size: 24px;
+      color: $color-muted;
+    }
+
+    .main-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background-color: $color-blue;
+      color: $color-white;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      z-index: 1;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(15, 15, 20, 0.6);
+      color: $color-white;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: $color-red;
+      }
+    }
+
+    &.add-tile {
+      flex-direction: column;
+      gap: 6px;
+      border-style: dashed;
+      color: $color-muted;
+      font-size: 11px;
+      font-weight: 600;
+
+      i {
+        font-size: 16px;
+      }
+
+      &:hover {
+        color: $color-blue;
+        background-color: rgba($color-blue, 0.04);
+      }
+    }
+  }
+
+  .ep-note-box {
+    background-color: rgba($color-blue, 0.06);
+    border-radius: $radius-md;
+    padding: 14px 16px;
+
+    .note-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: $color-blue-dark;
+      margin-bottom: 8px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+
+      li {
+        font-size: 12px;
+        color: $color-muted;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Variants table
+  // ==========================================================================
+  .ep-variants-card {
+    margin-bottom: 20px;
+    animation-delay: 0.1s;
+  }
+
+  .ep-add-variant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: $radius-md;
+    border: none;
+    background-color: $color-blue;
+    color: $color-white;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color $transition-fast,
+      transform $transition-fast,
+      box-shadow $transition-fast;
+
+    &:hover {
+      background-color: $color-blue-dark;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba($color-blue, 0.35);
+    }
+  }
+
+  .ep-variant-table-scroll {
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    thead {
+      background-color: $color-bg;
+
+      th {
+        text-align: left;
+        padding: 12px 14px;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: $color-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+      }
+
+      .col-actions {
+        text-align: right;
+      }
+    }
+
+    tbody tr {
+      border-top: 1px solid $color-border;
+      transition: background-color $transition-fast;
+
+      &:hover {
+        background-color: rgba($color-blue, 0.03);
+      }
+
+      td {
+        padding: 14px;
+        font-size: 13px;
+        vertical-align: top;
+      }
+    }
+  }
+
+  .variant-name-cell {
+    min-width: 150px;
+
+    .name {
+      margin: 0 0 4px;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      background-color: rgba($color-blue, 0.1);
+      color: $color-blue-dark;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+  }
+
+  .sku-cell {
+    color: $color-muted;
+    font-family: "Courier New", monospace;
+    white-space: nowrap;
+  }
+
+  .specs-cell {
+    min-width: 210px;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      li {
+        font-size: 11.5px;
+        color: $color-muted;
+
+        strong {
+          color: $color-text;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .price-cell {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .discount-cell {
+    color: $color-red;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .ep-variant-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.status-active {
+      background-color: rgba($color-green, 0.12);
+      color: darken($color-green, 6%);
+    }
+    &.status-out_of_stock {
+      background-color: rgba($color-orange, 0.14);
+      color: darken($color-orange, 10%);
+    }
+    &.status-discontinued {
+      background-color: rgba($color-red, 0.12);
+      color: $color-red;
+    }
+  }
+
+  .ep-variant-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+
+    .ep-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: $radius-sm;
+      border: 1.5px solid $color-border;
+      background-color: $color-white;
+      color: $color-muted;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        border-color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: $color-blue;
+        border-color: $color-blue;
+        color: $color-white;
+        transform: translateY(-1px);
+      }
+
+      &.is-danger:hover {
+        background-color: $color-red;
+        border-color: $color-red;
+      }
+    }
+  }
+
+  .ep-variant-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: $color-muted;
+    font-size: 13px;
+  }
+
+  // ==========================================================================
+  // Variant add/edit form panel
+  // ==========================================================================
+  .ep-variant-form-card {
+    animation: epPopIn 0.35s cubic-bezier(0.34, 1.1, 0.64, 1) both;
+    border-color: rgba($color-blue, 0.35);
+  }
+
+  .ep-variant-form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    padding-top: 16px;
+    border-top: 1px solid $color-border;
+
+    @include respond($bp-xs) {
+      flex-direction: column-reverse;
+    }
+
+    button {
+      min-width: 160px;
+      height: 44px;
+      border-radius: $radius-md;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        background-color $transition-fast,
+        transform $transition-fast,
+        opacity $transition-fast;
+
+      @include respond($bp-xs) {
+        width: 100%;
+      }
+    }
+  }
+
+  .ep-variant-cancel-btn {
+    border: 1.5px solid $color-border;
+    background-color: $color-white;
+    color: $color-text;
+
+    &:hover:not(:disabled) {
+      background-color: $color-bg;
+    }
+  }
+
+  .ep-variant-save-btn {
+    border: none;
+    background-color: $color-blue;
+    color: $color-white;
+
+    &:hover:not(:disabled) {
+      background-color: $color-blue-dark;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+}

@@ -37,6 +37,10 @@ class ProductVariantRepository {
   async findById(id) {
     return await ProductVariant.findById(id)
   }
+
+  async createMany(data) {
+    return await ProductVariant.insertMany(data)
+  }
   async findByProductId(productId) {
     return await ProductVariant.find({
       product_id: productId,

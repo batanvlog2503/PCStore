@@ -525,7 +525,38 @@ $ap-danger: #ef4444;
     }
   }
 }
+.ap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.ap-reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  background: #fff;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: all 0.2s ease;
+}
+
+.ap-reset-btn:hover {
+  background: #f5f5f5;
+}
+
+.ap-reset-btn i {
+  font-size: 14px;
+}
 .ap-main-badge {
   position: absolute;
   bottom: 4px;

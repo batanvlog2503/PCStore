@@ -170,6 +170,28 @@ class ProductController {
       next(error)
     }
   }
+
+  async createProduct(req, res, next) {
+    try {
+      const result = await ProductService.createProduct({
+        body: req.body,
+        files: req.files,
+      })
+
+      return res.status(201).json({
+        success: true,
+        message: "Tạo sản phẩm thành công",
+        data: result,
+      })
+    } catch (error) {
+      console.error("Lỗi tạo sản phẩm:", error)
+
+      return res.status(400).json({
+        success: false,
+        message: error.message || "Tạo sản phẩm thất bại",
+      })
+    }
+  }
 }
 
 module.exports = new ProductController()

@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./AddProduct.scss"
 import axiosInstance from "../../../utils/axiosInstance"
-
+import { useNavigate } from "react-router-dom"
 const emptyVariant = () => ({
   _key: crypto.randomUUID(),
   sku: "",
@@ -23,6 +23,34 @@ const emptyVariant = () => ({
 })
 
 const AddProduct = () => {
+  const navigate = useNavigate()
+  const resetForm = () => {
+    setForm({
+      name: "",
+      category_id: "",
+      brand_id: "",
+      description: "",
+      status: "active",
+    })
+
+    // giải phóng preview URL cũ
+    images.forEach((img) => {
+      if (img.preview) {
+        URL.revokeObjectURL(img.preview)
+      }
+    })
+
+    setImages([])
+
+    setVariants([emptyVariant()])
+
+    setActiveVariant(0)
+
+    setErrors({})
+
+    setSubmitting(false)
+  }
+  // categories and brands
   const [categories, setCategories] = useState([])
   const [brands, setBrands] = useState([])
 
@@ -34,7 +62,7 @@ const AddProduct = () => {
     status: "active",
   })
 
-  // ===== ẢNH: chỉ còn 1 danh sách duy nhất, mỗi ảnh có is_main =====
+  //  ẢNH: chỉ còn 1 danh sách duy nhất, mỗi ảnh có is_main
   const [images, setImages] = useState([]) // [{_key, file, preview, is_main}]
   const [variants, setVariants] = useState([emptyVariant()])
   const [activeVariant, setActiveVariant] = useState(0)
@@ -115,24 +143,28 @@ const AddProduct = () => {
     })
   }
 
-  // ================= PHIÊN BẢN =================
+  // phiên bản variants
+
+  // thêm phiên bản
   const addVariant = () => {
     setVariants((prev) => [...prev, emptyVariant()])
     setActiveVariant(variants.length)
   }
 
+  // cái active variant là trỏ vào variant vừa tạo thêm
+  // xóa variant
   const removeVariant = (idx) => {
     if (variants.length === 1) return
     setVariants((prev) => prev.filter((_, i) => i !== idx))
     setActiveVariant((prev) => Math.max(0, prev - (idx <= prev ? 1 : 0)))
   }
-
+  // thay đổi giá trị variants
   const handleVariantChange = (idx, field, value) => {
     setVariants((prev) =>
       prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)),
     )
   }
-
+  // cũng giống trên nhưng sẽ có khớn
   const handleSpecChange = (idx, field, value) => {
     setVariants((prev) =>
       prev.map((v, i) =>
@@ -179,7 +211,8 @@ const AddProduct = () => {
       fd.append("brand_id", form.brand_id)
       fd.append("description", form.description)
       fd.append("status", form.status)
-
+      // fd.append(mainImageIndex)
+      // fd.append(variantsPayload)
       // gửi toàn bộ ảnh theo đúng thứ tự trong mảng images
       images.forEach((img) => fd.append("images", img.file))
 
@@ -204,15 +237,18 @@ const AddProduct = () => {
         stock: Number(v.stock) || 0,
         status: v.status,
       }))
+      // formData không biết array hay object như JSON
       fd.append("variants", JSON.stringify(variantsPayload))
 
-      await axiosInstance.post(
-        `${import.meta.env.VITE_APP_URL}/admin/products`,
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/admin/products/add`,
         fd,
         { headers: { "Content-Type": "multipart/form-data" } },
       )
 
       alert("Tạo sản phẩm thành công!")
+
+      navigate("/admin/products")
     } catch (err) {
       console.error("Lỗi tạo sản phẩm:", err)
       alert(err.response?.data?.message || "Tạo sản phẩm thất bại")
@@ -231,6 +267,14 @@ const AddProduct = () => {
       <div className="ap-header">
         <h1>Thêm sản phẩm</h1>
         <p>Tạo sản phẩm mới trong cửa hàng của bạn</p>
+        <button
+          type="button"
+          className="ap-reset-btn"
+          onClick={resetForm}
+        >
+          <i className="fa-solid fa-rotate-right"></i>
+          Làm mới
+        </button>
       </div>
 
       {/* ===== SECTION 1: THÔNG TIN CƠ BẢN ===== */}

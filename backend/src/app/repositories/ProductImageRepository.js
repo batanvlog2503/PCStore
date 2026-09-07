@@ -9,7 +9,7 @@ class ProductImageRepository {
     return await ProductImage.findById(id)
   }
 
-  async createMany(data) {
+  async insertMany(data) {
     return await ProductImage.insertMany(data) // thay vì createData ta dùng insermany
   }
 

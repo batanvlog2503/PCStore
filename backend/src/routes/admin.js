@@ -9,6 +9,34 @@ const OrderItemController = require("../app/controllers/OrderItemController")
 const ProductController = require("../app/controllers/ProductController")
 const BrandController = require("../app/controllers/BrandController")
 const CategoryController = require("../app/controllers/CategoryController")
+const multer = require("multer")
+const path = require("path")
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../public/product"))
+  },
+
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname)
+
+    const name = `product-${Date.now()}-${Math.round(
+      Math.random() * 1e9,
+    )}${ext}`
+
+    cb(null, name)
+  },
+})
+
+const fileFilter = (req, file, cb) => {
+  const typeFile = ["image/jpeg", "image/png", "image/jpg"]
+  if (typeFile.includes(file.mimetype)) {
+    cb(null, true)
+  } else {
+    cb(new Error("Chỉ cho phép upload file ảnh"), false)
+  }
+}
+
+const upload = multer({ storage: storage, fileFilter: fileFilter })
 router.get(
   "/dashboard",
   auth,
@@ -103,7 +131,13 @@ router.get(
   authorize("admin"),
   ProductController.adminGetProductDetail,
 )
-
+router.post(
+  "/products/add",
+  auth,
+  authorize("admin"),
+  upload.array("images", 10), // lưu ý cái images phải giống với images ở fd.images fe
+  ProductController.createProduct,
+)
 router.delete(
   "/products/:id/soft-delete",
   auth,
@@ -124,4 +158,5 @@ router.get(
   authorize("admin"),
   CategoryController.getAllCategories,
 )
+
 module.exports = router

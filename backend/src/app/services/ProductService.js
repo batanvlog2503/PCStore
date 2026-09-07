@@ -1,3 +1,4 @@
+const slugify = require("slugify")
 const ProductRepo = require("../repositories/ProductRepository")
 const CategoryRepo = require("../repositories/CategoryRepository")
 const BrandRepo = require("../repositories/BrandRepository")
@@ -8,6 +9,24 @@ const ProductImageRepo = require("../repositories/ProductImageRepository")
 const ProductVariant = require("../models/ProductVariant")
 const ProductImage = require("../models/ProductImage")
 const filterAllProducts = require("../../helpers/filterAllProducts")
+
+const generateUniqueSlug = async (name) => {
+  const baseSlug = slugify(name, {
+    lower: true,
+    strict: true,
+    locale: "vi",
+  })
+
+  let slug = baseSlug
+  let counter = 1
+
+  while (await ProductRepo.findBySlug(slug)) {
+    slug = `${baseSlug}-${counter}`
+    counter++
+  }
+
+  return slug
+}
 class ProductService {
   async getAllProducts(req) {
     return await ProductRepo.getAll(req)
@@ -59,13 +78,48 @@ class ProductService {
     return product
   }
 
-  async createProduct(data) {
-    const { category_id, brand_id, name, slug, description, status } = data
-
-    if (!category_id || !brand_id || !name || !slug) {
-      throw new AppError(400, "Missing required fields")
+  async createProduct({ body, files }) {
+    const {
+      name,
+      category_id,
+      brand_id,
+      description,
+      status,
+      mainImageIndex,
+      variants,
+    } = body
+    if (!name) {
+      throw new Error("Tên sản phẩm không được để trống")
     }
 
+    if (!category_id) {
+      throw new Error("Danh mục không được để trống")
+    }
+
+    if (!brand_id) {
+      throw new Error("Thương hiệu không được để trống")
+    }
+
+    if (!variants) {
+      throw new Error("Sản phẩm phải có ít nhất một phiên bản")
+    }
+    if (!files || files.length === 0) {
+      throw new AppError(400, "Sản phẩm phải có ít nhất một ảnh")
+    }
+    // chuyyeenr variants thành json vì trước đó formData -> stringtify
+
+    // variants từ FormData là JSON string
+    let parsedVariants
+
+    try {
+      parsedVariants = JSON.parse(variants)
+    } catch (error) {
+      throw new Error("Dữ liệu variants không hợp lệ")
+    }
+
+    if (!Array.isArray(parsedVariants) || parsedVariants.length === 0) {
+      throw new Error("Sản phẩm phải có ít nhất một phiên bản")
+    }
     const category = await CategoryRepo.findById(category_id)
 
     if (!category) {
@@ -78,20 +132,100 @@ class ProductService {
       throw new AppError(404, "Brand not found")
     }
 
-    const existed = await ProductRepo.findBySlug(slug)
-
-    if (existed) {
-      throw new AppError(400, "Slug already exists")
-    }
-
-    return await ProductRepo.create({
+    const slug = await generateUniqueSlug(name)
+    // 1. tạo Product và sẽ tạo ra ProductId
+    const product = await ProductRepo.create({
       category_id,
       brand_id,
       name,
       slug,
       description,
-      status,
+      status: status || "active",
     })
+
+    // Product đã có ID
+    const productId = product._id
+    // 2. TẠO PRODUCT IMAGES
+
+    let images = []
+    if (files && files.length > 0) {
+      const mainIndex = Number(mainImageIndex)
+      if (mainIndex < 0 || mainIndex >= files.length) {
+        throw new AppError(400, "Ảnh chính không hợp lệ")
+      }
+      const imagesData = files.map((file, index) => ({
+        product_id: productId,
+        image_url: `/product/${file.filename}`,
+        is_main: index === mainIndex,
+      }))
+
+      images = await ProductImageRepo.insertMany(imagesData)
+
+      const mainImage = images.find((image) => image.is_main)
+
+      if (mainImage) {
+        await ProductRepo.updateById(productId, {
+          image_url: mainImage.image_url,
+        })
+      }
+    }
+    parsedVariants.forEach((variant, index) => {
+      if (!variant.sku?.trim()) {
+        throw new AppError(
+          400,
+          `SKU phiên bản ${index + 1} không được để trống`,
+        )
+      }
+
+      if (!variant.config_name?.trim()) {
+        throw new AppError(
+          400,
+          `Tên cấu hình phiên bản ${index + 1} không được để trống`,
+        )
+      }
+
+      if (!variant.price || Number(variant.price) <= 0) {
+        throw new AppError(400, `Giá phiên bản ${index + 1} không hợp lệ`)
+      }
+    })
+    // 3. TẠO PRODUCT VARIANTS
+    const variantsData = parsedVariants.map((variant) => ({
+      product_id: productId,
+
+      sku: variant.sku,
+
+      config_name: variant.config_name,
+
+      specs: {
+        cpu: variant.specs.cpu,
+        ram: Number(variant.specs.ram),
+        storage_capacity: Number(variant.specs.storage_capacity),
+        storage_type: variant.specs.storage_type,
+        gpu: variant.specs.gpu,
+        screen_size: Number(variant.specs.screen_size),
+        screen_resolution: variant.specs.screen_resolution,
+      },
+
+      price: Number(variant.price),
+
+      discount_price:
+        variant.discount_price !== null &&
+        variant.discount_price !== undefined &&
+        variant.discount_price !== ""
+          ? Number(variant.discount_price)
+          : null,
+
+      status: variant.status || "active",
+      stock: Number(variant.stock) || 0,
+    }))
+
+    const createdVariants = await ProductVariantRepo.createMany(variantsData)
+
+    return {
+      product,
+      images,
+      variants: createdVariants,
+    }
   }
 
   async updateProduct(id, data) {
@@ -332,10 +466,23 @@ class ProductService {
   }
   async getProductStats() {
     const [total, active, hidden, deleted] = await Promise.all([
-      ProductRepo.countProducts({}),
-      ProductRepo.countProducts({ status: "active" }),
-      ProductRepo.countProducts({ status: "hidden" }),
-      ProductRepo.countProducts({ status: "deleted" }),
+      ProductRepo.countProducts({
+        deleted: { $ne: true },
+      }),
+
+      ProductRepo.countProducts({
+        status: "active",
+        deleted: { $ne: true },
+      }),
+
+      ProductRepo.countProducts({
+        status: "hidden",
+        deleted: { $ne: true },
+      }),
+
+      ProductRepo.countProducts({
+        deleted: true,
+      }),
     ])
 
     return {
