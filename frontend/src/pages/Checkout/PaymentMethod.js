@@ -6,15 +6,9 @@ export const PAYMENT_METHODS = [
     icon: "fa-solid fa-money-bill-wave",
   },
   {
-    id: "bank_transfer",
+    id: "bank",
     title: "Chuyển khoản ngân hàng",
     subtitle: "Chuyển khoản qua tài khoản ngân hàng",
     icon: "fa-solid fa-building-columns",
-  },
-  {
-    id: "e_wallet",
-    title: "Ví điện tử",
-    subtitle: "Thanh toán qua MoMo, ZaloPay, VNPay...",
-    icon: "fa-solid fa-wallet",
   },
 ]

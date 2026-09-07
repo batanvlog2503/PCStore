@@ -136,21 +136,30 @@ const Checkout = () => {
   }
 
   const subtotal = useMemo(
-    () => items.reduce((sum, it) => sum + it.discount_price * it.quantity, 0),
+    () =>
+      items.reduce(
+        (sum, item) => sum + Number(item.price || 0) * item.quantity,
+        0,
+      ),
     [items],
   )
 
   const productDiscount = useMemo(
     () =>
-      items.reduce((sum, it) => {
-        if (!it.price) return sum
-        return sum + (it.price - it.discount_price) * it.quantity
+      items.reduce((sum, item) => {
+        const price = Number(item.price || 0)
+        const discountPrice = Number(item.discount_price || price)
+
+        return sum + Math.max(price - discountPrice, 0) * item.quantity
       }, 0),
     [items],
   )
-
+  const shippingFee = 0
   const voucherDiscount = appliedVoucher?.discount_amount || 0
-  const total = Math.max(0, subtotal - productDiscount - voucherDiscount)
+  const total = Math.max(
+    0,
+    subtotal - productDiscount - voucherDiscount + shippingFee,
+  )
 
   const handleApplyVoucher = async () => {
     if (!voucherCode.trim()) return
@@ -193,10 +202,21 @@ const Checkout = () => {
         },
       )
 
-      if (response.data.success) {
-        const order = response.data.order
+      const order = response.data.order
 
-        navigate(`/order-success/${order._id}`, { state: { order } })
+      // COD
+      if (paymentMethod === "cod") {
+        navigate(`/order-success/${order._id}`, {
+          state: { order },
+        })
+        return
+      }
+      // BANK / SePay
+      if (paymentMethod === "bank") {
+        navigate(
+          `/order/payment?id=${order._id}&totalAmount=${order.total_amount}`,
+        )
+        return
       }
     } catch (error) {
       alert(
@@ -206,30 +226,7 @@ const Checkout = () => {
       setIsSubmitting(false)
     }
   }
-  const calculateOrderAmount = (items) => {
-    const subtotal = items.reduce((total, item) => {
-      return total + item.price * item.quantity
-    }, 0)
-    const product_discount = items.reduce((total, item) => {
-      const discount = item.price - item.discount_price
-      return total + Math.max(discount, 0) * quantity
-    }, 0)
 
-    const voucher_discount = 0
-
-    const shipping_fee = 0
-
-    const total_amount =
-      subtotal - product_discount - voucher_discount + shipping_fee
-
-    return {
-      subtotal,
-      product_discount,
-      voucher_discount,
-      shipping_fee,
-      total_amount,
-    }
-  }
   // frontend gửi khi tạo order
   // const {
   //   cart_item_ids,

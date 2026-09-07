@@ -24,14 +24,6 @@ const PaymentSchema = new Schema(
       required: true,
     },
 
-    request_id: {
-      // request của server với momo
-      type: String,
-      required: true,
-      unique: true,
-      maxlength: 255,
-    },
-
     transaction_id: {
       // momo có transaction identifier để truy lùng giao dịch
       type: String,

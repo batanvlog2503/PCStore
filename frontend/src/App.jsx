@@ -25,7 +25,7 @@ import MyOrder from "./pages/Profile/MyOrder/MyOrder"
 import MyWishList from "./pages/Profile/MyWishlist/MyWishlist"
 import MyAddress from "./pages/Profile/MyAddress/MyAddress"
 import MyLog from "./pages/Profile/MyLog/MyLog"
-
+import Payment from "./pages/Payment/Payment"
 // Admin
 
 import AdminLayout from "./layouts/AdminLayout/AdminLayout"
@@ -57,7 +57,10 @@ const router = createBrowserRouter(
           path="cart"
           element={<Cart />}
         />
-
+        <Route
+          path="order/payment"
+          element={<Payment></Payment>}
+        />
         <Route
           path="order-success/:orderId"
           element={<OrderSuccess />}

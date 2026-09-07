@@ -1,0 +1,35 @@
+Khách hàng
+    │
+    │ Checkout
+    ▼
+Frontend gửi thông tin đơn hàng
+    │
+    ▼
+Backend tạo Order
+    │
+    │ status: pending
+    │ payment_status: pending
+    ▼
+Backend trả về thông tin QR
+    │
+    ▼
+Frontend hiển thị QR thanh toán
+    │
+    │ Khách quét QR bằng app ngân hàng
+    ▼
+Ngân hàng chuyển tiền
+    │
+    ▼
+SePay phát hiện giao dịch
+    │
+    ▼
+SePay gửi WEBHOOK về Backend
+    │
+    ▼
+Backend xác minh giao dịch
+    │
+    ▼
+Order.payment_status = paid
+    │
+    ▼
+Frontend biết thanh toán thành công
