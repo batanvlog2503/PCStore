@@ -191,7 +191,7 @@ export const Header = () => {
               <Link>PC Build</Link>
             </li>
             <li>
-              <Link>Khuyến mãi</Link>
+              <Link to="/home/voucher">Khuyến mãi</Link>
             </li>
             <li>
               <Link>Tin Tức</Link>

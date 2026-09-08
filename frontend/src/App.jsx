@@ -25,6 +25,7 @@ import MyOrder from "./pages/Profile/MyOrder/MyOrder"
 import WishList from "./pages/Profile/WishList/WishList"
 import MyAddress from "./pages/Profile/MyAddress/MyAddress"
 import MyLog from "./pages/Profile/MyLog/MyLog"
+import { Voucher } from "./pages/Voucher/Voucher"
 import Payment from "./pages/Payment/Payment"
 // Admin
 
@@ -36,6 +37,7 @@ import ManagementProduct from "./admin/ManagementProduct.jsx/ManagementProduct"
 import AddProduct from "./admin/ManagementProduct.jsx/AddProduct/AddProduct"
 import EditProduct from "./admin/ManagementProduct.jsx/EditProduct/EditProduct"
 import AddComponent from "./admin/ManagementProduct.jsx/AddComponent/AddComponent"
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -48,7 +50,10 @@ const router = createBrowserRouter(
           index
           element={<Home />}
         />
-
+        <Route
+          path="home/voucher"
+          element={<Voucher />}
+        />
         <Route
           path="product/:id"
           element={<Product />}
