@@ -29,6 +29,7 @@ const AddProduct = () => {
       name: "",
       category_id: "",
       brand_id: "",
+      use_case: "",
       description: "",
       status: "active",
     })
@@ -58,6 +59,7 @@ const AddProduct = () => {
     name: "",
     category_id: "",
     brand_id: "",
+    use_case: "",
     description: "",
     status: "active",
   })
@@ -179,6 +181,7 @@ const AddProduct = () => {
     if (!form.name.trim()) next.name = "Vui lòng nhập tên sản phẩm"
     if (!form.category_id) next.category_id = "Vui lòng chọn danh mục"
     if (!form.brand_id) next.brand_id = "Vui lòng chọn thương hiệu"
+    if (!form.use_case) next.use_case = "Vui lòng chọn mục đích sử dụng"
     if (images.length === 0)
       next.images = "Vui lòng chọn ít nhất 1 ảnh sản phẩm"
 
@@ -211,6 +214,7 @@ const AddProduct = () => {
       fd.append("brand_id", form.brand_id)
       fd.append("description", form.description)
       fd.append("status", form.status)
+      fd.append("use_case", form.use_case)
       // fd.append(mainImageIndex)
       // fd.append(variantsPayload)
       // gửi toàn bộ ảnh theo đúng thứ tự trong mảng images
@@ -349,6 +353,31 @@ const AddProduct = () => {
               </select>
               {errors.brand_id && (
                 <span className="ap-error">{errors.brand_id}</span>
+              )}
+            </div>
+            <div className="ap-field">
+              <label>
+                Mục đích sử dụng <span className="req">*</span>
+              </label>
+
+              <select
+                name="use_case"
+                value={form.use_case}
+                onChange={handleFormChange}
+                className={errors.use_case ? "is-error" : ""}
+              >
+                <option value="">Chọn mục đích sử dụng</option>
+
+                <option value="gaming">Gaming</option>
+                <option value="office">Văn phòng</option>
+                <option value="design">Thiết kế</option>
+                <option value="student">Học sinh / Sinh viên</option>
+                <option value="macbook">MacBook</option>
+                <option value="ultrabook">Ultrabook</option>
+              </select>
+
+              {errors.use_case && (
+                <span className="ap-error">{errors.use_case}</span>
               )}
             </div>
 

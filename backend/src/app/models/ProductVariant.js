@@ -40,6 +40,12 @@ const ProductVariantSchema = new Schema({
     enum: ["active", "out_of_stock", "discontinued"],
     default: "active",
   },
+
+  use_case: {
+    type: String,
+    enum: ["gaming", "office", "design", "student", "macbook", "ultrabook"],
+    required: true,
+  },
 })
 
 ProductVariantSchema.index({ product_id: 1 })

@@ -677,19 +677,6 @@ $bp-xl: 1200px;
           }
         }
 
-        // ô "Bộ lọc" đầu tiên nổi bật hơn các tiêu chí còn lại
-        &:first-child {
-          background-color: $color-black;
-          color: $color-white;
-          border-color: $color-black;
-
-          &:hover {
-            background-color: $color-yellow;
-            color: $color-black;
-            border-color: $color-yellow;
-          }
-        }
-
         &:hover {
           background-color: $color-yellow;
           border-color: $color-yellow;
@@ -1130,5 +1117,450 @@ $bp-xl: 1200px;
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+}
+
+// ==========================================================================
+// BỔ SUNG vào Home.scss hiện có — không thay thế toàn bộ file cũ.
+// Dán khối này vào cuối Home.scss (hoặc trong .home { ... } nếu file cũ
+// đang bọc mọi thứ trong 1 selector cha).
+// ==========================================================================
+
+$color-red: #e5484d; // đổi theo màu chủ đạo thật của bạn nếu khác
+$color-border: #ececec;
+$color-gray: #8a8a8a;
+$color-bg-soft: #f7f7f7;
+$transition-fast: 0.2s ease-in-out;
+
+// ==========================================================================
+// Danh mục (Laptop / PC / Màn hình...) — trạng thái active
+// ==========================================================================
+// ------------------------------
+// 4. Category list (home-list-type)
+// ------------------------------
+.home-list-type {
+  ul.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 9px 16px;
+
+      background-color: $color-white;
+      border: 1px solid $color-border;
+      border-radius: 6px;
+
+      color: $color-black;
+      font-size: 14px;
+      font-weight: 500;
+
+      cursor: pointer;
+
+      transition: 0.2s ease;
+
+      i {
+        font-size: 14px;
+      }
+
+      &:hover {
+        border-color: $color-yellow;
+        background-color: #fffdf5;
+        color: black;
+      }
+
+      &.active {
+        background-color: $color-yellow;
+        border-color: $color-yellow;
+        color: $color-black;
+        font-weight: 600;
+      }
+    }
+  }
+
+  @include respond($bp-sm) {
+    ul.row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+
+      @include hide-scrollbar;
+
+      li {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+// ===============================
+// CHỌN THEO TIÊU CHÍ
+// ===============================
+
+.home-criteria {
+  position: relative;
+  z-index: 100;
+
+  .criteria-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .list-criteria {
+    position: relative;
+    z-index: 101;
+
+    ul.row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      li {
+        position: relative;
+        z-index: 1;
+
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        padding: 9px 18px;
+        border-radius: 20px;
+        border: 1.5px solid $color-border;
+        background-color: $color-white;
+
+        font-size: 13px;
+        font-weight: 600;
+        color: $color-black;
+
+        cursor: pointer;
+        white-space: nowrap;
+
+        transition: 0.2s ease;
+
+        &:hover {
+          border-color: $color-yellow;
+          background-color: $color-yellow;
+        }
+
+        &.active {
+          background-color: $color-yellow;
+          border-color: $color-yellow;
+          color: $color-black;
+        }
+
+        &.has-dropdown {
+          i.fa-chevron-down {
+            font-size: 10px;
+            transition: transform 0.2s ease;
+          }
+
+          &.open {
+            z-index: 200;
+
+            i.fa-chevron-down {
+              transform: rotate(180deg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ===============================
+  // DROPDOWN
+  // ===============================
+
+  .criteria-dropdown {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    left: 0;
+
+    min-width: 200px;
+    max-height: 280px;
+
+    overflow-y: auto;
+
+    padding: 6px;
+
+    background-color: #fff;
+    border: 1px solid $color-border;
+    border-radius: 10px;
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+    // QUAN TRỌNG
+    z-index: 9999;
+
+    animation: criteriaDropdownFadeIn 0.15s ease-out;
+
+    .dropdown-item {
+      padding: 9px 12px;
+      border-radius: 6px;
+
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+
+      cursor: pointer;
+      white-space: nowrap;
+
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #f7f7f7;
+      }
+
+      &.selected {
+        background-color: rgba($color-yellow, 0.2);
+        color: $color-black;
+        font-weight: 700;
+      }
+    }
+
+    .dropdown-empty {
+      padding: 10px 12px;
+      font-size: 12px;
+      color: $color-gray;
+    }
+  }
+}
+
+@keyframes criteriaDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ==========================================================================
+// Sắp xếp theo — trạng thái active
+// ==========================================================================
+.home-sort .title .filter li {
+  cursor: pointer;
+  transition: color $transition-fast;
+
+  &.active {
+    color: $color-red;
+    font-weight: 700;
+
+    i {
+      color: $color-red;
+    }
+  }
+}
+
+// ==========================================================================
+// Loading / Empty state cho danh sách sản phẩm
+// ==========================================================================
+.list-loading,
+.list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 60px 0;
+  color: $color-gray;
+
+  i {
+    font-size: 34px;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.list-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 4px solid $color-border;
+  border-top-color: $color-red;
+  animation: homeListSpin 0.8s linear infinite;
+}
+
+@keyframes homeListSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive: dropdown full width trên mobile để dễ bấm
+@media (max-width: 576px) {
+  .home-criteria .criteria-dropdown {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: auto;
+    min-width: 0;
+  }
+}
+
+/* ================= ĐANG LỌC THEO ================= */
+
+.active-filters {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  margin: 20px 0;
+  padding: 14px 16px;
+
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  .active-filters-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    white-space: nowrap;
+    font-weight: 600;
+    color: #333;
+
+    i {
+      color: #e11d48;
+    }
+  }
+
+  .active-filters-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    width: 100%;
+  }
+
+  .filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 7px 10px;
+
+    background: #fff1f2;
+    border: 1px solid #fda4af;
+    border-radius: 6px;
+
+    color: #e11d48;
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #ffe4e6;
+      border-color: #fb7185;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 18px;
+      height: 18px;
+
+      padding: 0;
+
+      border: none;
+      border-radius: 50%;
+
+      background: transparent;
+      color: #e11d48;
+
+      cursor: pointer;
+
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #e11d48;
+        color: white;
+      }
+
+      i {
+        font-size: 11px;
+      }
+    }
+  }
+
+  .clear-all-tags-btn {
+    padding: 7px 12px;
+
+    border: none;
+    background: transparent;
+
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #e11d48;
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .active-filters {
+    flex-direction: column;
+    gap: 10px;
+
+    padding: 12px;
+
+    .active-filters-label {
+      font-size: 14px;
+    }
+
+    .filter-tag {
+      font-size: 13px;
+      padding: 6px 9px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .active-filters {
+    margin: 15px 0;
+
+    .active-filters-list {
+      gap: 6px;
+    }
+
+    .filter-tag {
+      width: auto;
+      max-width: 100%;
+      font-size: 12px;
+    }
   }
 }

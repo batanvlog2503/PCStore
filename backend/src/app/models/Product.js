@@ -15,6 +15,11 @@ const ProductSchema = new Schema(
     description: { type: String },
     rating_avg: { type: Number, default: 0, min: 0, max: 5 },
     sold_count: { type: Number, default: 0, min: 0 },
+    use_case: {
+      type: String,
+      enum: ["gaming", "office", "design", "student", "macbook", "ultrabook"],
+      required: true,
+    },
     status: {
       type: String,
       enum: ["active", "hidden"],

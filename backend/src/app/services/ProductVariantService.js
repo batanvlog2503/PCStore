@@ -13,10 +13,11 @@ class ProductVariantService {
     return await ProductVariantRepo.findById(id)
   }
 
-  async getAllVariantsAndImage(page = 1, limit = 40) {
+  async getAllVariantsAndImage(req) {
     const { variants, total } =
-      await ProductVariantRepo.getAllWithProductAndImage(page, limit)
-
+      await ProductVariantRepo.getAllWithProductAndImage(req)
+    const page = Math.max(Number(req.query.page) || 1, 1)
+    const limit = Math.max(Number(req.query.limit) || 40, 1)
     return {
       variants,
       total,

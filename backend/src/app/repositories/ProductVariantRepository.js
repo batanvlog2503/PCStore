@@ -1,3 +1,5 @@
+const filterAllProductVariants = require("../../helpers/filterAllProductVariants")
+const sortableProductVariants = require("../../helpers/sortableProductVariants")
 const ProductVariant = require("../models/ProductVariant")
 
 class ProductVariantRepository {
@@ -67,11 +69,13 @@ class ProductVariantRepository {
   }
 
   // ProductVariantRepository.js
-  async getAllWithProductAndImage(page = 1, limit = 40) {
+  async getAllWithProductAndImage(req) {
+    const page = Math.max(Number(req.query.page) || 1, 1)
+    const limit = Math.max(Number(req.query.limit) || 40, 1)
+    const sortable = sortableProductVariants(req)
     const skip = (page - 1) * limit
-
+    const filter = filterAllProductVariants(req)
     const result = await ProductVariant.aggregate([
-      // 1. Join sang Product để lấy tên, slug
       {
         $lookup: {
           from: "products",
@@ -80,47 +84,127 @@ class ProductVariantRepository {
           as: "product",
         },
       },
-      { $unwind: "$product" },
 
-      // 2. Join sang ProductImage, chỉ lấy đúng 1 ảnh chính (is_main: true)
-      //    của cùng product_id đó
+      {
+        $unwind: "$product",
+      },
+
+      // 2. FILTER
+      {
+        $match: filter,
+      },
+
+      // 3. JOIN MAIN IMAGE
       {
         $lookup: {
           from: "productimages",
-          let: { productId: "$product._id" },
+          let: {
+            productId: "$product._id",
+          },
           pipeline: [
-            { $match: { $expr: { $eq: ["$product_id", "$$productId"] } } },
-            { $match: { is_main: true } },
-            { $limit: 1 },
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$product_id", "$$productId"],
+                },
+              },
+            },
+            {
+              $match: {
+                is_main: true,
+              },
+            },
+            {
+              $limit: 1,
+            },
           ],
           as: "mainImage",
         },
       },
 
-      // 3. Làm phẳng dữ liệu ra, dễ dùng ở frontend
+      // 4. FORMAT DATA
+
       {
         $addFields: {
-          image_url: { $arrayElemAt: ["$mainImage.image_url", 0] },
+          image_url: {
+            $arrayElemAt: ["$mainImage.image_url", 0],
+          },
+
           product_name: "$product.name",
+
           product_slug: "$product.slug",
+
+          discount_percent: {
+            $cond: [
+              {
+                $and: [
+                  { $ne: ["$discount_price", null] },
+                  { $gt: ["$price", 0] },
+                  { $lt: ["$discount_price", "$price"] },
+                ],
+              },
+              {
+                $multiply: [
+                  {
+                    $divide: [
+                      {
+                        $subtract: ["$price", "$discount_price"],
+                      },
+                      "$price",
+                    ],
+                  },
+                  100,
+                ],
+              },
+              0,
+            ],
+          },
         },
       },
-      { $project: { product: 0, mainImage: 0 } },
-      { $sort: { created_at: -1 } },
 
-      // 4. Lấy dữ liệu trang hiện tại + đếm tổng số, chỉ trong 1 lần query
+      // 5. REMOVE TEMP DATA
+
+      {
+        $project: {
+          product: 0,
+          mainImage: 0,
+        },
+      },
+      // 6. SORT
+
+      {
+        $sort: sortable,
+      },
+
+      // 7. PAGINATION + TOTAL
       {
         $facet: {
-          data: [{ $skip: skip }, { $limit: limit }],
-          totalCount: [{ $count: "count" }],
+          data: [
+            {
+              $skip: skip,
+            },
+            {
+              $limit: limit,
+            },
+          ],
+
+          totalCount: [
+            {
+              $count: "count",
+            },
+          ],
         },
       },
     ])
 
     const variants = result[0]?.data || []
+
     const total = result[0]?.totalCount[0]?.count || 0
 
-    return { variants, total }
+    return {
+      variants,
+      total,
+    }
   }
   async increaseStock(variantId, quantity, session) {
     return await ProductVariant.findByIdAndUpdate(

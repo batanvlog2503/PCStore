@@ -85,9 +85,26 @@ class ProductService {
       brand_id,
       description,
       status,
+      use_case,
       mainImageIndex,
       variants,
     } = body
+    const validUseCases = [
+      "gaming",
+      "office",
+      "design",
+      "student",
+      "macbook",
+      "ultrabook",
+    ]
+
+    if (!use_case) {
+      throw new AppError(400, "Vui lòng chọn mục đích sử dụng")
+    }
+
+    if (!validUseCases.includes(use_case)) {
+      throw new AppError(400, "Mục đích sử dụng không hợp lệ")
+    }
     if (!name) {
       throw new Error("Tên sản phẩm không được để trống")
     }
@@ -139,6 +156,7 @@ class ProductService {
       brand_id,
       name,
       slug,
+      use_case,
       description,
       status: status || "active",
     })
@@ -193,7 +211,7 @@ class ProductService {
       product_id: productId,
 
       sku: variant.sku,
-
+      use_case: use_case,
       config_name: variant.config_name,
 
       specs: {

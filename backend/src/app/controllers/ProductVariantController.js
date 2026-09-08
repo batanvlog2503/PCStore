@@ -30,13 +30,7 @@ class ProductVariantController {
   }
   async getAllVariantsAndImage(req, res, next) {
     try {
-      const page = Math.max(Number(req.query.page) || 1, 1)
-      const limit = Math.max(Number(req.query.limit) || 40, 1)
-
-      const result = await ProductVariantService.getAllVariantsAndImage(
-        page,
-        limit,
-      )
+      const result = await ProductVariantService.getAllVariantsAndImage(req)
 
       return res.status(200).json({
         success: true,
