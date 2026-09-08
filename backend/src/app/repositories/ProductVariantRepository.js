@@ -235,6 +235,95 @@ class ProductVariantRepository {
 
     return result
   }
+
+  //top-selling
+  async getTopSelling(limit = 10) {
+    const result = await ProductVariant.aggregate([
+      {
+        $lookup: {
+          from: "products",
+          localField: "product_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+
+      {
+        $unwind: "$product",
+      },
+
+      {
+        $match: {
+          status: "active",
+          "product.status": "active",
+        },
+      },
+
+      {
+        $sort: {
+          "product.sold_count": -1,
+          created_at: -1,
+        },
+      },
+
+      {
+        $limit: Number(limit),
+      },
+
+      {
+        $lookup: {
+          from: "productimages",
+          let: {
+            productId: "$product._id",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$product_id", "$$productId"],
+                },
+              },
+            },
+            {
+              $match: {
+                is_main: true,
+              },
+            },
+            {
+              $limit: 1,
+            },
+          ],
+          as: "mainImage",
+        },
+      },
+
+      // =============================
+      // 6. FORMAT DATA
+      // =============================
+      {
+        $addFields: {
+          image_url: {
+            $arrayElemAt: ["$mainImage.image_url", 0],
+          },
+
+          product_name: "$product.name",
+
+          product_slug: "$product.slug",
+
+          sold_count: "$product.sold_count",
+        },
+      },
+
+      {
+        $project: {
+          product: 0,
+          mainImage: 0,
+        },
+      },
+    ])
+
+    return result
+  }
 }
 
 module.exports = new ProductVariantRepository()

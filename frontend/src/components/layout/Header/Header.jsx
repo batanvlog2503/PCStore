@@ -112,7 +112,7 @@ export const Header = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/account/orders">
+                    <Link to="/account/order">
                       <i className="fa-solid fa-box"></i> Đơn hàng của tôi
                     </Link>
                   </li>
@@ -122,7 +122,7 @@ export const Header = () => {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/account/addresses">
+                    <Link to="/account/address">
                       <i className="fa-solid fa-location-dot"></i> Địa chỉ của
                       tôi
                     </Link>

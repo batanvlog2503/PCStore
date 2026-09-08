@@ -80,6 +80,16 @@ class ProductVariantService {
       message: "Delete variant successfully",
     }
   }
+
+  async getTopSelling(req) {
+    const limit = Math.max(Math.min(Number(req.query.limit) || 10, 20), 1)
+
+    const variants = await ProductVariantRepo.getTopSelling(limit)
+
+    return {
+      variants,
+    }
+  }
 }
 
 module.exports = new ProductVariantService()

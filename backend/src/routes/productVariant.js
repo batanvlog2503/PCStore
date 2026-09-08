@@ -5,10 +5,20 @@ const {
   updateProductVariantValidator,
 } = require("../helpers/validationProductVariant")
 const router = express.Router()
-
+const authorize = require("../app/middlewares/authorize")
 const ProductVariantController = require("../app/controllers/ProductVariantController")
-router.get("/image/all", auth, ProductVariantController.getAllVariantsAndImage)
-
+router.get(
+  "/image/all",
+  auth,
+  authorize("user"),
+  ProductVariantController.getAllVariantsAndImage,
+)
+router.get(
+  "/top-selling",
+  auth,
+  authorize("user", "admin"),
+  ProductVariantController.getTopSelling,
+)
 router.get("/all/id", auth, ProductVariantController.getAllId)
 router.get("/all", auth, ProductVariantController.getAllVariants)
 router.get(

@@ -1,0 +1,463 @@
+// ==========================================================================
+// TopProduct.scss — PC Store
+// Banner nền vàng có hiệu ứng nhấp nháy, card sản phẩm bán chạy
+// ==========================================================================
+
+$color-black: #0d0d0d;
+$color-white: #ffffff;
+$color-white-soft: #f7f7f7;
+$color-yellow: #ffc107;
+$color-yellow-dark: #e0a800;
+$color-yellow-light: #ffd54f;
+$color-red: #e5484d;
+$color-gray: #8a8a8a;
+$color-border: #ececec;
+
+$font-main: "Segoe UI", "Roboto", Arial, sans-serif;
+$transition-fast: 0.2s ease-in-out;
+$transition-medium: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+$bp-sm: 576px;
+$bp-md: 768px;
+$bp-lg: 992px;
+$bp-xl: 1200px;
+
+@mixin respond($bp) {
+  @media (max-width: $bp) {
+    @content;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Hiệu ứng "nhấp nháy" nền vàng — dao động độ sáng nhẹ, không chớp tắt gắt
+// (chớp tắt hẳn dễ gây khó chịu mắt, nên chỉ đổi độ sáng + glow)
+@keyframes bannerFlicker {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes flameFlicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.08) rotate(-4deg);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(0.96) rotate(3deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.05) rotate(-2deg);
+    opacity: 0.9;
+  }
+}
+
+@keyframes textGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba($color-white, 0.4);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba($color-white, 0.85),
+      0 0 30px rgba($color-yellow-light, 0.6);
+  }
+}
+
+.top-product {
+  max-width: 1240px;
+  margin: 0 auto 36px;
+  padding: 0 24px;
+  font-family: $font-main;
+  animation: fadeInUp 0.4s ease-out;
+
+  @include respond($bp-md) {
+    padding: 0 14px;
+    margin-bottom: 26px;
+  }
+}
+
+// ==========================================================================
+// Banner nền vàng nhấp nháy
+// ==========================================================================
+.top-product-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 18px 24px;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(
+    135deg,
+    $color-yellow-light,
+    $color-yellow,
+    $color-yellow-dark
+  );
+  background-size: 200% 200%;
+  animation: bannerFlicker 2.2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    // dải sáng quét ngang liên tục, tăng cảm giác "nổi bật/hot"
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 40%,
+      rgba($color-white, 0.35) 50%,
+      transparent 60%
+    );
+    background-size: 250% 250%;
+    animation: shimmerSweepTop 2.5s linear infinite;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+    color: $color-black;
+    letter-spacing: 0.5px;
+    animation: textGlow 2.2s ease-in-out infinite;
+
+    .highlight {
+      color: $color-white;
+      -webkit-text-stroke: 1px $color-black;
+    }
+
+    @include respond($bp-sm) {
+      font-size: 17px;
+    }
+  }
+
+  .flame-icon {
+    display: inline-flex;
+    font-size: 26px;
+    color: $color-red;
+    animation: flameFlicker 1.2s ease-in-out infinite;
+
+    &.flip {
+      transform: scaleX(-1);
+    }
+
+    @include respond($bp-sm) {
+      font-size: 18px;
+    }
+  }
+}
+
+@keyframes shimmerSweepTop {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+// ==========================================================================
+// Body — nền vàng bao quanh slider
+// ==========================================================================
+.top-product-body {
+  background: linear-gradient(180deg, $color-yellow-light, $color-yellow);
+  border-radius: 0 0 16px 16px;
+  padding: 24px 16px;
+
+  @include respond($bp-sm) {
+    padding: 18px 10px;
+  }
+}
+
+.top-product-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 4px solid rgba($color-white, 0.5);
+    border-top-color: $color-black;
+    animation: topProductSpin 0.8s linear infinite;
+  }
+}
+
+@keyframes topProductSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==========================================================================
+// Slider
+// ==========================================================================
+.top-product-slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .slider-arrow {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background-color: $color-white;
+    color: $color-black;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition:
+      background-color $transition-fast,
+      transform $transition-fast,
+      opacity $transition-fast;
+
+    &:hover:not(:disabled) {
+      background-color: $color-black;
+      color: $color-yellow;
+      transform: scale(1.08);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    @include respond($bp-sm) {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+  }
+
+  .slider-viewport {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .slider-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+// ==========================================================================
+// Card sản phẩm
+// ==========================================================================
+.top-product-slide {
+  flex: 0 0 20%; // 5 card/màn hình desktop
+  padding: 0 8px;
+  box-sizing: border-box;
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--rank) * 0.05s);
+
+  @include respond($bp-xl) {
+    flex-basis: 33.333%; // 3 card
+  }
+  @include respond($bp-md) {
+    flex-basis: 50%; // 2 card
+  }
+  @include respond(480px) {
+    flex-basis: 100%; // 1 card
+  }
+}
+
+.top-product-card {
+  position: relative;
+  background-color: $color-white;
+  border-radius: 14px;
+  padding: 14px 14px 12px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition:
+    transform $transition-fast,
+    box-shadow $transition-fast;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+
+    .card-image img {
+      transform: scale(1.06);
+    }
+  }
+
+  .rank-badge {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    z-index: 2;
+    background-color: $color-black;
+    color: $color-yellow;
+    font-size: 10.5px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  .discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    background-color: $color-red;
+    color: $color-white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    animation: popBadgeTop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform $transition-medium;
+    }
+  }
+
+  .spec-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+
+    span {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: $color-red;
+      border: 1px solid rgba($color-red, 0.35);
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+  }
+
+  .spec-line {
+    margin: 0 0 8px;
+    font-size: 11px;
+    color: $color-gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-name {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: $color-black;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 34px;
+  }
+
+  .price-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    .price-new {
+      font-size: 15px;
+      font-weight: 800;
+      color: $color-red;
+    }
+
+    .price-old {
+      font-size: 11.5px;
+      color: $color-gray;
+      text-decoration: line-through;
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px dashed $color-border;
+
+    .sold-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: $color-yellow-dark;
+
+      i {
+        color: $color-red;
+      }
+    }
+
+    .wishlist-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid $color-border;
+      background-color: $color-white;
+      color: $color-gray;
+      font-size: 12px;
+      cursor: pointer;
+      transition:
+        background-color $transition-fast,
+        color $transition-fast,
+        transform $transition-fast;
+
+      &:hover {
+        background-color: $color-red;
+        border-color: $color-red;
+        color: $color-white;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+@keyframes popBadgeTop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

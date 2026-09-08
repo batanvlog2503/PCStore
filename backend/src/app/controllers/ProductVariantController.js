@@ -132,6 +132,22 @@ class ProductVariantController {
       next(err)
     }
   }
+
+  // top-selling
+
+  async getTopSelling(req, res, next) {
+    try {
+      const data = await ProductVariantService.getTopSelling(req)
+
+      return res.status(200).json({
+        success: true,
+        message: "get variant top-selling successfully !!!",
+        data,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new ProductVariantController()

@@ -3,6 +3,8 @@ import "./Home.scss"
 import axiosInstance from "../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
 import CommentPublic from "./CommentPublic"
+import TopProduct from "./TopProduct"
+import { Introduction } from "./Introduction"
 import {
   ADS_SET_A,
   ADS_SET_B,
@@ -393,7 +395,7 @@ export const Home = () => {
           </button>
         </div>
       </div>
-
+      <TopProduct></TopProduct>
       <div
         className="home-criteria"
         ref={criteriaBarRef}
@@ -643,6 +645,7 @@ export const Home = () => {
           )}
         </div>
       </div>
+      <Introduction></Introduction>
       <CommentPublic></CommentPublic>
     </div>
   )
