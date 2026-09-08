@@ -160,7 +160,7 @@ export const Header = () => {
             <p>Technology For Life</p>
           </div>
         </div>
-        <div className="header-middle-2 search"></div>
+
         <div className="header-middle-3">
           <div className="love">
             <i className="fa-regular fa-heart"></i> <span>Yêu thích</span>
