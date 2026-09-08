@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
-import "./AddProduct.scss" // dùng chung style layout/card/field
+
 import "./AddComponent.scss" // style riêng cho bảng thông số động
-import axiosInstance from "../../utils/axiosInstance"
+import axiosInstance from "../../../utils/axiosInstance"
 
 const emptyAttribute = () => ({
   _key: crypto.randomUUID(),

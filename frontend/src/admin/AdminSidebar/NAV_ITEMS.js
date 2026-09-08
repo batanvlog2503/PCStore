@@ -7,6 +7,7 @@ export const NAV_ITEMS = [
       { to: "/admin/products", label: "Danh sách" },
       { to: "/admin/products/new", label: "Thêm mới" },
       { to: "/admin/categories", label: "Danh mục" },
+      { to: "/admin/components/new", label: "Thêm linh kiện" },
     ],
   },
   { to: "/admin/orders", label: "Đơn hàng", icon: "fa-solid fa-receipt" },

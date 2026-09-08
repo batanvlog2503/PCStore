@@ -426,7 +426,7 @@ const DashboardRepository = {
         status: "active",
       })
         .sort({
-          sold_count: -1,
+          created_at: -1,
         })
         .skip(skip)
         .limit(limit)

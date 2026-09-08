@@ -229,7 +229,7 @@ class OrderService {
           total_amount: amount.total_amount,
           payment_method,
           payment_status: "pending",
-          status: "confirmed",
+          status: "pending",
 
           note: note || null,
         },
@@ -383,53 +383,34 @@ class OrderService {
       updateData.cancelled_at = null
     }
 
-    // =========================
-    // NẾU COMPLETED VÀ CHƯA CỘNG SOLD
-    // =========================
+    const orderItems = await OrderItem.find({
+      order_id: order._id,
+    }).lean()
+
+    // COMPLETED
+    // CHỈ TĂNG SOLD_COUNT
+    // KHÔNG TRỪ STOCK
 
     if (status === "completed" && oldStatus !== "completed") {
-      const orderItems = await OrderItem.find({
-        order_id: order._id,
-      }).lean()
+      for (const item of orderItems) {
+        await Product.findByIdAndUpdate(item.product_id, {
+          $inc: {
+            sold_count: item.quantity,
+          },
+        })
+      }
+    }
 
-      if (status === "completed" && oldStatus !== "completed") {
-        console.log("=== COMPLETED ORDER ===")
-        console.log("Order ID:", order._id)
-
-        const orderItems = await OrderItem.find({
-          order_id: order._id,
-        }).lean()
-
-        console.log("ORDER ITEMS:", orderItems)
-
-        for (const item of orderItems) {
-          console.log(
-            "Updating product:",
-            item.product_id,
-            "Quantity:",
-            item.quantity,
-          )
-
-          const product = await Product.findByIdAndUpdate(
-            item.product_id,
-            {
-              $inc: {
-                sold_count: item.quantity,
-              },
+    // CANCELLED
+    // HOÀN LẠI STOCK
+    if (status === "cancelled" && oldStatus !== "cancelled") {
+      for (const item of orderItems) {
+        if (item.variant_id) {
+          await ProductVariant.findByIdAndUpdate(item.variant_id, {
+            $inc: {
+              stock: item.quantity,
             },
-            {
-              new: true,
-            },
-          )
-          console.log("Product SOLD COUNT:", product.sold_count)
-          // Nếu có variant
-          if (item.variant_id) {
-            await ProductVariant.findByIdAndUpdate(item.variant_id, {
-              $inc: {
-                stock: -item.quantity,
-              },
-            })
-          }
+          })
         }
       }
     }

@@ -6,7 +6,6 @@ import "./OrderSuccess.scss"
 const PAYMENT_LABELS = {
   cod: "Thanh toán khi nhận hàng (COD)",
   bank: "Chuyển khoản ngân hàng",
-  e_wallet: "Ví điện tử",
 }
 
 const OrderSuccess = () => {
@@ -299,19 +298,6 @@ const OrderSuccess = () => {
           </div>
         </div>
       )}
-
-      {/* ================= BANNER TRẠNG THÁI ================= */}
-      <div className="processing-banner">
-        <i className="fa-regular fa-clock"></i>
-        <div>
-          <p>Đơn hàng của bạn đang được xử lý</p>
-          <span>
-            Chúng tôi sẽ nhanh chóng xác nhận đơn hàng và liên hệ với bạn để
-            thông báo chi tiết. Bạn có thể theo dõi trạng thái đơn hàng trong
-            mục "Đơn hàng của tôi".
-          </span>
-        </div>
-      </div>
 
       {/* ================= NÚT HÀNH ĐỘNG ================= */}
       <div className="success-actions">
