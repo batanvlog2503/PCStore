@@ -17,6 +17,21 @@ const Product = () => {
   const [activeTab, setActiveTab] = useState("description") // "description" | "specs"
   const [quantity, setQuantity] = useState(1)
 
+  // wishlist
+  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [isWishlistLoading, setIsWishlistLoading] = useState(false)
+
+  const checkWishlist = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/wishlist/check/${id}`,
+      )
+
+      setIsWishlisted(response.data.isWishlisted)
+    } catch (error) {
+      console.log("Không kiểm tra được wishlist", error)
+    }
+  }
   const getProduct = async () => {
     try {
       setIsLoading(true)
@@ -48,8 +63,36 @@ const Product = () => {
 
   useEffect(() => {
     getProduct()
+    checkWishlist()
   }, [id])
+  const handleToggleWishlist = async () => {
+    try {
+      setIsWishlistLoading(true)
 
+      if (isWishlisted) {
+        const response = await axiosInstance.delete(
+          `${import.meta.env.VITE_APP_URL}/wishlist/remove/${id}`,
+        )
+        alert(response.data.message)
+        setIsWishlisted(false)
+      } else {
+        const response = await axiosInstance.post(
+          `${import.meta.env.VITE_APP_URL}/wishlist/add/${id}`,
+        )
+        alert(response.data.message)
+        setIsWishlisted(true)
+      }
+    } catch (error) {
+      console.log("WISHLIST ERROR:", error.response?.data)
+      console.log("STATUS:", error.response?.status)
+      alert(
+        error.response?.data?.message ||
+          "Không thể cập nhật sản phẩm yêu thích",
+      )
+    } finally {
+      setIsWishlistLoading(false)
+    }
+  }
   const selectedVariant = variants.find((v) => v._id === selectedVariantId)
 
   const hasDiscount =
@@ -141,7 +184,6 @@ const Product = () => {
   return (
     <div className="container p-0 product">
       <div className="product-variant">
-        {/* ================= ẢNH SẢN PHẨM ================= */}
         <div className="product-image left">
           <div className="image column image-4">
             {images.map((img) => (
@@ -181,11 +223,26 @@ const Product = () => {
         {/* ================= THÔNG TIN + VARIANT ================= */}
         <div className="variant">
           <div className="title">
+            <div className="product-title-row">
+              <h3>{product.name}</h3>
+
+              <button
+                type="button"
+                className={`wishlist-heart ${isWishlisted ? "active" : ""}`}
+                onClick={handleToggleWishlist}
+                disabled={isWishlistLoading}
+                title={isWishlisted ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
+              >
+                <i
+                  className={
+                    isWishlisted ? "fa-solid fa-heart" : "fa-regular fa-heart"
+                  }
+                ></i>{" "}
+              </button>
+            </div>
             {hasDiscount && (
               <p className="discount-tag">Giảm {discountPercent}%</p>
             )}
-
-            <h3>{product.name}</h3>
 
             <div className="star-judge judge sold-out">
               <p className="star">

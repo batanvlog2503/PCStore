@@ -22,7 +22,7 @@ import OrderSuccess from "./pages/OrderSuccess/OrderSuccess"
 import OrderDetail from "./pages/Profile/MyOrder/OrderDetail"
 import MyInfor from "./pages/Profile/MyInfor/MyInfor"
 import MyOrder from "./pages/Profile/MyOrder/MyOrder"
-import MyWishList from "./pages/Profile/MyWishlist/MyWishlist"
+import WishList from "./pages/Profile/WishList/WishList"
 import MyAddress from "./pages/Profile/MyAddress/MyAddress"
 import MyLog from "./pages/Profile/MyLog/MyLog"
 import Payment from "./pages/Payment/Payment"
@@ -85,7 +85,7 @@ const router = createBrowserRouter(
 
             <Route
               path="wishlist"
-              element={<MyWishList />}
+              element={<WishList />}
             />
 
             <Route

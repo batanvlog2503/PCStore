@@ -14,6 +14,7 @@ const voucherRoute = require("./voucher")
 const paymentRoute = require("./payment")
 const reviewRoute = require("./review")
 const adminRoute = require("./admin")
+const wishlistRoute = require("./wishlist")
 function route(app) {
   console.log("Category route mounted")
 
@@ -33,6 +34,7 @@ function route(app) {
   app.use("/review", reviewRoute)
   app.use("/payment", paymentRoute)
   app.use("/admin", adminRoute)
+  app.use("/wishlist", wishlistRoute)
 }
 
 module.exports = route
