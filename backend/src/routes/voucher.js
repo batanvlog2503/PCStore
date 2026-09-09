@@ -9,7 +9,13 @@ const {
 const authorize = require("../app/middlewares/authorize")
 const router = express.Router()
 router.get("/my", auth, authorize("user"), VoucherController.getMyVouchers)
-
+router.post("/apply", auth, authorize("user"), VoucherController.applyVoucher)
+router.get(
+  "/claimed-ids",
+  auth,
+  authorize("user"),
+  VoucherController.getClaimedIds,
+)
 router.get("/all", auth, authorize("user"), VoucherController.getAll)
 router.get(
   "/active",
@@ -55,12 +61,6 @@ router.post(
   auth,
   authorize("user"),
   VoucherController.validateVoucher,
-)
-router.get(
-  "/claimed-ids",
-  auth,
-  authorize("user"),
-  VoucherController.getClaimedIds,
 )
 
 module.exports = router

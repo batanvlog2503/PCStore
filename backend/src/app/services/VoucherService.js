@@ -237,6 +237,108 @@ class VoucherService {
 
     return voucherIds
   }
+
+  async applyVoucher(userId, code, orderTotal) {
+    // 1. Tìm voucher
+    if (!userId) {
+      throw new AppError(400, "User ID is required")
+    }
+    if (!code) {
+      throw new AppError(400, "Voucher code is required")
+    }
+    if (!orderTotal || orderTotal <= 0) {
+      throw new AppError(400, "Order total is invalid")
+    }
+
+    const voucher = await VoucherRepo.findVoucherByCode(code)
+
+    if (!voucher) {
+      throw new Error("Voucher không tồn tại hoặc đã ngừng hoạt động")
+    }
+
+    // 2. Kiểm tra user có sở hữu voucher không
+    const userVoucher = await VoucherRepo.findAvailableUserVoucher(
+      userId,
+      voucher._id,
+    )
+
+    if (!userVoucher) {
+      throw new Error(
+        "Bạn không sở hữu voucher này hoặc voucher đã được sử dụng",
+      )
+    }
+
+    const now = new Date()
+
+    // 3. Kiểm tra thời gian bắt đầu
+    if (voucher.start_date && new Date(voucher.start_date) > now) {
+      throw new Error("Voucher chưa đến thời gian sử dụng")
+    }
+
+    // 4. Kiểm tra hết hạn
+    if (voucher.end_date && new Date(voucher.end_date) < now) {
+      throw new Error("Voucher đã hết hạn")
+    }
+
+    // 5. Kiểm tra đơn hàng tối thiểu
+    const minOrderValue = Number(voucher.min_order_value || 0)
+
+    if (Number(orderTotal) < minOrderValue) {
+      throw new Error(
+        `Đơn hàng phải từ ${minOrderValue.toLocaleString("vi-VN")}đ để sử dụng voucher này`,
+      )
+    }
+
+    // ===============================
+    // 6. TÍNH SỐ TIỀN ĐƯỢC GIẢM
+    // ===============================
+
+    let discountAmount = 0
+
+    // Voucher giảm theo %
+    if (voucher.discount_type === "percent") {
+      discountAmount =
+        (Number(orderTotal) * Number(voucher.discount_value)) / 100
+
+      // Có giới hạn giảm tối đa
+      if (
+        voucher.max_discount &&
+        discountAmount > Number(voucher.max_discount)
+      ) {
+        discountAmount = Number(voucher.max_discount)
+      }
+    }
+
+    // Voucher giảm số tiền cố định
+    if (voucher.discount_type === "fixed") {
+      discountAmount = Number(voucher.discount_value)
+    }
+
+    // Không được giảm lớn hơn giá trị đơn hàng
+    discountAmount = Math.min(discountAmount, Number(orderTotal))
+
+    // ===============================
+    // 7. RETURN KẾT QUẢ
+    // ===============================
+
+    return {
+      user_voucher_id: userVoucher._id,
+
+      voucher_id: voucher._id,
+      code: voucher.code,
+
+      voucher_type: voucher.voucher_type,
+
+      discount_type: voucher.discount_type,
+      discount_value: voucher.discount_value,
+
+      discount_amount: discountAmount,
+
+      min_order_value: voucher.min_order_value,
+
+      max_discount: voucher.max_discount || null,
+    }
+  }
 }
 
 module.exports = new VoucherService()

@@ -29,15 +29,59 @@ const Checkout = () => {
   })
   const [selectedAddressId, setSelectedAddressId] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState("cod")
-  const [voucherCode, setVoucherCode] = useState("")
-  const [appliedVoucher, setAppliedVoucher] = useState(null)
-  const [isApplyingVoucher, setIsApplyingVoucher] = useState(false)
+
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // ================= VOUCHER =================
+  const [myVouchers, setMyVouchers] = useState([])
+  const [isLoadingVouchers, setIsLoadingVouchers] = useState(true)
+
+  // Tách riêng voucher giảm giá sản phẩm và voucher giảm phí ship —
+  // mỗi loại có state chọn + state đã áp dụng riêng, đảm bảo chỉ
+  // được chọn tối đa 1 voucher mỗi loại (nhờ radio "name" khác nhau)
+  const [selectedProductVoucherId, setSelectedProductVoucherId] = useState(null)
+  const [selectedShippingVoucherId, setSelectedShippingVoucherId] =
+    useState(null)
+  const [appliedProductVoucher, setAppliedProductVoucher] = useState(null)
+  const [appliedShippingVoucher, setAppliedShippingVoucher] = useState(null)
+  // id voucher đang gọi API áp dụng (dùng để hiện spinner + khoá tạm các lựa chọn khác)
+  const [applyingVoucherId, setApplyingVoucherId] = useState(null)
+
+  // Lấy voucher user đã nhận (trạng thái "available" là chưa dùng),
+  // dùng để render danh sách cho chọn thay vì gõ tay mã code
+  const getMyVouchers = async () => {
+    try {
+      setIsLoadingVouchers(true)
+      const response = await axiosInstance.get(
+        `${import.meta.env.VITE_APP_URL}/voucher/my`,
+      )
+      setMyVouchers(response.data.vouchers || [])
+    } catch (error) {
+      setMyVouchers([])
+    } finally {
+      setIsLoadingVouchers(false)
+    }
+  }
+
+  useEffect(() => {
+    getMyVouchers()
+  }, [])
 
   const formatPrice = (price) => {
     if (price == null) return ""
     return price.toLocaleString("vi-VN") + "đ"
+  }
+
+  // Hiển thị mô tả ngắn gọn mức giảm ngay trên từng voucher
+  const formatVoucherDiscount = (voucher) => {
+    if (voucher.discount_type === "percent") {
+      const cap = voucher.max_discount
+        ? ` (tối đa ${formatPrice(voucher.max_discount)})`
+        : ""
+      return `Giảm ${voucher.discount_value}%${cap}`
+    }
+    return `Giảm ${formatPrice(voucher.discount_value)}`
   }
 
   // Lấy lại TOÀN BỘ giỏ hàng từ server, rồi chỉ giữ đúng những item có _id
@@ -99,6 +143,7 @@ const Checkout = () => {
       }
     }
   }, [])
+
   const getDefaultAddress = async () => {
     try {
       const response = await axiosInstance.get(
@@ -117,6 +162,7 @@ const Checkout = () => {
   useEffect(() => {
     getDefaultAddress()
   }, [])
+
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
@@ -155,26 +201,94 @@ const Checkout = () => {
     [items],
   )
   const shippingFee = 0
-  const voucherDiscount = appliedVoucher?.discount_amount || 0
+
+  // Tổng giảm giá từ voucher = giảm sản phẩm + giảm ship (mỗi loại tối đa 1 voucher)
+  const productVoucherDiscount = appliedProductVoucher?.discount_amount || 0
+  const shippingVoucherDiscount = appliedShippingVoucher?.discount_amount || 0
+  const voucherDiscount = productVoucherDiscount + shippingVoucherDiscount
+
   const total = Math.max(
     0,
     subtotal - productDiscount - voucherDiscount + shippingFee,
   )
 
-  const handleApplyVoucher = async () => {
-    if (!voucherCode.trim()) return
-    setIsApplyingVoucher(true)
+  // order_total dùng để server kiểm tra min_order_value — tính giống hệt
+  // logic hiển thị summary (đã trừ giảm giá sản phẩm)
+  const orderTotalForVoucher = subtotal - productDiscount
+
+  // Voucher chỉ dùng được khi còn hạn, đã bắt đầu, và đơn hàng đạt mức tối thiểu
+  const isVoucherUsable = (voucher) => {
+    const now = new Date()
+    const notExpired = new Date(voucher.end_date) >= now
+    const started = new Date(voucher.start_date) <= now
+    const enoughOrder = orderTotalForVoucher >= (voucher.min_order_value || 0)
+    return notExpired && started && enoughOrder
+  }
+
+  // Chia danh sách voucher user đang có thành 2 nhóm theo voucher_type
+  const productVouchers = useMemo(
+    () =>
+      myVouchers.filter((entry) => entry.voucher.voucher_type !== "shipping"),
+    [myVouchers],
+  )
+  const shippingVouchers = useMemo(
+    () =>
+      myVouchers.filter((entry) => entry.voucher.voucher_type === "shipping"),
+    [myVouchers],
+  )
+
+  // Dùng chung cho cả 2 nhóm, phân biệt bằng "type" ('product' | 'shipping')
+  // để cập nhật đúng state tương ứng, đảm bảo mỗi nhóm chỉ giữ 1 voucher đã chọn
+  const handleApplyVoucher = async (entry, type) => {
+    const isProduct = type === "product"
+    // 1. xác định voucher đang chọn là sản phẩm hay phí shipping
+    const currentSelectedId = isProduct
+      ? selectedProductVoucherId
+      : selectedShippingVoucherId
+
+    // Bấm lại đúng voucher đang chọn -> bỏ áp dụng
+    if (currentSelectedId === entry._id) {
+      if (isProduct) {
+        setSelectedProductVoucherId(null)
+        setAppliedProductVoucher(null)
+      } else {
+        setSelectedShippingVoucherId(null)
+        setAppliedShippingVoucher(null)
+      }
+      return
+    }
+
+    setApplyingVoucherId(entry._id)
+    if (isProduct) {
+      setSelectedProductVoucherId(entry._id)
+    } else {
+      setSelectedShippingVoucherId(entry._id)
+    }
+
+    // kiếm tra và tính số tiền giảm
     try {
       const response = await axiosInstance.post(
-        `${import.meta.env.VITE_APP_URL}/vouchers/apply`,
-        { code: voucherCode.trim(), order_total: subtotal - productDiscount },
+        `${import.meta.env.VITE_APP_URL}/voucher/apply`,
+        { code: entry.voucher.code, order_total: orderTotalForVoucher },
       )
-      setAppliedVoucher(response.data.data)
+      console.log("CODE: ", entry.voucher.code)
+      console.log("ORDER_TOTAL: ", orderTotalForVoucher)
+      if (isProduct) {
+        setAppliedProductVoucher(response.data.data)
+      } else {
+        setAppliedShippingVoucher(response.data.data)
+      }
     } catch (error) {
-      setAppliedVoucher(null)
-      alert(error.response?.data?.message || "Mã giảm giá không hợp lệ")
+      if (isProduct) {
+        setAppliedProductVoucher(null)
+        setSelectedProductVoucherId(null)
+      } else {
+        setAppliedShippingVoucher(null)
+        setSelectedShippingVoucherId(null)
+      }
+      alert(error.response?.data?.message || "Không thể áp dụng voucher này")
     } finally {
-      setIsApplyingVoucher(false)
+      setApplyingVoucherId(null)
     }
   }
 
@@ -197,7 +311,6 @@ const Checkout = () => {
           cart_item_ids: cartItemIds,
           address_id: selectedAddressId,
           payment_method: paymentMethod,
-
           note: form.note,
         },
       )
@@ -255,6 +368,76 @@ const Checkout = () => {
           Quay lại giỏ hàng
         </Link>
       </div>
+    )
+  }
+
+  // Component con dùng chung để render 1 voucher trong danh sách,
+  // tránh lặp lại JSX cho 2 nhóm (product / shipping)
+  const renderVoucherItem = (entry, type) => {
+    const voucher = entry.voucher
+    const usable = isVoucherUsable(voucher)
+    const isSelected =
+      type === "product"
+        ? selectedProductVoucherId === entry._id
+        : selectedShippingVoucherId === entry._id
+    const isThisApplying = applyingVoucherId === entry._id
+    const radioGroupName =
+      type === "product"
+        ? "applied-product-voucher"
+        : "applied-shipping-voucher"
+
+    return (
+      <label
+        key={entry._id}
+        className={`voucher-select-item ${isSelected ? "selected" : ""} ${
+          !usable ? "disabled" : ""
+        } ${type === "shipping" ? "type-shipping" : "type-product"}`}
+      >
+        <input
+          type="radio"
+          name={radioGroupName}
+          checked={isSelected}
+          disabled={!usable || Boolean(applyingVoucherId)}
+          onChange={() => handleApplyVoucher(entry, type)}
+        />
+
+        <div className="voucher-select-icon">
+          <i
+            className={
+              type === "shipping"
+                ? "fa-solid fa-truck-fast"
+                : "fa-solid fa-percent"
+            }
+          ></i>
+        </div>
+
+        <div className="voucher-select-info">
+          <div className="voucher-select-top">
+            <span className="voucher-select-code">{voucher.code}</span>
+            {isThisApplying && (
+              <i className="fa-solid fa-spinner voucher-select-spinner"></i>
+            )}
+          </div>
+          <p className="voucher-select-desc">
+            {formatVoucherDiscount(voucher)}
+          </p>
+          <p className="voucher-select-condition">
+            Đơn tối thiểu {formatPrice(voucher.min_order_value)}
+          </p>
+          {!usable && (
+            <p className="voucher-select-warning">
+              {new Date(voucher.end_date) < new Date()
+                ? "Voucher đã hết hạn"
+                : `Cần mua thêm ${formatPrice(
+                    Math.max(
+                      (voucher.min_order_value || 0) - orderTotalForVoucher,
+                      0,
+                    ),
+                  )} để dùng voucher này`}
+            </p>
+          )}
+        </div>
+      </label>
     )
   }
 
@@ -472,20 +655,60 @@ const Checkout = () => {
             <h3>
               <span className="bar"></span> 3. Mã giảm giá
             </h3>
-            <div className="voucher-input">
-              <input
-                type="text"
-                placeholder="Nhập mã giảm giá của bạn"
-                value={voucherCode}
-                onChange={(e) => setVoucherCode(e.target.value)}
-              />
-              <button
-                onClick={handleApplyVoucher}
-                disabled={isApplyingVoucher}
-              >
-                {isApplyingVoucher ? "..." : "Áp dụng"}
-              </button>
-            </div>
+
+            {isLoadingVouchers ? (
+              <p className="voucher-select-loading">
+                Đang tải voucher của bạn...
+              </p>
+            ) : myVouchers.length === 0 ? (
+              <p className="voucher-select-empty">
+                Bạn chưa có voucher nào. Ghé{" "}
+                <Link to="/voucher">Kho voucher</Link> để nhận thêm ưu đãi nhé.
+              </p>
+            ) : (
+              <div className="voucher-select-groups">
+                {/* ============= NHÓM GIẢM GIÁ SẢN PHẨM ============= */}
+                <div className="voucher-select-group">
+                  <p className="voucher-group-title">
+                    <i className="fa-solid fa-percent"></i> Giảm giá sản phẩm
+                    <span className="voucher-group-hint">(chọn tối đa 1)</span>
+                  </p>
+
+                  {productVouchers.length === 0 ? (
+                    <p className="voucher-select-empty small">
+                      Bạn không có voucher giảm giá sản phẩm nào.
+                    </p>
+                  ) : (
+                    <div className="voucher-select-list">
+                      {productVouchers.map((entry) =>
+                        renderVoucherItem(entry, "product"),
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* ============= NHÓM GIẢM PHÍ SHIP ============= */}
+                <div className="voucher-select-group">
+                  <p className="voucher-group-title">
+                    <i className="fa-solid fa-truck-fast"></i> Miễn phí vận
+                    chuyển
+                    <span className="voucher-group-hint">(chọn tối đa 1)</span>
+                  </p>
+
+                  {shippingVouchers.length === 0 ? (
+                    <p className="voucher-select-empty small">
+                      Bạn không có voucher miễn phí vận chuyển nào.
+                    </p>
+                  ) : (
+                    <div className="voucher-select-list">
+                      {shippingVouchers.map((entry) =>
+                        renderVoucherItem(entry, "shipping"),
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -534,10 +757,17 @@ const Checkout = () => {
             </div>
           )}
 
-          {voucherDiscount > 0 && (
+          {productVoucherDiscount > 0 && (
             <div className="summary-row discount">
-              <span>Mã giảm giá ({appliedVoucher.code})</span>
-              <span>-{formatPrice(voucherDiscount)}</span>
+              <span>Voucher ({appliedProductVoucher.code})</span>
+              <span>-{formatPrice(productVoucherDiscount)}</span>
+            </div>
+          )}
+
+          {shippingVoucherDiscount > 0 && (
+            <div className="summary-row discount">
+              <span>Voucher ship ({appliedShippingVoucher.code})</span>
+              <span>-{formatPrice(shippingVoucherDiscount)}</span>
             </div>
           )}
 

@@ -793,3 +793,162 @@ $bp-lg: 992px;
     }
   }
 }
+
+.voucher-select-loading,
+.voucher-select-empty {
+  font-size: 14px;
+  color: #7b8999;
+  margin: 0;
+
+  a {
+    color: #2f78c4;
+    font-weight: 600;
+  }
+}
+
+.voucher-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.voucher-select-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  input[type="radio"] {
+    margin-top: 4px;
+    accent-color: #2f78c4;
+    cursor: pointer;
+  }
+
+  &:hover:not(.disabled) {
+    border-color: #2f78c4;
+    background: #f7fafd;
+  }
+
+  &.selected {
+    border-color: #2f78c4;
+    background: #eef6fd;
+    box-shadow: 0 0 0 3px rgba(47, 120, 196, 0.1);
+  }
+
+  &.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    input[type="radio"] {
+      cursor: not-allowed;
+    }
+  }
+
+  .voucher-select-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 16px;
+    color: white;
+  }
+
+  &.type-product .voucher-select-icon {
+    background: linear-gradient(135deg, #ffc11a, #f58b00);
+  }
+
+  &.type-shipping .voucher-select-icon {
+    background: linear-gradient(135deg, #20b15a, #07843a);
+  }
+
+  .voucher-select-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .voucher-select-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .voucher-select-code {
+    font-weight: 800;
+    font-size: 14px;
+    color: #2b405b;
+  }
+
+  .voucher-select-spinner {
+    animation: voucher-select-spin 0.7s linear infinite;
+    color: #2f78c4;
+    font-size: 13px;
+  }
+
+  .voucher-select-desc {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #3f536b;
+    font-weight: 600;
+  }
+
+  .voucher-select-condition {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #7b8999;
+  }
+
+  .voucher-select-warning {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #c0392b;
+  }
+}
+
+@keyframes voucher-select-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.voucher-select-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.voucher-select-group {
+  .voucher-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #263b55;
+
+    i {
+      color: #f0a000;
+    }
+
+    .voucher-group-hint {
+      font-weight: 500;
+      font-size: 12px;
+      color: #9aa7b5;
+    }
+  }
+}
+
+.voucher-select-empty.small {
+  font-size: 13px;
+  margin: 0;
+}

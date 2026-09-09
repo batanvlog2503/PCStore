@@ -124,7 +124,7 @@ class VoucherController {
     }
   }
 
-  async claimVoucher(req, res) {
+  async claimVoucher(req, res, next) {
     try {
       const userId = req.user._id
 
@@ -176,13 +176,30 @@ class VoucherController {
         vouchers,
       })
     } catch (error) {
-      console.error("GET MY VOUCHERS ERROR:", error)
+      next(error)
+    }
+  }
 
-      return res.status(500).json({
-        success: false,
-        message: "Lấy voucher của bạn thất bại",
-        error: error.message,
+  async applyVoucher(req, res, next) {
+    try {
+      const userId = req.user._id
+
+      const { code, order_total } = req.body
+      console.log("CODE: ", code)
+      console.log("ORDER_TOTAL: ", order_total)
+      const data = await VoucherService.applyVoucher(
+        userId,
+        code.toUpperCase(),
+        Number(order_total),
+      )
+
+      return res.status(200).json({
+        success: true,
+        message: "Áp dụng voucher thành công",
+        data,
       })
+    } catch (error) {
+      next(error)
     }
   }
 }

@@ -1,6 +1,7 @@
 const Voucher = require("../models/Voucher")
 const filterVoucher = require("../../helpers/filterVoucher")
 const searchVoucher = require("../../helpers/searchVoucher")
+const UserVoucher = require("../../app/models/UserVoucher")
 class VoucherRepository {
   async getAll(filter, sort, skip, limit) {
     return await Voucher.find(filter).sort(sort).skip(skip).limit(limit).lean()
@@ -76,6 +77,31 @@ class VoucherRepository {
       quantity: { $gt: 0 },
       start_date: { $lte: now },
       end_date: { $gte: now },
+    })
+  }
+
+  // Tìm voucher theo code
+  async findVoucherByCode(code) {
+    return await Voucher.findOne({
+      code: code.toUpperCase(),
+      is_active: true,
+    })
+  }
+
+  // Kiểm tra user có sở hữu voucher này không
+  async findUserVoucher(userId, voucherId) {
+    return await UserVoucher.findOne({
+      user_id: userId,
+      voucher_id: voucherId,
+    })
+  }
+
+  // Tìm voucher user đang có và chưa sử dụng
+  async findAvailableUserVoucher(userId, voucherId) {
+    return await UserVoucher.findOne({
+      user_id: userId,
+      voucher_id: voucherId,
+      status: "available",
     })
   }
 }
