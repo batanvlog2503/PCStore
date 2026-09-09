@@ -163,7 +163,8 @@ export const Header = () => {
 
         <div className="header-middle-3">
           <div className="love">
-            <i className="fa-regular fa-heart"></i> <span>Yêu thích</span>
+            <i className="fa-regular fa-heart"></i>{" "}
+            <span onClick={() => navigate("/account/wishlist")}>Yêu thích</span>
           </div>
           <div className="my-cart">
             <Link

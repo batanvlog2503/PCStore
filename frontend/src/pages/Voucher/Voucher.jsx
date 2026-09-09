@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useState } from "react"
 import "./Voucher.scss"
 import axiosInstance from "../../utils/axiosInstance"
 
@@ -18,6 +18,8 @@ const SORT_OPTIONS = [
   { value: "discount", label: "Giảm nhiều nhất" },
 ]
 
+const ITEMS_PER_PAGE = 10
+
 const formatPrice = (value) => {
   if (value == null) return ""
   return value.toLocaleString("vi-VN") + "đ"
@@ -28,8 +30,6 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString("vi-VN")
 }
 
-// Nhãn to hiển thị giữa mảnh voucher — tách riêng logic cho 2 loại
-// product (vàng) và shipping (xanh lá) theo đúng voucher_type trong schema
 const getVoucherHeadline = (voucher) => {
   if (voucher.voucher_type === "shipping") {
     return { title: "MIỄN PHÍ", subtitle: "VẬN CHUYỂN" }
@@ -49,6 +49,38 @@ const getVoucherStatusFlag = (voucher) => {
   return "available"
 }
 
+// Rút gọn dãy số trang kiểu "1 2 3 ... 8" khi có nhiều trang
+const getPageNumbers = (current, total) => {
+  const delta = 1
+  const range = []
+  const rangeWithDots = []
+  let last = null
+
+  for (let i = 1; i <= total; i++) {
+    if (
+      i === 1 ||
+      i === total ||
+      (i >= current - delta && i <= current + delta)
+    ) {
+      range.push(i)
+    }
+  }
+
+  for (const i of range) {
+    if (last !== null) {
+      if (i - last === 2) {
+        rangeWithDots.push(last + 1)
+      } else if (i - last > 2) {
+        rangeWithDots.push("...")
+      }
+    }
+    rangeWithDots.push(i)
+    last = i
+  }
+
+  return rangeWithDots
+}
+
 export const Voucher = () => {
   const [vouchers, setVouchers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -59,13 +91,29 @@ export const Voucher = () => {
   const [detailVoucher, setDetailVoucher] = useState(null)
   const [cartTotal, setCartTotal] = useState(0)
 
-  const getVouchers = async () => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+
+  // Server tự lọc theo type, tự sort, tự phân trang (page/limit) —
+  // FE chỉ truyền tham số và hiển thị đúng những gì trả về, không xử lý thêm
+  const getVouchers = async (page) => {
     try {
       setIsLoading(true)
       const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/voucher/all`,
+        {
+          params: {
+            page,
+            limit: ITEMS_PER_PAGE,
+            voucher_type: filterType !== "all" ? filterType : undefined,
+            sort,
+          },
+        },
       )
       setVouchers(response.data.vouchers || [])
+      setTotalPages(response.data.pagination?.totalPages || 1)
+      setTotalCount(response.data.pagination?.total || 0)
     } catch (error) {
       alert(error.response?.data?.message || "Không tải được danh sách voucher")
     } finally {
@@ -73,9 +121,6 @@ export const Voucher = () => {
     }
   }
 
-  // Lấy tổng tiền giỏ hàng hiện tại để kiểm tra "có đủ điều kiện nhận không"
-  // ở phần xem chi tiết — nếu chưa đăng nhập / lỗi thì coi như 0, chỉ ảnh
-  // hưởng tới phần gợi ý, không chặn việc xem thông tin voucher
   const getCartTotal = async () => {
     try {
       const response = await axiosInstance.get(
@@ -86,8 +131,7 @@ export const Voucher = () => {
       setCartTotal(0)
     }
   }
-
-  // Danh sách _id voucher user đã nhận rồi, để disable nút + hiện "Đã nhận"
+  // lấy id voucher đã lấy để k spam nhận
   const getClaimedIds = async () => {
     try {
       const response = await axiosInstance.get(
@@ -100,10 +144,20 @@ export const Voucher = () => {
   }
 
   useEffect(() => {
-    getVouchers()
-    getClaimedIds()
     getCartTotal()
+    getClaimedIds()
   }, [])
+
+  // Đổi filter/sort thì quay về trang 1, tránh đang ở trang 3 rồi lọc
+  // còn 1 trang -> danh sách trống
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterType, sort])
+
+  // Fetch lại mỗi khi đổi trang, filter, hoặc sort
+  useEffect(() => {
+    getVouchers(currentPage)
+  }, [currentPage, filterType, sort])
 
   const handleClaim = async (voucher) => {
     const flag = getVoucherStatusFlag(voucher)
@@ -130,30 +184,17 @@ export const Voucher = () => {
     }
   }
 
-  const visibleVouchers = useMemo(() => {
-    let list = [...vouchers]
-
-    if (filterType !== "all") {
-      list = list.filter((v) => v.voucher_type === filterType)
-    }
-
-    switch (sort) {
-      case "expiring":
-        list.sort((a, b) => new Date(a.end_date) - new Date(b.end_date))
-        break
-      case "discount":
-        list.sort((a, b) => (b.discount_value || 0) - (a.discount_value || 0))
-        break
-      case "newest":
-      default:
-        list.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        break
-    }
-
-    return list
-  }, [vouchers, filterType, sort])
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages || page === currentPage) return
+    setCurrentPage(page)
+    document
+      .querySelector(".voucher-panel")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   const isEligible = (voucher) => cartTotal >= (voucher.min_order_value || 0)
+
+  const pageNumbers = getPageNumbers(currentPage, totalPages)
 
   return (
     <div className="voucher-page container">
@@ -239,6 +280,9 @@ export const Voucher = () => {
               Nhanh tay nhận voucher để tận hưởng những ưu đãi hấp dẫn nhất!
             </p>
           </div>
+          {!isLoading && totalCount > 0 && (
+            <span className="voucher-count-badge">{totalCount} voucher</span>
+          )}
         </div>
 
         {isLoading ? (
@@ -257,102 +301,159 @@ export const Voucher = () => {
               </div>
             ))}
           </div>
-        ) : visibleVouchers.length === 0 ? (
+        ) : vouchers.length === 0 ? (
           <div className="voucher-empty">
             <i className="fa-solid fa-ticket"></i>
             <h3>Không có voucher nào phù hợp</h3>
             <p>Thử chọn bộ lọc khác hoặc quay lại sau nhé.</p>
           </div>
         ) : (
-          <div className="voucher-grid">
-            {visibleVouchers.map((voucher, index) => {
-              const flag = getVoucherStatusFlag(voucher)
-              const claimed = claimedIds.includes(voucher._id)
-              const isClaiming = claimingId === voucher._id
-              const headline = getVoucherHeadline(voucher)
-              const typeClass =
-                voucher.voucher_type === "shipping"
-                  ? "type-shipping"
-                  : "type-product"
+          <>
+            <div
+              className="voucher-grid"
+              key={currentPage}
+            >
+              {vouchers.map((voucher, index) => {
+                const flag = getVoucherStatusFlag(voucher)
+                const claimed = claimedIds.includes(voucher._id)
+                const isClaiming = claimingId === voucher._id
+                const headline = getVoucherHeadline(voucher)
+                const typeClass =
+                  voucher.voucher_type === "shipping"
+                    ? "type-shipping"
+                    : "type-product"
 
-              return (
-                <div
-                  className={`voucher-card ${typeClass} ${flag !== "available" ? "disabled" : ""}`}
-                  key={voucher._id}
-                  style={{ animationDelay: `${index * 60}ms` }}
-                >
-                  <div className="voucher-left">
-                    <p className="headline-label">
-                      {voucher.voucher_type === "shipping" ? "" : "GIẢM"}
-                    </p>
-                    <p className="headline-title">{headline.title}</p>
-                    {headline.subtitle && (
-                      <p className="headline-subtitle">{headline.subtitle}</p>
-                    )}
-                    {voucher.max_discount &&
-                      voucher.discount_type === "percent" && (
-                        <p className="headline-cap">
-                          TỐI ĐA {formatPrice(voucher.max_discount)}
-                        </p>
+                return (
+                  <div
+                    className={`voucher-card ${typeClass} ${flag !== "available" ? "disabled" : ""}`}
+                    key={voucher._id}
+                    style={{ animationDelay: `${index * 60}ms` }}
+                  >
+                    <div className="voucher-left">
+                      <p className="headline-label">
+                        {voucher.voucher_type === "shipping" ? "" : "GIẢM"}
+                      </p>
+                      <p className="headline-title">{headline.title}</p>
+                      {headline.subtitle && (
+                        <p className="headline-subtitle">{headline.subtitle}</p>
                       )}
-                    <i className="fa-solid fa-tag left-icon"></i>
-                  </div>
+                      {voucher.max_discount &&
+                        voucher.discount_type === "percent" && (
+                          <p className="headline-cap">
+                            TỐI ĐA {formatPrice(voucher.max_discount)}
+                          </p>
+                        )}
+                      <i className="fa-solid fa-tag left-icon"></i>
+                    </div>
 
-                  <div className="voucher-right">
-                    <div className="voucher-right-top">
-                      <div>
-                        <span className="voucher-code">{voucher.code}</span>
-                        <span className={`type-chip ${typeClass}`}>
-                          {voucher.voucher_type === "shipping"
-                            ? "Vận chuyển"
-                            : "Giảm giá"}
-                        </span>
+                    <div className="voucher-right">
+                      <div className="voucher-right-top">
+                        <div>
+                          <span className="voucher-code">{voucher.code}</span>
+                          <span className={`type-chip ${typeClass}`}>
+                            {voucher.voucher_type === "shipping"
+                              ? "Vận chuyển"
+                              : "Giảm giá"}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="detail-btn"
+                          onClick={() => setDetailVoucher(voucher)}
+                          aria-label="Xem chi tiết voucher"
+                        >
+                          <i className="fa-solid fa-circle-info"></i>
+                        </button>
                       </div>
+
+                      <p className="voucher-condition">
+                        <i className="fa-regular fa-gift"></i> Đơn tối thiểu{" "}
+                        {formatPrice(voucher.min_order_value)}
+                      </p>
+                      <p className="voucher-hsd">
+                        <i className="fa-regular fa-calendar"></i> HSD:{" "}
+                        {formatDate(voucher.end_date)}
+                      </p>
 
                       <button
                         type="button"
-                        className="detail-btn"
-                        onClick={() => setDetailVoucher(voucher)}
-                        aria-label="Xem chi tiết voucher"
+                        className={`claim-btn ${claimed ? "claimed" : ""} ${isClaiming ? "claiming" : ""}`}
+                        disabled={flag !== "available" || claimed || isClaiming}
+                        onClick={() => handleClaim(voucher)}
                       >
-                        <i className="fa-solid fa-circle-info"></i>
+                        {isClaiming ? (
+                          <>
+                            <i className="fa-solid fa-spinner spinner-icon"></i>{" "}
+                            Đang xử lý...
+                          </>
+                        ) : flag === "expired" ? (
+                          "Đã hết hạn"
+                        ) : flag === "out_of_stock" ? (
+                          "Đã hết lượt"
+                        ) : claimed ? (
+                          <>
+                            <i className="fa-solid fa-check"></i> Đã nhận
+                          </>
+                        ) : (
+                          <>
+                            <i className="fa-solid fa-gift"></i> Nhận voucher
+                          </>
+                        )}
                       </button>
                     </div>
-
-                    <p className="voucher-condition">
-                      <i className="fa-regular fa-gift"></i> Đơn tối thiểu{" "}
-                      {formatPrice(voucher.min_order_value)}
-                    </p>
-                    <p className="voucher-hsd">
-                      <i className="fa-regular fa-calendar"></i> HSD:{" "}
-                      {formatDate(voucher.end_date)}
-                    </p>
-
-                    <button
-                      type="button"
-                      className={`claim-btn ${claimed ? "claimed" : ""} ${isClaiming ? "claiming" : ""}`}
-                      disabled={flag !== "available" || claimed || isClaiming}
-                      onClick={() => handleClaim(voucher)}
-                    >
-                      {flag === "expired" ? (
-                        "Đã hết hạn"
-                      ) : flag === "out_of_stock" ? (
-                        "Đã hết lượt"
-                      ) : claimed ? (
-                        <>
-                          <i className="fa-solid fa-check"></i> Đã nhận
-                        </>
-                      ) : (
-                        <>
-                          <i className="fa-solid fa-gift"></i> Nhận voucher
-                        </>
-                      )}
-                    </button>
                   </div>
+                )
+              })}
+            </div>
+
+            {/* ================= PAGINATION ================= */}
+            {totalPages > 1 && (
+              <div className="voucher-pagination">
+                <button
+                  type="button"
+                  className="page-nav-btn"
+                  disabled={currentPage === 1}
+                  onClick={() => goToPage(currentPage - 1)}
+                  aria-label="Trang trước"
+                >
+                  <i className="fa-solid fa-chevron-left"></i>
+                </button>
+
+                <div className="page-numbers">
+                  {pageNumbers.map((p, idx) =>
+                    p === "..." ? (
+                      <span
+                        className="page-dots"
+                        key={`dots-${idx}`}
+                      >
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        key={p}
+                        className={`page-btn ${currentPage === p ? "active" : ""}`}
+                        onClick={() => goToPage(p)}
+                      >
+                        {p}
+                      </button>
+                    ),
+                  )}
                 </div>
-              )
-            })}
-          </div>
+
+                <button
+                  type="button"
+                  className="page-nav-btn"
+                  disabled={currentPage === totalPages}
+                  onClick={() => goToPage(currentPage + 1)}
+                  aria-label="Trang sau"
+                >
+                  <i className="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -427,7 +528,6 @@ export const Voucher = () => {
               </li>
             </ul>
 
-            {/* KIỂM TRA ĐIỀU KIỆN — so đơn hàng hiện tại của user với min_order_value */}
             <div
               className={`eligibility-box ${isEligible(detailVoucher) ? "eligible" : "not-eligible"}`}
             >
@@ -462,23 +562,14 @@ export const Voucher = () => {
               type="button"
               className={`claim-btn modal-claim-btn ${
                 claimedIds.includes(detailVoucher._id) ? "claimed" : ""
-              }`}
+              } ${claimingId === detailVoucher._id ? "claiming" : ""}`}
               disabled={
                 getVoucherStatusFlag(detailVoucher) !== "available" ||
-                claimedIds.includes(detailVoucher._id)
+                claimedIds.includes(detailVoucher._id) ||
+                claimingId === detailVoucher._id
               }
               onClick={() => handleClaim(detailVoucher)}
-            >
-              {claimedIds.includes(detailVoucher._id) ? (
-                <>
-                  <i className="fa-solid fa-check"></i> Đã nhận voucher này
-                </>
-              ) : (
-                <>
-                  <i className="fa-solid fa-gift"></i> Nhận voucher ngay
-                </>
-              )}
-            </button>
+            ></button>
           </div>
         </div>
       )}

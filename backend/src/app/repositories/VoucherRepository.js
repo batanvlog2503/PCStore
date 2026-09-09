@@ -2,27 +2,55 @@ const Voucher = require("../models/Voucher")
 const filterVoucher = require("../../helpers/filterVoucher")
 const searchVoucher = require("../../helpers/searchVoucher")
 class VoucherRepository {
-  async getAll(req) {
-    const filter = filterVoucher(req)
-    const search = searchVoucher(req)
-
-    const query = {
-      ...filter,
-      ...search,
-    }
-
-    const [vouchers, total] = await Promise.all([
-      Voucher.find(query),
-      Voucher.countDocuments(query),
-    ])
-
-    return { vouchers, total }
+  async getAll(filter, sort, skip, limit) {
+    return await Voucher.find(filter).sort(sort).skip(skip).limit(limit).lean()
   }
 
-  async findById(id) {
-    return await Voucher.findById(id)
+  async count(filter) {
+    return await Voucher.countDocuments(filter)
   }
 
+  async findById(voucherId) {
+    return await Voucher.findById(voucherId)
+  }
+
+  // Atomic: chỉ giảm quantity khi quantity > 0
+  async claimVoucherAtomic(voucherId) {
+    const now = new Date()
+
+    return await Voucher.findOneAndUpdate(
+      {
+        _id: voucherId,
+        status: "active",
+        quantity: { $gt: 0 },
+        start_date: { $lte: now },
+        end_date: { $gt: now },
+      },
+      {
+        $inc: {
+          quantity: -1,
+        },
+      },
+      {
+        new: true,
+      },
+    )
+  }
+
+  // Nếu cần cộng lại quantity khi rollback
+  async increaseQuantity(voucherId) {
+    return await Voucher.findByIdAndUpdate(
+      voucherId,
+      {
+        $inc: {
+          quantity: 1,
+        },
+      },
+      {
+        new: true,
+      },
+    )
+  }
   async findByCode(code) {
     return await Voucher.findOne({ code })
   }

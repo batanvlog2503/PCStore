@@ -24,7 +24,6 @@ class WishlistRepository {
   async getAllByUser(userId) {
     return await Wishlist.find({
       user_id: userId,
-      status: "active",
     })
       .populate("product_id")
       .sort({

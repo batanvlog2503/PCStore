@@ -1,9 +1,37 @@
 const VoucherRepo = require("../repositories/VoucherRepository")
 const AppError = require("../utils/AppError")
 
+const UserVoucherRepo = require("../repositories/UserVoucherRepository")
+const filterAllVouchers = require("../../helpers/filterAllVouchers")
+const sortableVouchers = require("../../helpers/sortableVouchers")
 class VoucherService {
-  async getAllVouchers(req) {
-    return await VoucherRepo.getAll(req)
+  async getAll(req) {
+    const filter = filterAllVouchers(req)
+    const sort = sortableVouchers(req)
+    const page = Math.max(Number(req.query.page) || 1, 1)
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100)
+    const skip = (page - 1) * limit
+    const [vouchers, total] = await Promise.all([
+      VoucherRepo.getAll(filter, sort, skip, limit),
+      VoucherRepo.count(filter),
+    ])
+    const totalPages = Math.ceil(total / limit)
+    return {
+      pagination: {
+        page,
+
+        limit,
+
+        total,
+
+        totalPages,
+
+        hasNextPage: page < totalPages,
+
+        hasPrevPage: page > 1,
+      },
+      vouchers,
+    }
   }
 
   async getVoucherById(id) {
@@ -18,7 +46,25 @@ class VoucherService {
 
     return voucher
   }
+  async getMyVouchers(userId) {
+    const userVouchers = await UserVoucherRepo.findByUser(userId)
 
+    const vouchers = userVouchers
+      .filter((item) => item.voucher_id)
+      .map((item) => ({
+        _id: item._id,
+
+        status: item.status,
+
+        received_at: item.received_at,
+
+        used_at: item.used_at,
+
+        voucher: item.voucher_id,
+      }))
+
+    return vouchers
+  }
   async getVoucherByCode(code) {
     if (!code) {
       throw new AppError(404, "Code is required !!!")
@@ -128,6 +174,68 @@ class VoucherService {
 
   async getActiveVouchers() {
     return await VoucherRepo.getActiveVouchers()
+  }
+
+  async claimVoucher(userId, voucherId) {
+    if (!userId) {
+      throw new AppError(400, "User ID is required")
+    }
+    if (!voucherId) {
+      throw new AppError(400, "Voucher ID is required")
+    }
+    const existingUserVoucher = await UserVoucherRepo.findByUserAndVoucher(
+      userId,
+      voucherId,
+    )
+
+    if (existingUserVoucher) {
+      throw new AppError(400, "Bạn đã nhận voucher này rồi")
+    }
+
+    const voucher = await VoucherRepo.findById(voucherId)
+
+    if (!voucher) {
+      throw new AppError(404, "Voucher không tồn tại")
+    }
+    // nhận voucher và kiểm tra và trừ quantity
+    const claimedVoucher = await VoucherRepo.claimVoucherAtomic(voucherId)
+
+    if (!claimedVoucher) {
+      throw new AppError(
+        400,
+        "Voucher không còn lượt, chưa đến thời gian sử dụng hoặc đã hết hạn",
+      )
+    }
+
+    try {
+      const userVoucher = await UserVoucherRepo.create({
+        user_id: userId,
+        voucher_id: voucherId,
+        status: "available", // default là available
+      })
+
+      return {
+        voucher: claimedVoucher,
+        userVoucher,
+      }
+    } catch (error) {
+      // ROLLBACK quantity
+      await VoucherRepository.increaseQuantity(voucherId)
+      // Mongo duplicate key
+      if (error.code === 11000) {
+        throw new AppError(400, "Bạn đã nhận voucher này rồi")
+      }
+
+      throw error
+    }
+  }
+
+  async getClaimedVoucherIds(userId) {
+    const userVouchers = await UserVoucherRepo.getVoucherIdsByUserId(userId)
+
+    const voucherIds = userVouchers.map((item) => item.voucher_id.toString())
+
+    return voucherIds
   }
 }
 

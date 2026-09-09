@@ -42,6 +42,7 @@ const WishList = () => {
       const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/wishlist/all`,
       )
+      console.log("Account wishlist", response.data.wishlists)
       setItems(response.data.wishlists || [])
     } catch (error) {
       alert(
