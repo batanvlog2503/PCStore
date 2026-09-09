@@ -7,7 +7,12 @@ class UserVoucherRepository {
       voucher_id: voucherId,
     })
   }
-
+  async findUserVoucherByIdAndUser(userVoucherId, userId) {
+    return await UserVoucher.findOne({
+      _id: userVoucherId,
+      user_id: userId,
+    })
+  }
   async create(data) {
     return await UserVoucher.create(data)
   }

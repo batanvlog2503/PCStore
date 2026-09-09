@@ -113,6 +113,41 @@ const OrderSchema = new Schema(
       default: null,
     },
 
+    // ================= VOUCHER SẢN PHẨM =================
+
+    product_user_voucher_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserVoucher",
+      default: null,
+    },
+
+    product_voucher_discount: {
+      type: Number,
+      default: 0,
+    },
+
+    product_voucher_code: {
+      type: String,
+      default: null,
+    },
+
+    // ================= VOUCHER SHIPPING =================
+
+    shipping_user_voucher_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserVoucher",
+      default: null,
+    },
+
+    shipping_voucher_discount: {
+      type: Number,
+      default: 0,
+    },
+
+    shipping_voucher_code: {
+      type: String,
+      default: null,
+    },
     // =========================
     // Ghi chú
     // =========================

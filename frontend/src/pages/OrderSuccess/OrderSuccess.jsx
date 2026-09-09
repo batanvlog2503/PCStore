@@ -57,6 +57,23 @@ const OrderSuccess = () => {
     order?.payment_method === "bank" && order?.payment_status === "paid"
 
   const remainingAmount = isBankPaid ? 0 : Number(order?.total_amount || 0)
+
+  // ================= TÍNH TOÁN HIỂN THỊ VOUCHER =================
+
+  // Voucher giảm sản phẩm
+  const productVoucherDiscount = Number(order?.product_voucher_discount || 0)
+
+  // Voucher giảm phí ship
+  const shippingVoucherDiscount = Number(order?.shipping_voucher_discount || 0)
+
+  // Phí ship gốc
+  const originalShippingFee = Number(order?.shipping_fee || 0)
+
+  // Phí ship thực tế sau voucher
+  const finalShippingFee = Math.max(
+    0,
+    originalShippingFee - shippingVoucherDiscount,
+  )
   const handleCopyCode = () => {
     if (!order?.order_code) return
     navigator.clipboard.writeText(order.order_code) // copy vào clipboard vào hẹ thống
@@ -221,35 +238,67 @@ const OrderSuccess = () => {
           </div>
 
           <div className="totals">
+            {/* Tạm tính */}
             <div className="totals-row">
               <span>Tạm tính</span>
               <span>{formatPrice(order.subtotal)}</span>
             </div>
-            {order.product_discount > 0 && (
+
+            {/* Giảm giá sản phẩm có sẵn */}
+            {Number(order.product_discount || 0) > 0 && (
               <div className="totals-row discount">
                 <span>Giảm giá sản phẩm</span>
                 <span>-{formatPrice(order.product_discount)}</span>
               </div>
             )}
-            {order.voucher_discount > 0 && (
+
+            {/* Voucher giảm giá sản phẩm */}
+            {productVoucherDiscount > 0 && (
               <div className="totals-row discount">
-                <span>Mã giảm giá</span>
-                <span>-{formatPrice(order.voucher_discount)}</span>
+                <span>
+                  Voucher giảm giá sản phẩm
+                  {order.product_voucher_code
+                    ? ` (${order.product_voucher_code})`
+                    : ""}
+                </span>
+
+                <span>-{formatPrice(productVoucherDiscount)}</span>
               </div>
             )}
+
+            {/* Phí vận chuyển */}
+            {/* Phí vận chuyển */}
             <div className="totals-row">
               <span>Phí vận chuyển</span>
+
               <span>
-                {order.shipping_fee > 0
-                  ? formatPrice(order.shipping_fee)
-                  : "0đ"}
+                {originalShippingFee > 0
+                  ? formatPrice(originalShippingFee)
+                  : "Miễn phí"}
               </span>
             </div>
+
+            {/* Voucher giảm phí ship */}
+            {shippingVoucherDiscount > 0 && (
+              <div className="totals-row discount">
+                <span>
+                  Voucher vận chuyển
+                  {order.shipping_voucher_code
+                    ? ` (${order.shipping_voucher_code})`
+                    : ""}
+                </span>
+
+                <span>-{formatPrice(shippingVoucherDiscount)}</span>
+              </div>
+            )}
+
+            {/* Tổng đơn hàng */}
             <div className="totals-row total">
               <span>Tổng đơn hàng</span>
               <span>{formatPrice(order.total_amount)}</span>
             </div>
 
+            {/* Đã thanh toán */}
             {isBankPaid && (
               <div className="totals-row paid">
                 <span>Đã thanh toán</span>
@@ -257,6 +306,7 @@ const OrderSuccess = () => {
               </div>
             )}
 
+            {/* Còn phải thanh toán */}
             <div
               className={
                 isBankPaid

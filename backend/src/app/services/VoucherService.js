@@ -289,9 +289,7 @@ class VoucherService {
       )
     }
 
-    // ===============================
     // 6. TÍNH SỐ TIỀN ĐƯỢC GIẢM
-    // ===============================
 
     let discountAmount = 0
 
@@ -316,10 +314,6 @@ class VoucherService {
 
     // Không được giảm lớn hơn giá trị đơn hàng
     discountAmount = Math.min(discountAmount, Number(orderTotal))
-
-    // ===============================
-    // 7. RETURN KẾT QUẢ
-    // ===============================
 
     return {
       user_voucher_id: userVoucher._id,

@@ -10,8 +10,10 @@ const ProductVariantRepo = require("../repositories/ProductVariantRepository")
 const Product = require("../models/Product")
 const ProductVariant = require("../models/ProductVariant")
 const OrderItem = require("../models/OrderItem")
+const VoucherRepo = require("../repositories/VoucherRepository")
 const User = require("../models/User")
 const filterAllOrders = require("../../helpers/filterAllOrders")
+const UserVoucherRepo = require("../repositories/UserVoucherRepository")
 const validateStock = (items) => {
   for (const item of items) {
     const variant = item.variant_id // đã populate
@@ -47,26 +49,120 @@ const calculateOrderAmount = (items) => {
   }, 0)
 
   const product_discount = items.reduce((total, item) => {
-    const discount = item.variant_id.price - item.variant_id.discount_price
+    const price = item.variant_id.price
+    const discountPrice = item.variant_id.discount_price ?? price // fallback nếu null/undefined
+    const discount = price - discountPrice
 
     return total + Math.max(0, discount) * item.quantity
   }, 0)
 
-  const voucher_discount = 0
-  const shipping_fee = 0
-
-  const total_amount =
-    subtotal - product_discount - voucher_discount + shipping_fee
-
-  return {
-    subtotal,
-    product_discount,
-    voucher_discount,
-    shipping_fee,
-    total_amount,
-  }
+  return { subtotal, product_discount }
 }
 
+const calculateProductVoucherDiscount = (voucher, orderTotal) => {
+  const now = new Date()
+
+  // Check thời gian
+  if (voucher.start_date && new Date(voucher.start_date) > now) {
+    throw new AppError(400, "Voucher chưa đến thời gian sử dụng")
+  }
+
+  if (voucher.end_date && new Date(voucher.end_date) < now) {
+    throw new AppError(400, "Voucher đã hết hạn")
+  }
+
+  // Check trạng thái
+  if (voucher.status !== "active") {
+    throw new AppError(400, "Voucher không còn khả dụng")
+  }
+
+  // Check đúng loại voucher
+  if (voucher.voucher_type !== "product") {
+    throw new AppError(400, "Voucher không phải loại giảm sản phẩm")
+  }
+
+  // Check đơn tối thiểu
+  const minOrderValue = Number(voucher.min_order_value || 0)
+
+  if (Number(orderTotal) < minOrderValue) {
+    throw new AppError(
+      400,
+      `Đơn hàng phải từ ${minOrderValue.toLocaleString("vi-VN")}đ`,
+    )
+  }
+
+  let discountAmount = 0
+
+  // Giảm %
+  if (voucher.discount_type === "percent") {
+    discountAmount = (Number(orderTotal) * Number(voucher.discount_value)) / 100
+
+    if (voucher.max_discount && discountAmount > Number(voucher.max_discount)) {
+      discountAmount = Number(voucher.max_discount)
+    }
+  }
+
+  // Giảm tiền cố định
+  if (voucher.discount_type === "fixed") {
+    discountAmount = Number(voucher.discount_value)
+  }
+
+  // Không giảm quá tiền sản phẩm
+  return Math.min(discountAmount, Number(orderTotal))
+}
+
+const calculateShippingVoucherDiscount = (voucher, orderTotal, shippingFee) => {
+  const now = new Date()
+
+  // Check thời gian
+  if (voucher.start_date && new Date(voucher.start_date) > now) {
+    throw new AppError(400, "Voucher chưa đến thời gian sử dụng")
+  }
+
+  if (voucher.end_date && new Date(voucher.end_date) < now) {
+    throw new AppError(400, "Voucher đã hết hạn")
+  }
+
+  // Check trạng thái
+  if (voucher.status !== "active") {
+    throw new AppError(400, "Voucher không còn khả dụng")
+  }
+
+  // Check đúng loại
+  if (voucher.voucher_type !== "shipping") {
+    throw new AppError(400, "Voucher không phải loại vận chuyển")
+  }
+
+  // Check đơn hàng tối thiểu
+  const minOrderValue = Number(voucher.min_order_value || 0)
+
+  if (Number(orderTotal) < minOrderValue) {
+    throw new AppError(
+      400,
+      `Đơn hàng phải từ ${minOrderValue.toLocaleString("vi-VN")}đ`,
+    )
+  }
+
+  let discountAmount = 0
+
+  // Voucher % phí ship
+  if (voucher.discount_type === "percent") {
+    discountAmount =
+      (Number(shippingFee) * Number(voucher.discount_value)) / 100
+
+    if (voucher.max_discount && discountAmount > Number(voucher.max_discount)) {
+      discountAmount = Number(voucher.max_discount)
+    }
+  }
+
+  // Voucher freeship / giảm số tiền cố định
+  if (voucher.discount_type === "fixed") {
+    discountAmount = Number(voucher.discount_value)
+  }
+
+  // Không được giảm quá phí ship
+  return Math.min(discountAmount, Number(shippingFee))
+}
 class OrderService {
   // async getAllOrders(req) {
   //   return await OrderRepo.getAll(req)
@@ -155,22 +251,25 @@ class OrderService {
       items,
     }
   }
-  // old createOrder
-  // async createOrder(data) {
-  //   const exist = await OrderRepo.findByOrderCode(data.order_code)
-
-  //   if (exist) {
-  //     throw new AppError(400, "Order code already exists")
-  //   }
-
-  //   return await OrderRepo.create(data)
-  // }
-  // new CreateOrder
 
   async createOrder(userId, data) {
     // tại sao phải có userId đơn giản để lấy cartItem của người đó
-    const { cart_item_ids, address_id, payment_method, note } = data
-
+    const {
+      cart_item_ids,
+      address_id,
+      payment_method,
+      note,
+      product_user_voucher_id,
+      shipping_user_voucher_id,
+    } = data
+    // Chặn trường hợp FE/lỗi gửi trùng 1 voucher cho cả 2 vai trò
+    if (
+      product_user_voucher_id &&
+      shipping_user_voucher_id &&
+      String(product_user_voucher_id) === String(shipping_user_voucher_id)
+    ) {
+      throw new AppError(400, "Không thể dùng cùng một voucher cho cả 2 mục")
+    }
     // lấy cart của user thông qua userId
     //B1: Timf cart thogn qua userId
     const cart = await CartRepo.findByUserId(userId)
@@ -191,17 +290,104 @@ class OrderService {
     // tinhs tien
     //B4: tinh tong tien, tinh tien giam gia
     const amount = calculateOrderAmount(items)
+    // Phí ship khai báo riêng ở đây (tạm thời = 0, sau này có thể tính theo địa chỉ/khối lượng...)
+    const shippingFee = 20000
+    // Tổng tiền dùng để xét voucher
+    // lấy tổng tiền không khuyến mãi - tổng số tiền giảm giá khuyễn mãi chưa voucher
 
+    const orderTotalForVoucher = amount.subtotal - amount.product_discount
+    // B5: Xử lý Voucher
+
+    let productVoucherDiscount = 0
+    let shippingVoucherDiscount = 0
+
+    let productUserVoucher = null
+    let shippingUserVoucher = null
+    let productVoucher = null
+    let shippingVoucher = null
+
+    // ---------- PRODUCT VOUCHER ----------
+    if (product_user_voucher_id) {
+      productUserVoucher = await UserVoucherRepo.findUserVoucherByIdAndUser(
+        product_user_voucher_id,
+        userId,
+      )
+
+      if (!productUserVoucher) {
+        throw new AppError(400, "Voucher giảm giá sản phẩm không hợp lệ")
+      }
+
+      if (productUserVoucher.status !== "available") {
+        throw new AppError(400, "Voucher giảm giá sản phẩm đã được sử dụng")
+      }
+
+      productVoucher = await VoucherRepo.findById(productUserVoucher.voucher_id)
+
+      if (!productVoucher) {
+        throw new AppError(404, "Voucher không tồn tại")
+      }
+
+      if (productVoucher.voucher_type === "shipping") {
+        throw new AppError(400, "Voucher này không phải voucher giảm sản phẩm")
+      }
+
+      productVoucherDiscount = calculateProductVoucherDiscount(
+        productVoucher,
+        orderTotalForVoucher,
+      )
+    }
+
+    // ---------- SHIPPING VOUCHER ----------
+    if (shipping_user_voucher_id) {
+      shippingUserVoucher = await UserVoucherRepo.findUserVoucherByIdAndUser(
+        shipping_user_voucher_id,
+        userId,
+      )
+
+      if (!shippingUserVoucher) {
+        throw new AppError(400, "Voucher vận chuyển không hợp lệ")
+      }
+
+      if (shippingUserVoucher.status !== "available") {
+        throw new AppError(400, "Voucher vận chuyển đã được sử dụng")
+      }
+
+      shippingVoucher = await VoucherRepo.findById(
+        shippingUserVoucher.voucher_id,
+      )
+
+      if (!shippingVoucher) {
+        throw new AppError(404, "Voucher không tồn tại")
+      }
+
+      if (shippingVoucher.voucher_type !== "shipping") {
+        throw new AppError(400, "Voucher này không phải voucher vận chuyển")
+      }
+
+      shippingVoucherDiscount = calculateShippingVoucherDiscount(
+        shippingVoucher,
+        orderTotalForVoucher,
+        shippingFee,
+      )
+    }
+
+    // Tổng voucher giảm
+    const voucherDiscount = productVoucherDiscount + shippingVoucherDiscount
+
+    // Tổng tiền cuối
+    const totalAmount = Math.max(
+      0,
+      amount.subtotal - amount.product_discount - voucherDiscount + shippingFee,
+    )
     // B5: lấy các id của product [list ProductId]
+
     const productIds = items.map((item) => item.variant_id.product_id._id)
 
     const productImages =
       await ProductImageRepo.findMainImagesByProductIds(productIds)
 
     // Tạo Map:
-    //
     // productId -> image_url
-    //
 
     const imageMap = new Map(
       productImages.map((image) => [
@@ -221,12 +407,30 @@ class OrderService {
         {
           user_id: userId,
           address_id,
+
           order_code: generateOrderCode(),
+
           subtotal: amount.subtotal,
+
+          // Giảm giá sản phẩm có sẵn
           product_discount: amount.product_discount,
-          voucher_discount: amount.voucher_discount,
-          shipping_fee: amount.shipping_fee,
-          total_amount: amount.total_amount,
+
+          // Tổng tiền giảm từ tất cả voucher
+          voucher_discount: voucherDiscount,
+          product_user_voucher_id: productUserVoucher
+            ? productUserVoucher._id
+            : null,
+          product_voucher_discount: productVoucherDiscount,
+          product_voucher_code: productVoucher?.code || null,
+
+          shipping_user_voucher_id: shippingUserVoucher
+            ? shippingUserVoucher._id
+            : null,
+          shipping_voucher_discount: shippingVoucherDiscount,
+          shipping_voucher_code: shippingVoucher?.code || null,
+
+          shipping_fee: shippingFee,
+          total_amount: totalAmount,
           payment_method,
           payment_status: "pending",
           status: "pending",
@@ -235,12 +439,15 @@ class OrderService {
         },
         session,
       )
+
       // B8. Tạo OrderItem
       const orderItems = items.map((item) => {
         const variant = item.variant_id
         const product = variant.product_id
 
         const productImage = imageMap.get(product._id.toString())
+
+        const finalPrice = variant.discount_price ?? variant.price
 
         return {
           order_id: order._id,
@@ -256,17 +463,29 @@ class OrderService {
           config_name: variant.config_name || null,
 
           price: variant.price,
-          discount_price: variant.discount_price,
+          discount_price: variant.discount_price ?? null,
 
           quantity: item.quantity,
 
-          subtotal: variant.discount_price * item.quantity,
+          subtotal: finalPrice * item.quantity,
         }
       })
 
       await OrderItemRepo.createMany(orderItems, session)
 
-      // B9. Trừ Stock
+      // B10: Đánh dấu Voucher đã dùng
+
+      if (productUserVoucher) {
+        await VoucherRepo.markUserVoucherAsUsed(productUserVoucher._id, session)
+      }
+
+      if (shippingUserVoucher) {
+        await VoucherRepo.markUserVoucherAsUsed(
+          shippingUserVoucher._id,
+          session,
+        )
+      }
+      // B11. Trừ Stock
       for (const item of items) {
         const variant = item.variant_id
 

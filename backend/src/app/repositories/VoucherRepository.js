@@ -83,8 +83,7 @@ class VoucherRepository {
   // Tìm voucher theo code
   async findVoucherByCode(code) {
     return await Voucher.findOne({
-      code: code.toUpperCase(),
-      is_active: true,
+      code: code,
     })
   }
 
@@ -103,6 +102,25 @@ class VoucherRepository {
       voucher_id: voucherId,
       status: "available",
     })
+  }
+
+  async markUserVoucherAsUsed(id, session) {
+    return await UserVoucher.findOneAndUpdate(
+      {
+        _id: id,
+        status: "available",
+      },
+      {
+        $set: {
+          status: "used",
+          used_at: new Date(),
+        },
+      },
+      {
+        new: true,
+        session,
+      },
+    )
   }
 }
 

@@ -200,17 +200,24 @@ const Checkout = () => {
       }, 0),
     [items],
   )
-  const shippingFee = 0
+  const shippingFee = 20000
 
-  // Tổng giảm giá từ voucher = giảm sản phẩm + giảm ship (mỗi loại tối đa 1 voucher)
-  const productVoucherDiscount = appliedProductVoucher?.discount_amount || 0
-  const shippingVoucherDiscount = appliedShippingVoucher?.discount_amount || 0
-  const voucherDiscount = productVoucherDiscount + shippingVoucherDiscount
+  const productVoucherDiscount = Number(
+    appliedProductVoucher?.discount_amount || 0,
+  )
+
+  const shippingVoucherDiscount = Math.min(
+    Number(appliedShippingVoucher?.discount_amount || 0),
+    shippingFee,
+  )
+
+  const finalShippingFee = Math.max(0, shippingFee - shippingVoucherDiscount)
 
   const total = Math.max(
     0,
-    subtotal - productDiscount - voucherDiscount + shippingFee,
+    subtotal - productDiscount - productVoucherDiscount + finalShippingFee,
   )
+  const voucherDiscount = productVoucherDiscount + shippingVoucherDiscount
 
   // order_total dùng để server kiểm tra min_order_value — tính giống hệt
   // logic hiển thị summary (đã trừ giảm giá sản phẩm)
@@ -312,6 +319,13 @@ const Checkout = () => {
           address_id: selectedAddressId,
           payment_method: paymentMethod,
           note: form.note,
+
+          product_user_voucher_id:
+            appliedProductVoucher?.user_voucher_id || null,
+          // lấy voucher_id của user đã nhận
+
+          shipping_user_voucher_id:
+            appliedShippingVoucher?.user_voucher_id || null,
         },
       )
 
@@ -759,21 +773,25 @@ const Checkout = () => {
 
           {productVoucherDiscount > 0 && (
             <div className="summary-row discount">
-              <span>Voucher ({appliedProductVoucher.code})</span>
+              <span>Voucher ({appliedProductVoucher?.code})</span>
+
               <span>-{formatPrice(productVoucherDiscount)}</span>
             </div>
           )}
 
           {shippingVoucherDiscount > 0 && (
             <div className="summary-row discount">
-              <span>Voucher ship ({appliedShippingVoucher.code})</span>
+              <span>Voucher ship ({appliedShippingVoucher?.code})</span>
+
               <span>-{formatPrice(shippingVoucherDiscount)}</span>
             </div>
           )}
-
           <div className="summary-row">
             <span>Phí vận chuyển</span>
-            <span className="free-ship">Miễn phí</span>
+
+            <span>
+              {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
+            </span>
           </div>
 
           <div className="summary-total">

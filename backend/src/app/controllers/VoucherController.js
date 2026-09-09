@@ -185,11 +185,11 @@ class VoucherController {
       const userId = req.user._id
 
       const { code, order_total } = req.body
-      console.log("CODE: ", code)
+      console.log("CODE:", code)
       console.log("ORDER_TOTAL: ", order_total)
       const data = await VoucherService.applyVoucher(
         userId,
-        code.toUpperCase(),
+        code,
         Number(order_total),
       )
 
