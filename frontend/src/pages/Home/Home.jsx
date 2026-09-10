@@ -30,7 +30,7 @@ const INITIAL_FILTERS = {
 export const Home = () => {
   const navigate = useNavigate()
   const criteriaBarRef = useRef(null)
-
+  const [detailVoucher, setDetailVoucher] = useState(null)
   const formatDateTime = (date) => {
     if (!date) return ""
     return new Date(date).toLocaleString("vi-VN", {
@@ -47,6 +47,20 @@ export const Home = () => {
     return price.toLocaleString("vi-VN") + "đ"
   }
 
+  const formatDate = (date) => {
+    if (!date) return ""
+    return new Date(date).toLocaleDateString("vi-VN")
+  }
+
+  const getVoucherHeadline = (voucher) => {
+    if (voucher?.voucher_type === "shipping") {
+      return { title: "MIỄN PHÍ", subtitle: "VẬN CHUYỂN" }
+    }
+    if (voucher?.discount_type === "percent") {
+      return { title: `GIẢM ${voucher?.discount_value}%`, subtitle: "" }
+    }
+    return { title: "GIẢM", subtitle: formatPrice(voucher?.discount_value) }
+  }
   const [isSetA, setIsSetA] = useState(true)
   const [vouchers, setVouchers] = useState([])
   const [brands, setBrands] = useState([])
@@ -67,7 +81,7 @@ export const Home = () => {
   const getVouchers = async () => {
     try {
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_APP_URL}/voucher/all`,
+        `${import.meta.env.VITE_APP_URL}/voucher/intro`,
       )
       setVouchers(response.data.vouchers)
     } catch (error) {
@@ -360,9 +374,21 @@ export const Home = () => {
                   className="voucher-slide"
                   key={v._id}
                 >
-                  <div className="card-voucher">
+                  <div
+                    className={`card-voucher ${
+                      v?.voucher_type === "shipping"
+                        ? "type-shipping"
+                        : "type-product"
+                    }`}
+                  >
                     <div className="left-voucher">
-                      {v?.discount_type === "percent" ? (
+                      {v?.voucher_type === "shipping" ? (
+                        <span>
+                          Miễn phí
+                          <br />
+                          vận chuyển
+                        </span>
+                      ) : v?.discount_type === "percent" ? (
                         <span>Giảm {v?.discount_value}%</span>
                       ) : (
                         <span>Giảm {v?.discount_value}VNĐ</span>
@@ -370,13 +396,33 @@ export const Home = () => {
                     </div>
                     <div className="middle-voucher">
                       <span>{v?.code}</span>
-                      <p>
-                        Tối đa giảm giá {v?.max_discount}VNĐ áp dụng toàn bộ
-                        laptop
-                      </p>
+                      {v?.voucher_type === "shipping" ? (
+                        <p>
+                          Miễn phí tối đa{" "}
+                          {v?.max_discount != null
+                            ? formatPrice(v.max_discount)
+                            : formatPrice(v?.discount_value)}{" "}
+                          phí vận chuyển
+                        </p>
+                      ) : v?.max_discount != null ? (
+                        <p>
+                          Tối đa giảm giá {formatPrice(v.max_discount)} áp dụng
+                          toàn bộ laptop
+                        </p>
+                      ) : (
+                        <p>
+                          Giảm{" "}
+                          {v?.discount_type === "percent"
+                            ? `${v?.discount_value}%`
+                            : formatPrice(v?.discount_value)}{" "}
+                          áp dụng toàn bộ laptop
+                        </p>
+                      )}
                       <p>Thời hạn bắt đầu: </p>
                       <span>{formatDateTime(v?.start_date)}</span>
-                      <button>Chi tiết</button>
+                      <button onClick={() => setDetailVoucher(v)}>
+                        Chi tiết
+                      </button>
                     </div>
                     <div className="right-voucher"></div>
                   </div>
@@ -647,6 +693,88 @@ export const Home = () => {
       </div>
       <Introduction></Introduction>
       <CommentPublic></CommentPublic>
+
+      {detailVoucher && (
+        <div
+          className="voucher-modal-overlay"
+          onClick={() => setDetailVoucher(null)}
+        >
+          <div
+            className="voucher-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="modal-close"
+              onClick={() => setDetailVoucher(null)}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+
+            <div
+              className={`modal-headline ${
+                detailVoucher.voucher_type === "shipping"
+                  ? "type-shipping"
+                  : "type-product"
+              }`}
+            >
+              <p className="modal-title">
+                {getVoucherHeadline(detailVoucher).title}
+              </p>
+              {getVoucherHeadline(detailVoucher).subtitle && (
+                <p className="modal-subtitle">
+                  {getVoucherHeadline(detailVoucher).subtitle}
+                </p>
+              )}
+              <p className="modal-code">Mã: {detailVoucher.code}</p>
+            </div>
+
+            <ul className="modal-info-list">
+              {detailVoucher.voucher_type !== "shipping" && (
+                <li>
+                  <i className="fa-regular fa-gift"></i>
+                  Đơn hàng tối thiểu:{" "}
+                  <strong>{formatPrice(detailVoucher.min_order_value)}</strong>
+                </li>
+              )}
+
+              <li>
+                <i className="fa-solid fa-scissors"></i>
+                {detailVoucher.voucher_type === "shipping"
+                  ? "Miễn phí tối đa: "
+                  : "Giảm tối đa: "}
+                <strong>
+                  {formatPrice(
+                    detailVoucher.max_discount ?? detailVoucher.discount_value,
+                  )}
+                </strong>
+              </li>
+
+              <li>
+                <i className="fa-regular fa-calendar"></i>
+                Thời hạn:{" "}
+                <strong>
+                  {formatDate(detailVoucher.start_date)} -{" "}
+                  {formatDate(detailVoucher.end_date)}
+                </strong>
+              </li>
+
+              <li>
+                <i className="fa-solid fa-layer-group"></i>
+                Số lượng còn lại: <strong>{detailVoucher.quantity}</strong>
+              </li>
+            </ul>
+
+            <button
+              type="button"
+              className="claim-btn modal-claim-btn"
+              onClick={() => navigate("/home/voucher")}
+            >
+              <i className="fa-solid fa-gift"></i> Nhận ngay
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

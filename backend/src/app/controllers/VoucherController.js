@@ -202,6 +202,20 @@ class VoucherController {
       next(error)
     }
   }
+
+  async getIntroVouchers(req, res, next) {
+    try {
+      const vouchers = await VoucherService.getIntroVouchers()
+
+      return res.status(200).json({
+        success: true,
+        message: "Lấy 10 voucher mới nhất thành công",
+        vouchers,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new VoucherController()

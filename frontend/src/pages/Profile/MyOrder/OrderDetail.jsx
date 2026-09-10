@@ -284,18 +284,38 @@ const OrderDetail = () => {
               <span>Tạm tính</span>
               <span>{formatPrice(order.subtotal)}</span>
             </div>
+
             {order.product_discount > 0 && (
               <div className="totals-row discount">
                 <span>Giảm giá sản phẩm</span>
                 <span>-{formatPrice(order.product_discount)}</span>
               </div>
             )}
-            {order.voucher_discount > 0 && (
+
+            {order.product_voucher_discount > 0 && (
               <div className="totals-row discount">
-                <span>Mã giảm giá</span>
-                <span>-{formatPrice(order.voucher_discount)}</span>
+                <span>
+                  Voucher
+                  {order.product_voucher_code
+                    ? ` (${order.product_voucher_code})`
+                    : ""}
+                </span>
+                <span>-{formatPrice(order.product_voucher_discount)}</span>
               </div>
             )}
+
+            {order.shipping_voucher_discount > 0 && (
+              <div className="totals-row discount">
+                <span>
+                  Voucher ship
+                  {order.shipping_voucher_code
+                    ? ` (${order.shipping_voucher_code})`
+                    : ""}
+                </span>
+                <span>-{formatPrice(order.shipping_voucher_discount)}</span>
+              </div>
+            )}
+
             <div className="totals-row">
               <span>Phí vận chuyển</span>
               <span>

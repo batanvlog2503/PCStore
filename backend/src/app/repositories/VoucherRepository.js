@@ -122,6 +122,14 @@ class VoucherRepository {
       },
     )
   }
+
+  async getIntroVouchers() {
+    return await Voucher.find({
+      status: "active",
+    })
+      .sort({ createdAt: -1 })
+      .limit(10)
+  }
 }
 
 module.exports = new VoucherRepository()

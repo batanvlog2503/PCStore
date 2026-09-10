@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axiosInstance from "../../utils/axiosInstance"
 import "./Product.scss"
 
 const Product = () => {
   const { id } = useParams()
-
+  const navigate = useNavigate()
   const [product, setProduct] = useState(null)
   const [variants, setVariants] = useState([])
   const [images, setImages] = useState([])
@@ -21,6 +21,8 @@ const Product = () => {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [isWishlistLoading, setIsWishlistLoading] = useState(false)
 
+  // mua ngay , buy now
+  const [isBuyingNow, setIsBuyingNow] = useState(false)
   const checkWishlist = async () => {
     try {
       const response = await axiosInstance.get(
@@ -60,7 +62,51 @@ const Product = () => {
       setIsLoading(false)
     }
   }
+  const handleBuyNow = async (e) => {
+    e.preventDefault()
 
+    if (!selectedVariant) {
+      alert("Vui lòng chọn cấu hình sản phẩm")
+      return
+    }
+
+    if (selectedVariant.stock <= 0) {
+      alert("Sản phẩm đã hết hàng")
+      return
+    }
+
+    try {
+      setIsBuyingNow(true)
+
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/cart-item/add`,
+        {
+          variant_id: selectedVariant._id,
+          quantity: quantity,
+        },
+      )
+
+      if (!response.data.success || !response.data.item?._id) {
+        alert("Không thể tiến hành mua ngay, vui lòng thử lại")
+        return
+      }
+
+      // Chỉ mang đúng cart_item vừa tạo sang trang checkout,
+      // không lấy toàn bộ giỏ hàng như luồng "Thêm vào giỏ hàng" -> chọn ở giỏ
+      navigate("/checkout", {
+        state: {
+          cartItemIds: [response.data.item._id],
+        },
+      })
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Mua ngay không thành công, vui lòng thử lại",
+      )
+    } finally {
+      setIsBuyingNow(false)
+    }
+  }
   useEffect(() => {
     getProduct()
     checkWishlist()
@@ -342,12 +388,23 @@ const Product = () => {
                 <button
                   type="button"
                   className="buy-now"
-                  disabled={!selectedVariant || selectedVariant.stock === 0}
+                  disabled={
+                    !selectedVariant ||
+                    selectedVariant.stock === 0 ||
+                    isBuyingNow
+                  }
+                  onClick={handleBuyNow}
                 >
-                  Mua ngay <br />
-                  <span className="tips">
-                    Giao hàng tận nơi hoặc nhận tại cửa hàng
-                  </span>
+                  {isBuyingNow ? (
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                  ) : (
+                    <>
+                      Mua ngay <br />
+                      <span className="tips">
+                        Giao hàng tận nơi hoặc nhận tại cửa hàng
+                      </span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

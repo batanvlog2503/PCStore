@@ -8,7 +8,19 @@ const {
 } = require("../helpers/validationVoucher")
 const authorize = require("../app/middlewares/authorize")
 const router = express.Router()
-router.get("/my", auth, authorize("user"), VoucherController.getMyVouchers)
+
+router.get(
+  "/intro",
+  auth,
+  authorize("user"),
+  VoucherController.getIntroVouchers,
+)
+router.get(
+  "/my",
+  auth,
+  authorize("user", "admin"),
+  VoucherController.getMyVouchers,
+)
 router.post("/apply", auth, authorize("user"), VoucherController.applyVoucher)
 router.get(
   "/claimed-ids",

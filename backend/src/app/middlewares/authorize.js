@@ -2,7 +2,7 @@ const AppError = require("../utils/AppError")
 
 const authorize = (...roles) => {
   return (req, res, next) => {
-    const user = req.user
+    const user = req.user 
 
     if (!user) {
       return next(new AppError(401, "Unauthorized"))

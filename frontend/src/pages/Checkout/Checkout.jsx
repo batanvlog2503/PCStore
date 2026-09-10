@@ -8,6 +8,7 @@ import { PAYMENT_METHODS } from "./PaymentMethod.js"
 const Checkout = () => {
   const savedUser = localStorage.getItem("user")
   const location = useLocation()
+
   const navigate = useNavigate()
   const cartItemIds = location.state?.cartItemIds
 
@@ -677,7 +678,8 @@ const Checkout = () => {
             ) : myVouchers.length === 0 ? (
               <p className="voucher-select-empty">
                 Bạn chưa có voucher nào. Ghé{" "}
-                <Link to="/voucher">Kho voucher</Link> để nhận thêm ưu đãi nhé.
+                <Link to="/home/voucher">Kho voucher</Link> để nhận thêm ưu đãi
+                nhé.
               </p>
             ) : (
               <div className="voucher-select-groups">

@@ -333,6 +333,10 @@ class VoucherService {
       max_discount: voucher.max_discount || null,
     }
   }
+
+  async getIntroVouchers() {
+    return await VoucherRepo.getIntroVouchers()
+  }
 }
 
 module.exports = new VoucherService()

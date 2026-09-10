@@ -409,229 +409,249 @@ $bp-xl: 1200px;
 // 7. Voucher cards
 // ------------------------------
 .home-voucher {
+  margin: 30px 0;
+
+  h3 {
+    margin: 0 0 16px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #263b55;
+  }
+
   .voucher-slider {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
-  // Mũi tên trái/phải điều khiển slide
-  .slider-arrow {
-    flex: 0 0 auto;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 1.5px solid $color-border;
-    background-color: $color-white;
-    color: $color-black;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      background-color $transition-fast,
-      border-color $transition-fast,
-      transform $transition-fast,
-      opacity $transition-fast;
-
-    &:hover:not(:disabled) {
-      background-color: $color-yellow;
-      border-color: $color-yellow;
-      transform: scale(1.08);
-    }
-
-    &:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-
-    // Hết voucher để trượt -> làm mờ đi, không cho bấm nữa
-    &:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-    }
-  }
-
-  // Khung nhìn — cắt phần voucher tràn ra ngoài, chỉ hiện đúng số lượng cardsPerView
   .slider-viewport {
-    flex: 1 1 auto;
+    flex: 1;
     overflow: hidden;
   }
 
-  // Dải chứa toàn bộ voucher nối liền nhau, JS đẩy nó qua translateX
   .slider-track {
     display: flex;
-    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.35s ease;
   }
 
-  // Mỗi voucher chiếm đúng 1/3 khung nhìn ở desktop (khớp cardsPerView = 3 trong JS)
   .voucher-slide {
-    flex: 0 0 33.333%;
-    padding: 0 9px; // cộng với gap 18px cũ -> chia đôi làm khoảng cách 2 bên mỗi thẻ
+    flex: 0 0 calc(100% / 3);
+    padding: 0 9px;
     box-sizing: border-box;
-    animation: fadeInUp 0.4s ease-out both;
   }
 
+  /* ===== CARD giống Voucher.jsx/scss ===== */
   .card-voucher {
-    display: flex;
-    background-color: $color-black;
-    border-radius: 12px;
-    overflow: hidden;
     position: relative;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    display: flex;
+    min-height: 150px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #e3e9ef;
+    box-shadow: 0 8px 20px rgba(30, 60, 90, 0.06);
     transition:
-      transform $transition-fast,
-      box-shadow $transition-fast;
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
 
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 16px 35px rgba(30, 60, 90, 0.12);
     }
 
-    // Đường đứt nét ngăn cách kiểu vé, tỉ lệ 3:7
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 30%;
-      border-left: 2px dashed rgba($color-white, 0.35);
-    }
-
-    // 2 vòng tròn khuyết ở trên/dưới đường đứt nét (hiệu ứng vé xé)
+    /* đường kẻ đứt phân cách 2 nửa */
     &::after {
       content: "";
       position: absolute;
-      left: 30%;
-      top: -8px;
-      width: 16px;
-      height: 16px;
-      background-color: $color-white-soft;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      box-shadow: 0 100% 0 0 $color-white-soft;
+      left: 110px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      border-left: 2px dashed rgba(255, 255, 255, 0.65);
+      z-index: 1;
     }
 
+    /* ===== NỬA TRÁI ===== */
     .left-voucher {
-      flex: 0 0 30%;
+      position: relative;
+      width: 110px;
+      min-width: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      background-color: $color-yellow;
-      padding: 16px 8px;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      line-height: 1.2;
+      overflow: hidden;
+      padding: 10px;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      &::before {
+        width: 90px;
+        height: 90px;
+        top: -45px;
+        left: -30px;
+      }
+
+      &::after {
+        width: 70px;
+        height: 70px;
+        bottom: -35px;
+        right: -25px;
+      }
 
       span {
-        font-weight: 800;
-        font-size: 18px;
-        color: $color-black;
-        line-height: 1.2;
+        position: relative;
+        z-index: 2;
       }
     }
 
+    /* PRODUCT VOUCHER - cam vàng */
+    &.type-product .left-voucher {
+      background: linear-gradient(
+        135deg,
+        #ffc11a 0%,
+        #ffad00 50%,
+        #f58b00 100%
+      );
+    }
+
+    /* SHIPPING VOUCHER - xanh lá */
+    &.type-shipping .left-voucher {
+      background: linear-gradient(
+        135deg,
+        #20b15a 0%,
+        #13a84f 50%,
+        #07843a 100%
+      );
+    }
+
+    /* ===== NỬA GIỮA (nội dung) ===== */
     .middle-voucher {
-      flex: 0 0 70%;
-      padding: 14px 18px;
+      flex: 1;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       gap: 4px;
-      color: $color-white;
+      padding: 14px 16px;
+      min-width: 0;
 
       > span:first-child {
-        font-weight: 700;
-        font-size: 15px;
-        color: $color-white;
+        font-size: 16px;
+        font-weight: 800;
+        color: #2b405b;
       }
 
       p {
         margin: 0;
-        font-size: 12.5px;
-        color: $color-gray;
+        font-size: 12px;
+        color: #68798d;
         line-height: 1.4;
+
+        &:nth-of-type(2) {
+          margin-top: 2px;
+        }
       }
 
-      // đổi từ :last-child -> :last-of-type vì <button> mới là con cuối cùng thật
-      > span:last-of-type {
-        margin-top: 4px;
+      > span:nth-of-type(2) {
         font-size: 12px;
-        font-weight: 600;
-        color: $color-yellow;
+        color: #68798d;
+        margin-top: -2px;
       }
 
       button {
         align-self: flex-start;
         margin-top: 8px;
-        padding: 6px 18px;
-        border: 1.5px solid $color-yellow;
-        border-radius: 20px;
-        background-color: transparent;
-        color: $color-yellow;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #2f78c4, #2368ae);
+        color: white;
         font-size: 12px;
         font-weight: 700;
         cursor: pointer;
-        transition:
-          background-color $transition-fast,
-          color $transition-fast,
-          transform $transition-fast;
+        transition: all 0.2s ease;
 
         &:hover {
-          background-color: $color-yellow;
-          color: $color-black;
-          transform: translateY(-2px);
-        }
-
-        &:active {
-          transform: translateY(0) scale(0.96);
+          transform: translateY(-1px);
+          box-shadow: 0 8px 18px rgba(37, 104, 174, 0.25);
         }
       }
     }
 
+    /* dải phải cho cân đối (tuỳ chọn, có thể ẩn) */
     .right-voucher {
-      flex: 0 0 110px;
-      border-left: 1.5px dashed rgba($color-white, 0.25);
+      display: none;
     }
   }
 
-  // Tablet: 2 voucher/lần (khớp cardsPerView = 2 trong JS)
-  @include respond($bp-md) {
+  /* ===== NÚT MŨI TÊN ===== */
+  .slider-arrow {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #3f536b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: #f3ad00;
+      color: #d88c00;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 900px) {
     .voucher-slide {
       flex: 0 0 50%;
     }
-
-    .left-voucher span {
-      font-size: 15px;
-    }
-    .middle-voucher {
-      padding: 12px 14px;
-
-      > span:first-child {
-        font-size: 14px;
-      }
-      p {
-        font-size: 11.5px;
-      }
-      button {
-        font-size: 11px;
-        padding: 5px 14px;
-      }
-    }
-
-    .right-voucher {
-      flex-basis: 88px;
-    }
   }
 
-  // Điện thoại: 1 voucher/lần (khớp cardsPerView = 1 trong JS)
-  @include respond($bp-sm) {
+  @media (max-width: 560px) {
     .voucher-slide {
       flex: 0 0 100%;
-      padding: 0 4px;
     }
 
-    .slider-arrow {
-      width: 32px;
-      height: 32px;
-      font-size: 12px;
+    .card-voucher {
+      flex-direction: column;
+      min-height: auto;
+
+      &::after {
+        left: 0;
+        right: 0;
+        top: 80px;
+        bottom: auto;
+        width: auto;
+        height: 1px;
+        border-left: none;
+        border-top: 2px dashed rgba(255, 255, 255, 0.7);
+      }
+
+      .left-voucher {
+        width: 100%;
+        min-width: 100%;
+        height: 80px;
+      }
     }
   }
 }
@@ -1561,6 +1581,209 @@ $transition-fast: 0.2s ease-in-out;
       width: auto;
       max-width: 100%;
       font-size: 12px;
+    }
+  }
+}
+
+/* =========================================================
+   VOUCHER DETAIL MODAL (Home)
+========================================================= */
+.voucher-modal-overlay {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(20, 35, 55, 0.55);
+  backdrop-filter: blur(4px);
+  animation: home-modalOverlay 0.2s ease;
+
+  .voucher-modal {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+    animation: home-modalShow 0.25s ease;
+
+    .modal-close {
+      position: absolute;
+      z-index: 5;
+      right: 15px;
+      top: 15px;
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.35);
+      }
+    }
+
+    .modal-headline {
+      position: relative;
+      padding: 38px 35px 32px;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+
+      &::before {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        top: -90px;
+        left: -60px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      &.type-product {
+        background: linear-gradient(135deg, #ffc11a, #f59400);
+      }
+
+      &.type-shipping {
+        background: linear-gradient(135deg, #23b85e, #07833a);
+      }
+
+      .modal-title,
+      .modal-subtitle,
+      .modal-code {
+        position: relative;
+        z-index: 2;
+      }
+
+      .modal-title {
+        margin: 0;
+        font-size: 31px;
+        font-weight: 800;
+      }
+
+      .modal-subtitle {
+        margin: 6px 0 0;
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .modal-code {
+        margin: 14px 0 0;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+    }
+
+    .modal-info-list {
+      list-style: none;
+      margin: 0;
+      padding: 22px 28px 10px;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf1f5;
+        color: #63758a;
+        font-size: 14px;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        i {
+          width: 20px;
+          color: #2e75bd;
+        }
+
+        strong {
+          margin-left: auto;
+          color: #344b65;
+          text-align: right;
+        }
+      }
+    }
+
+    .claim-btn {
+      border: none;
+      padding: 11px 15px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2f78c4, #2368ae);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      i {
+        margin-right: 6px;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(37, 104, 174, 0.25);
+      }
+    }
+
+    .modal-claim-btn {
+      width: calc(100% - 56px);
+      margin: 12px 28px 28px;
+    }
+  }
+}
+
+@keyframes home-modalOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes home-modalShow {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 560px) {
+  .voucher-modal-overlay .voucher-modal {
+    .modal-info-list {
+      padding-left: 20px;
+      padding-right: 20px;
+
+      li {
+        align-items: flex-start;
+        flex-wrap: wrap;
+
+        strong {
+          width: 100%;
+          margin-left: 31px;
+          text-align: left;
+        }
+      }
+    }
+
+    .modal-claim-btn {
+      width: calc(100% - 40px);
+      margin-left: 20px;
+      margin-right: 20px;
     }
   }
 }

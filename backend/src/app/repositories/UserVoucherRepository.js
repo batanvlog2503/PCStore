@@ -20,6 +20,7 @@ class UserVoucherRepository {
   async findByUser(userId) {
     return await UserVoucher.find({
       user_id: userId,
+      status: "available",
     })
       .populate("voucher_id")
       .sort({
