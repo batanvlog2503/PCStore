@@ -28,14 +28,7 @@ const AdminLayout = () => {
         </div>
 
         <div className="admin-header-actions">
-          <button
-            className="header-icon-btn"
-            title="Thông báo"
-          >
-            <i className="fa-regular fa-bell"></i>
-            <span className="notif-dot"></span>
-          </button>
-
+         
           <div className="admin-account">
             <div className="avatar">A</div>
             <span className="admin-name">Admin</span>
