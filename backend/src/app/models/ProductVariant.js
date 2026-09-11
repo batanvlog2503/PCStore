@@ -25,14 +25,6 @@ const ProductVariantSchema = new Schema({
     type: Number,
     min: 0,
     default: null,
-    // tương đương CHECK (discount_price IS NULL OR discount_price <= price)
-    validate: {
-      validator: function (value) {
-        if (value === null || value === undefined) return true
-        return value <= this.price
-      },
-      message: "discount_price phải nhỏ hơn hoặc bằng price",
-    },
   },
   stock: { type: Number, required: true, default: 0, min: 0 },
   status: {

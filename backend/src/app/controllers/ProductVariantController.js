@@ -148,6 +148,27 @@ class ProductVariantController {
       next(error)
     }
   }
+
+  async updateVariantByVariantId(req, res, next) {
+    try {
+      const { variantId } = req.params
+      console.log("Price: ", req.body.price)
+      console.log("Discount_ Price: ", req.body.discount_price)
+
+      const variant = await ProductVariantService.updateVariantByVariantId(
+        variantId,
+        req.body,
+      )
+
+      return res.status(200).json({
+        success: true,
+        message: "Cập nhật phiên bản sản phẩm thành công",
+        variant,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 module.exports = new ProductVariantController()

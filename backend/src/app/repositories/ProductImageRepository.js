@@ -56,6 +56,13 @@ class ProductImageRepository {
       })
       .lean()
   }
+
+  async setAllNotMain(productId) {
+    return await ProductImage.updateMany(
+      { product_id: productId },
+      { is_main: false },
+    )
+  }
 }
 
 module.exports = new ProductImageRepository()

@@ -127,12 +127,13 @@ class ProductController {
 
   async updateProduct(req, res, next) {
     try {
+      console.log("Product Id:", req.params.productId)
       const product = await ProductService.updateProduct(
-        req.params.id,
+        req.params.productId,
         req.body,
       )
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Update product successfully",
         product,

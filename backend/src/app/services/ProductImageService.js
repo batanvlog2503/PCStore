@@ -109,6 +109,73 @@ class ProductImageService {
     // Đặt ảnh này thành ảnh chính
     return await ProductImageRepo.setMain(id)
   }
+
+  async uploadImages(productId, files) {
+    if (!files || files.length === 0) {
+      throw new Error("Không có ảnh để upload")
+    }
+
+    const oldImages = await ProductImageRepo.findByProductId(productId)
+    // old image không có ảnh
+    const isFirstImage = oldImages.length === 0
+
+    const imageData = files.map((file, index) => ({
+      product_id: productId,
+      image_url: `/product/${file.filename}`,
+      is_main: isFirstImage && index === 0, // set ảnh đầu là main
+    }))
+
+    return await ProductImageRepo.insertMany(imageData)
+  }
+
+  async updateMainImage(productId, imageId) {
+    if (!productId) {
+      throw new AppError(404, "productId not found")
+    }
+    if (!imageId) {
+      throw new AppError(404, "imageId not found")
+    }
+    const image = await ProductImageRepo.findById(imageId)
+
+    if (!image) {
+      throw new Error("Không tìm thấy ảnh")
+    }
+
+    if (image.product_id.toString() !== productId.toString()) {
+      throw new Error("Ảnh không thuộc sản phẩm này")
+    }
+
+    await ProductImageRepo.setAllNotMain(productId)
+
+    return await ProductImageRepo.setMain(imageId)
+  }
+
+  async deleteImage(imageId) {
+    const image = await ProductImageRepo.findById(imageId)
+
+    if (!image) {
+      throw new Error("Không tìm thấy ảnh")
+    }
+
+    const wasMain = image.is_main
+
+    await ProductImageRepo.deleteById(imageId)
+
+    // Nếu xóa ảnh chính thì chọn ảnh đầu tiên còn lại
+    if (wasMain) {
+      const remainingImages = await ProductImageRepo.findByProductId(
+        image.product_id,
+      )
+
+      if (remainingImages.length > 0) {
+        await ProductImageRepo.setAllNotMain(image.product_id)
+
+        await ProductImageRepo.setMain(remainingImages[0]._id)
+      }
+    }
+
+    return image
+  }
 }
 
 module.exports = new ProductImageService()

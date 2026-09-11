@@ -58,6 +58,7 @@ class ProductImageController {
       const result = await ProductImageService.deleteImage(req.params.id)
 
       return res.status(200).json({
+        message: "Delete image successfully!!!",
         success: true,
         ...result,
       })
@@ -76,6 +77,65 @@ class ProductImageController {
       })
     } catch (err) {
       next(err)
+    }
+  }
+
+  async uploadImages(req, res) {
+    try {
+      const { productId } = req.params
+
+      const images = await ProductImageService.uploadImages(
+        productId,
+        req.files,
+      )
+
+      return res.status(201).json({
+        message: "Upload ảnh thành công",
+        images,
+      })
+    } catch (error) {
+      console.error("Upload image error:", error)
+
+      return res.status(400).json({
+        message: error.message || "Upload ảnh thất bại",
+      })
+    }
+  }
+
+  async updateMainImage(req, res, next) {
+    try {
+      const { productId } = req.params
+      const { imageId } = req.body
+
+      const image = await ProductImageService.updateMainImage(
+        productId,
+        imageId,
+      )
+
+      return res.status(200).json({
+        message: "Cập nhật ảnh chính thành công",
+        image,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async deleteImage(req, res, next) {
+    try {
+      const { imageId } = req.params
+
+      await ProductImageService.deleteImage(imageId)
+
+      return res.status(200).json({
+        message: "Xóa ảnh thành công",
+      })
+    } catch (error) {
+      console.error("Delete image error:", error)
+
+      return res.status(400).json({
+        message: error.message || "Xóa ảnh thất bại",
+      })
     }
   }
 }

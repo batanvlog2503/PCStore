@@ -8,7 +8,9 @@ const authorize = require("../app/middlewares/authorize")
 const OrderItemController = require("../app/controllers/OrderItemController")
 const ProductController = require("../app/controllers/ProductController")
 const BrandController = require("../app/controllers/BrandController")
+const ProductVariantController = require("../app/controllers/ProductVariantController")
 const CategoryController = require("../app/controllers/CategoryController")
+const ProductImageController = require("../app/controllers/ProductImageController")
 const multer = require("multer")
 const path = require("path")
 const storage = multer.diskStorage({
@@ -110,12 +112,48 @@ router.patch(
   authorize("admin"),
   OrderController.updateOrderStatus,
 )
-
+router.put(
+  "/products/update/:productId",
+  auth,
+  authorize("admin"),
+  ProductController.updateProduct,
+)
 router.get(
   "/products/all",
   auth,
   authorize("admin"),
   ProductController.adminGetProducts,
+)
+
+// Upload ảnh mới
+router.post(
+  "/products/:productId/images",
+  auth,
+  authorize("admin"),
+  upload.array("images", 10),
+  ProductImageController.uploadImages,
+)
+
+// Cập nhật ảnh chính
+router.put(
+  "/products/:productId/images/main",
+  auth,
+  authorize("admin"),
+  ProductImageController.updateMainImage,
+)
+
+// Xóa ảnh
+router.delete(
+  "/products/images/:imageId",
+  auth,
+  authorize("admin"),
+  ProductImageController.deleteImage,
+)
+router.put(
+  "/variants/:variantId",
+  auth,
+  authorize("admin"),
+  ProductVariantController.updateVariantByVariantId,
 )
 
 router.get(

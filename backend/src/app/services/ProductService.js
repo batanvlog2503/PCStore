@@ -37,7 +37,7 @@ class ProductService {
       throw new AppError(404, "Product Id is required")
     }
 
-    const product = await Product.findById(productId).populate("brand_id")
+    const product = await ProductRepo.findById(productId)
 
     if (!product) throw new AppError(404, "Product not found")
 
@@ -246,38 +246,70 @@ class ProductService {
     }
   }
 
-  async updateProduct(id, data) {
-    const product = await ProductRepo.findById(id)
+  async updateProduct(productId, body) {
+    const { name, category_id, brand_id, slug, description, status, use_case } =
+      body
+
+    const product = await ProductRepo.findById(productId)
 
     if (!product) {
-      throw new AppError(404, "Product not found")
+      throw new AppError(404, "Không tìm thấy sản phẩm")
     }
 
-    if (data.category_id) {
-      const category = await CategoryRepo.findById(data.category_id)
-
-      if (!category) {
-        throw new AppError(404, "Category not found")
-      }
+    if (!name?.trim()) {
+      throw new AppError(400, "Tên sản phẩm không được để trống")
     }
 
-    if (data.brand_id) {
-      const brand = await BrandRepo.findById(data.brand_id)
-
-      if (!brand) {
-        throw new AppError(404, "Brand not found")
-      }
+    if (!category_id) {
+      throw new AppError(400, "Danh mục không được để trống")
     }
 
-    if (data.slug) {
-      const existed = await ProductRepo.findBySlug(data.slug)
-
-      if (existed && existed._id.toString() !== id) {
-        throw new AppError(400, "Slug already exists")
-      }
+    if (!brand_id) {
+      throw new AppError(400, "Thương hiệu không được để trống")
     }
 
-    return await ProductRepo.updateById(id, data)
+    if (!use_case) {
+      throw new AppError(400, "Vui lòng chọn mục đích sử dụng")
+    }
+
+    const validUseCases = [
+      "gaming",
+      "office",
+      "design",
+      "student",
+      "macbook",
+      "ultrabook",
+    ]
+
+    if (!validUseCases.includes(use_case)) {
+      throw new AppError(400, "Mục đích sử dụng không hợp lệ")
+    }
+
+    const category = await CategoryRepo.findById(category_id)
+
+    if (!category) {
+      throw new AppError(404, "Không tìm thấy danh mục")
+    }
+
+    const brand = await BrandRepo.findById(brand_id)
+
+    if (!brand) {
+      throw new AppError(404, "Không tìm thấy thương hiệu")
+    }
+
+    const updateData = {
+      name: name.trim(),
+      category_id,
+      brand_id,
+      slug,
+      description: description || "",
+      status: status || "active",
+      use_case,
+    }
+
+    const updatedProduct = await ProductRepo.updateById(productId, updateData)
+
+    return updatedProduct
   }
 
   async deleteProduct(id) {

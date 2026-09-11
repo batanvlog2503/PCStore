@@ -61,6 +61,7 @@ class ProductVariantRepository {
   async updateById(id, data) {
     return await ProductVariant.findByIdAndUpdate(id, data, {
       new: true,
+      runValidators: true,
     })
   }
 

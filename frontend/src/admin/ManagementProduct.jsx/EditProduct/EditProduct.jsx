@@ -15,6 +15,14 @@ const VARIANT_STATUS_OPTIONS = [
   { value: "discontinued", label: "Ngừng kinh doanh" },
 ]
 
+const USE_CASE_OPTIONS = [
+  { value: "gaming", label: "Gaming" },
+  { value: "office", label: "Văn phòng" },
+  { value: "design", label: "Thiết kế" },
+  { value: "student", label: "Học sinh / Sinh viên" },
+  { value: "macbook", label: "MacBook" },
+  { value: "ultrabook", label: "Ultrabook" },
+]
 const STORAGE_TYPE_OPTIONS = ["SSD", "HDD"]
 
 const EMPTY_VARIANT = {
@@ -36,100 +44,6 @@ const EMPTY_VARIANT = {
   status: "active",
 }
 
-// ================= MOCK (thay bằng API thật khi backend sẵn sàng) =================
-const MOCK_CATEGORIES = [
-  { _id: "cat1", name: "Laptop" },
-  { _id: "cat2", name: "Máy tính để bàn" },
-  { _id: "cat3", name: "Màn hình" },
-  { _id: "cat4", name: "Linh kiện" },
-]
-
-const MOCK_BRANDS = [
-  { _id: "b1", name: "Acer" },
-  { _id: "b2", name: "Dell" },
-  { _id: "b3", name: "Asus" },
-  { _id: "b4", name: "Lenovo" },
-]
-
-const MOCK_PRODUCT = {
-  _id: "p1",
-  name: "Laptop Acer Nitro V 15",
-  category_id: "cat1",
-  brand_id: "b1",
-  slug: "laptop-acer-nitro-v-15-1",
-  status: "active",
-  description:
-    "Laptop gaming Acer Nitro V 15 hiệu năng cao, phù hợp chơi game và làm việc với các tác vụ nặng. Thiết kế mạnh mẽ, màn hình 15.6 inch Full HD, cùng cấu hình vượt trội.",
-  image_url: "",
-}
-
-const MOCK_IMAGES = [
-  { _id: "img1", image_url: "", is_main: true },
-  { _id: "img2", image_url: "", is_main: false },
-  { _id: "img3", image_url: "", is_main: false },
-  { _id: "img4", image_url: "", is_main: false },
-]
-
-const MOCK_VARIANTS = [
-  {
-    _id: "v1",
-    sku: "NTV15-i5-8-512",
-    config_name: "i5 / 8GB / 512GB",
-    tag: "Cấu hình cơ bản",
-    specs: {
-      cpu: "Intel Core i5",
-      ram: 8,
-      storage_capacity: 512,
-      storage_type: "SSD",
-      gpu: "RTX 3050",
-      screen_size: 15.6,
-      screen_resolution: "FHD",
-    },
-    price: 18990000,
-    discount_price: 16990000,
-    stock: 15,
-    status: "active",
-  },
-  {
-    _id: "v2",
-    sku: "NTV15-i7-16-512",
-    config_name: "i7 / 16GB / 512GB",
-    tag: "Cấu hình nâng cao",
-    specs: {
-      cpu: "Intel Core i7",
-      ram: 16,
-      storage_capacity: 512,
-      storage_type: "SSD",
-      gpu: "RTX 4050",
-      screen_size: 15.6,
-      screen_resolution: "FHD",
-    },
-    price: 22990000,
-    discount_price: 19990000,
-    stock: 10,
-    status: "active",
-  },
-  {
-    _id: "v3",
-    sku: "NTV15-i7-16-1T",
-    config_name: "i7 / 16GB / 1TB",
-    tag: "Cấu hình cao cấp",
-    specs: {
-      cpu: "Intel Core i7",
-      ram: 16,
-      storage_capacity: 1024,
-      storage_type: "SSD",
-      gpu: "RTX 4060",
-      screen_size: 15.6,
-      screen_resolution: "FHD",
-    },
-    price: 26990000,
-    discount_price: 23990000,
-    stock: 8,
-    status: "active",
-  },
-]
-
 const EditProduct = () => {
   const { productId } = useParams()
   const navigate = useNavigate()
@@ -138,6 +52,7 @@ const EditProduct = () => {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const [categories, setCategories] = useState([])
   const [brands, setBrands] = useState([])
@@ -151,30 +66,36 @@ const EditProduct = () => {
   const [savingVariant, setSavingVariant] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  const [deletedImageIds, setDeletedImageIds] = useState([])
   const getData = async () => {
     try {
       setLoading(true)
+      setError(null)
 
-      // Khi có API thật:
-      // const [productRes, categoryRes, brandRes] = await Promise.all([
-      //   axiosInstance.get(`${import.meta.env.VITE_APP_URL}/admin/products/${productId}`),
-      //   axiosInstance.get(`${import.meta.env.VITE_APP_URL}/category/all`),
-      //   axiosInstance.get(`${import.meta.env.VITE_APP_URL}/brand/all`),
-      // ])
-      // setProduct(productRes.data.data.product)
-      // setImages(productRes.data.data.images)
-      // setVariants(productRes.data.data.variants)
-      // setCategories(categoryRes.data.categories)
-      // setBrands(brandRes.data.brands)
+      const [productRes, categoryRes, brandRes] = await Promise.all([
+        axiosInstance.get(
+          `${import.meta.env.VITE_APP_URL}/product/${productId}`,
+        ),
 
-      // ----- MOCK -----
-      setProduct(MOCK_PRODUCT)
-      setImages(MOCK_IMAGES)
-      setVariants(MOCK_VARIANTS)
-      setCategories(MOCK_CATEGORIES)
-      setBrands(MOCK_BRANDS)
+        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/category`),
+
+        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/brand/all`),
+      ])
+
+      const productData = productRes.data
+
+      setProduct(productData.product)
+      setVariants(productData.variants || [])
+      setImages(productData.images || [])
+
+      setCategories(categoryRes.data.categories || [])
+      setBrands(brandRes.data.brands || [])
     } catch (error) {
-      console.error("Lỗi lấy dữ liệu sản phẩm:", error)
+      console.error("Lỗi lấy dữ liệu sản phẩm:", error.response?.data || error)
+
+      setError(
+        error.response?.data?.message || "Không thể tải thông tin sản phẩm",
+      )
     } finally {
       setLoading(false)
     }
@@ -182,7 +103,6 @@ const EditProduct = () => {
 
   useEffect(() => {
     getData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId])
 
   // ==========================================================================
@@ -192,18 +112,10 @@ const EditProduct = () => {
     setProduct((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleCopySlug = () => {
-    if (!product?.slug) return
-    navigator.clipboard.writeText(product.slug)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
-
   const descriptionLength = product?.description?.length || 0
 
-  // ==========================================================================
   // Product images (khớp ProductImage: product_id, image_url, is_main)
-  // ==========================================================================
+  // chuyển ảnh thành is_main
   const handleSetMainImage = (imgId) => {
     setImages((prev) =>
       prev.map((img) => ({ ...img, is_main: img._id === imgId })),
@@ -212,10 +124,25 @@ const EditProduct = () => {
 
   const handleRemoveImage = (imgId) => {
     setImages((prev) => {
-      const removingMain = prev.find((i) => i._id === imgId)?.is_main
-      const next = prev.filter((i) => i._id !== imgId)
-      // nếu vừa xoá ảnh chính, tự gán ảnh đầu tiên còn lại làm ảnh chính
-      if (removingMain && next.length > 0) next[0].is_main = true
+      const image = prev.find((img) => img._id === imgId)
+
+      // Nếu là ảnh đã tồn tại trong database
+      if (image && !image.file) {
+        setDeletedImageIds((prevDeleted) => [...prevDeleted, imgId])
+      }
+
+      const removingMain = image?.is_main
+
+      const next = prev.filter((img) => img._id !== imgId)
+
+      // Nếu xóa ảnh chính thì gán ảnh đầu tiên còn lại làm ảnh chính
+      if (removingMain && next.length > 0) {
+        return next.map((img, index) => ({
+          ...img,
+          is_main: index === 0,
+        }))
+      }
+
       return next
     })
   }
@@ -332,6 +259,7 @@ const EditProduct = () => {
             ? null
             : Number(variantForm.discount_price),
         stock: Number(variantForm.stock),
+
         specs: {
           ...variantForm.specs,
           ram: Number(variantForm.specs.ram),
@@ -340,25 +268,45 @@ const EditProduct = () => {
         },
       }
 
-      // Khi có API thật:
-      // if (payload._id) {
-      //   await axiosInstance.put(`${import.meta.env.VITE_APP_URL}/admin/variants/${payload._id}`, payload)
-      // } else {
-      //   await axiosInstance.post(`${import.meta.env.VITE_APP_URL}/admin/products/${productId}/variants`, payload)
-      // }
+      let response
+      // SỬA VARIANT
+      if (payload._id) {
+        response = await axiosInstance.put(
+          `${import.meta.env.VITE_APP_URL}/admin/variants/${payload._id}`,
+          payload,
+        )
 
-      setVariants((prev) => {
-        if (payload._id) {
-          return prev.map((v) =>
-            v._id === payload._id ? { ...v, ...payload } : v,
-          )
-        }
-        return [...prev, { ...payload, _id: `local-${Date.now()}` }]
-      })
+        // Cập nhật lại variant trên giao diện
+        const updatedVariant = response.data.variant
+
+        setVariants((prev) =>
+          prev.map((v) => (v._id === payload._id ? updatedVariant : v)),
+        )
+
+        alert("Cập nhật phiên bản thành công!")
+      }
+
+      // ===============================
+      // THÊM VARIANT
+      // ===============================
+      else {
+        response = await axiosInstance.post(
+          `${import.meta.env.VITE_APP_URL}/admin/products/${productId}/variants`,
+          payload,
+        )
+
+        const newVariant = response.data.variant
+
+        setVariants((prev) => [...prev, newVariant])
+
+        alert("Thêm phiên bản mới thành công!")
+      }
 
       setVariantForm(null)
     } catch (error) {
-      alert(error.response?.data?.message || "Lưu phiên bản thất bại")
+      console.error("Lỗi lưu variant:", error)
+
+      alert(error.response?.data?.message || "❌ Lưu phiên bản thất bại")
     } finally {
       setSavingVariant(false)
     }
@@ -370,21 +318,55 @@ const EditProduct = () => {
     setVariants((prev) => prev.filter((v) => v._id !== variant._id))
   }
 
-  // ==========================================================================
-  // Save toàn bộ trang
-  // ==========================================================================
   const handleSaveProduct = async () => {
     try {
       setSaving(true)
 
-      // await axiosInstance.put(
-      //   `${import.meta.env.VITE_APP_URL}/admin/products/${productId}`,
-      //   product,
-      // )
-      // (ảnh mới upload qua FormData riêng nếu cần)
+      await axiosInstance.put(
+        `${import.meta.env.VITE_APP_URL}/admin/products/update/${productId}`,
+        product,
+      )
 
-      alert("Đã lưu thay đổi (demo) — nối API thật khi backend sẵn sàng.")
+      for (const imageId of deletedImageIds) {
+        await axiosInstance.delete(
+          `${import.meta.env.VITE_APP_URL}/admin/products/images/${imageId}`,
+        )
+      }
+
+      const newImages = images.filter((img) => img.file)
+
+      if (newImages.length > 0) {
+        const formData = new FormData()
+
+        newImages.forEach((img) => {
+          formData.append("images", img.file)
+        })
+
+        await axiosInstance.post(
+          `${import.meta.env.VITE_APP_URL}/admin/products/${productId}/images`,
+          formData,
+        )
+      }
+
+      const mainImage = images.find((img) => img.is_main)
+
+      if (mainImage && !mainImage.file) {
+        await axiosInstance.put(
+          `${import.meta.env.VITE_APP_URL}/admin/products/${productId}/images/main`,
+          {
+            imageId: mainImage._id,
+          },
+        )
+      }
+
+      setDeletedImageIds([])
+
+      alert("Cập nhật sản phẩm thành công!")
+
+      await getData()
     } catch (error) {
+      console.error(error)
+
       alert(error.response?.data?.message || "Lưu sản phẩm thất bại")
     } finally {
       setSaving(false)
@@ -398,11 +380,30 @@ const EditProduct = () => {
 
   const mainImage = useMemo(() => images.find((i) => i.is_main), [images])
 
-  if (loading || !product) {
+  if (loading) {
     return (
       <div className="edit-product-loading">
         <div className="spinner"></div>
         <p>Đang tải thông tin sản phẩm...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="edit-product-error">
+        <i className="fa-solid fa-circle-exclamation"></i>
+        <p>{error}</p>
+
+        <button onClick={() => getData()}>Thử lại</button>
+      </div>
+    )
+  }
+
+  if (!product) {
+    return (
+      <div className="edit-product-error">
+        <p>Không tìm thấy sản phẩm</p>
       </div>
     )
   }
@@ -481,7 +482,7 @@ const EditProduct = () => {
                 Danh mục <span className="required">*</span>
               </label>
               <select
-                value={product.category_id}
+                value={product.category_id?._id || product.category_id || ""}
                 onChange={(e) =>
                   handleProductChange("category_id", e.target.value)
                 }
@@ -502,7 +503,7 @@ const EditProduct = () => {
                 Thương hiệu <span className="required">*</span>
               </label>
               <select
-                value={product.brand_id}
+                value={product.brand_id?._id || product.brand_id || ""}
                 onChange={(e) =>
                   handleProductChange("brand_id", e.target.value)
                 }
@@ -528,7 +529,6 @@ const EditProduct = () => {
                 />
                 <button
                   type="button"
-                  onClick={handleCopySlug}
                   title="Sao chép slug"
                 >
                   <i
@@ -556,7 +556,29 @@ const EditProduct = () => {
                 ))}
               </select>
             </div>
+            <div className="ep-field">
+              <label>
+                Mục đích sử dụng <span className="required">*</span>
+              </label>
 
+              <select
+                value={product.use_case || ""}
+                onChange={(e) =>
+                  handleProductChange("use_case", e.target.value)
+                }
+              >
+                <option value="">Chọn mục đích sử dụng</option>
+
+                {USE_CASE_OPTIONS.map((item) => (
+                  <option
+                    key={item.value}
+                    value={item.value}
+                  >
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="ep-field full">
               <label>
                 Mô tả sản phẩm <span className="required">*</span>
@@ -608,7 +630,7 @@ const EditProduct = () => {
                 </button>
                 {img.image_url ? (
                   <img
-                    src={img.image_url}
+                    src={`${import.meta.env.VITE_APP_URL}${img.image_url}`}
                     alt="product"
                   />
                 ) : (
@@ -622,7 +644,7 @@ const EditProduct = () => {
               <span>Thêm ảnh</span>
               <input
                 type="file"
-                accept="image/png,image/jpeg"
+                accept="image/png,image/jpeg,image/jpg"
                 multiple
                 hidden
                 onChange={handleAddImage}
@@ -638,7 +660,9 @@ const EditProduct = () => {
               <li>
                 Ảnh chính sẽ hiển thị ở danh sách sản phẩm và trang chi tiết.
               </li>
-              <li>Hỗ trợ định dạng: JPG, PNG. Kích thước tối đa: 5MB/ảnh.</li>
+              <li>
+                Hỗ trợ định dạng: JPG, PNG, JPEG. Kích thước tối đa: 5MB/ảnh.
+              </li>
             </ul>
           </div>
         </div>
