@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import axiosInstance from "../../../utils/axiosInstance"
 import "./MyOrder.scss"
 
@@ -28,6 +28,7 @@ const PAYMENT_LABEL = {
 const PAGE_SIZE = 4
 
 const MyOrder = () => {
+  const navigate = useNavigate()
   const [orders, setOrders] = useState([])
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
@@ -293,10 +294,6 @@ const MyOrder = () => {
 
                   {order.status === "shipping" && (
                     <button className="track-btn">Theo dõi đơn hàng</button>
-                  )}
-
-                  {order.status === "completed" && (
-                    <button className="reorder-btn">Mua lại</button>
                   )}
                 </div>
 

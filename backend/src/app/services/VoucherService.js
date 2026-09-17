@@ -290,31 +290,50 @@ class VoucherService {
     }
 
     // 6. TÍNH SỐ TIỀN ĐƯỢC GIẢM
+    const shippingFee = 20000
 
     let discountAmount = 0
 
-    // Voucher giảm theo %
-    if (voucher.discount_type === "percent") {
-      discountAmount =
-        (Number(orderTotal) * Number(voucher.discount_value)) / 100
+    if (voucher.voucher_type === "shipping") {
+      // Voucher ship → tính trên phí vận chuyển
+      if (voucher.discount_type === "percent") {
+        discountAmount = (shippingFee * Number(voucher.discount_value)) / 100
 
-      // Có giới hạn giảm tối đa
-      if (
-        voucher.max_discount &&
-        discountAmount > Number(voucher.max_discount)
-      ) {
-        discountAmount = Number(voucher.max_discount)
+        if (
+          voucher.max_discount &&
+          discountAmount > Number(voucher.max_discount)
+        ) {
+          discountAmount = Number(voucher.max_discount)
+        }
       }
+
+      if (voucher.discount_type === "fixed") {
+        discountAmount = Number(voucher.discount_value)
+      }
+
+      // Không giảm quá phí ship
+      discountAmount = Math.min(discountAmount, shippingFee)
+    } else {
+      // Voucher sản phẩm → tính trên giá trị đơn
+      if (voucher.discount_type === "percent") {
+        discountAmount =
+          (Number(orderTotal) * Number(voucher.discount_value)) / 100
+
+        if (
+          voucher.max_discount &&
+          discountAmount > Number(voucher.max_discount)
+        ) {
+          discountAmount = Number(voucher.max_discount)
+        }
+      }
+
+      if (voucher.discount_type === "fixed") {
+        discountAmount = Number(voucher.discount_value)
+      }
+
+      // Không giảm quá giá trị đơn
+      discountAmount = Math.min(discountAmount, Number(orderTotal))
     }
-
-    // Voucher giảm số tiền cố định
-    if (voucher.discount_type === "fixed") {
-      discountAmount = Number(voucher.discount_value)
-    }
-
-    // Không được giảm lớn hơn giá trị đơn hàng
-    discountAmount = Math.min(discountAmount, Number(orderTotal))
-
     return {
       user_voucher_id: userVoucher._id,
 
