@@ -9,6 +9,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom"
+import ToastContainer from "./pages/Toast/ToastContainer"
 import ProtectRoute from "./utils/ProtectRoute"
 import { Home } from "./pages/Home/Home"
 import { MainLayout } from "./layouts/MainLayout/MainLayout"
@@ -180,7 +181,12 @@ const router = createBrowserRouter(
   ),
 )
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <ToastContainer />
+      <RouterProvider router={router} />
+    </>
+  )
 }
 
 export default App

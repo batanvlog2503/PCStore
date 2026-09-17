@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import axiosInstance from "../../utils/axiosInstance"
 import "./Product.scss"
-
+import { toast } from "../Toast/Toast"
 const Product = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -66,43 +66,46 @@ const Product = () => {
     e.preventDefault()
 
     if (!selectedVariant) {
-      alert("Vui lòng chọn cấu hình sản phẩm")
+      toast.warning("Vui lòng chọn cấu hình sản phẩm")
+      return
+    }
+    if (selectedVariant.stock <= 0) {
+      toast.warning("Sản phẩm đã hết hàng")
       return
     }
 
-    if (selectedVariant.stock <= 0) {
-      alert("Sản phẩm đã hết hàng")
-      return
-    }
+    const toastId = toast.loading("Đang xử lý...")
 
     try {
       setIsBuyingNow(true)
-
       const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/cart-item/add`,
-        {
-          variant_id: selectedVariant._id,
-          quantity: quantity,
-        },
+        { variant_id: selectedVariant._id, quantity },
       )
 
       if (!response.data.success || !response.data.item?._id) {
-        alert("Không thể tiến hành mua ngay, vui lòng thử lại")
+        toast.update(toastId, {
+          type: "error",
+          message: "Không thể tiến hành mua ngay, vui lòng thử lại",
+        })
         return
       }
 
-      // Chỉ mang đúng cart_item vừa tạo sang trang checkout,
-      // không lấy toàn bộ giỏ hàng như luồng "Thêm vào giỏ hàng" -> chọn ở giỏ
+      toast.update(toastId, {
+        type: "success",
+        message: "Đang chuyển đến trang thanh toán...",
+      })
+
       navigate("/checkout", {
-        state: {
-          cartItemIds: [response.data.item._id],
-        },
+        state: { cartItemIds: [response.data.item._id] },
       })
     } catch (error) {
-      alert(
-        error.response?.data?.message ||
+      toast.update(toastId, {
+        type: "error",
+        message:
+          error.response?.data?.message ||
           "Mua ngay không thành công, vui lòng thử lại",
-      )
+      })
     } finally {
       setIsBuyingNow(false)
     }
@@ -197,35 +200,24 @@ const Product = () => {
 
   const handleAddCartItem = async (e) => {
     e.preventDefault()
+    if (!selectedVariant)
+      return toast.warning("Vui lòng chọn cấu hình sản phẩm")
+    if (selectedVariant.stock <= 0) return toast.warning("Sản phẩm đã hết hàng")
 
-    if (!selectedVariant) {
-      alert("Vui lòng chọn cấu hình sản phẩm")
-      return
-    }
-
-    if (selectedVariant.stock <= 0) {
-      alert("Sản phẩm đã hết hàng")
-      return
-    }
-
-    try {
-      const response = await axiosInstance.post(
-        `${import.meta.env.VITE_APP_URL}/cart-item/add`,
-        {
+    await toast
+      .promise(
+        axiosInstance.post(`${import.meta.env.VITE_APP_URL}/cart-item/add`, {
           variant_id: selectedVariant._id,
-          quantity: quantity,
+          quantity,
+        }),
+        {
+          loading: "Đang thêm vào giỏ hàng...",
+          success: "Thêm vào giỏ hàng thành công",
+          error: (err) =>
+            err.response?.data?.message || "Thêm vào giỏ hàng không thành công",
         },
       )
-
-      if (response.data.success) {
-        alert("Thêm vào giỏ hàng thành công")
-      }
-      console.log(response.data.item)
-    } catch (error) {
-      alert(
-        error.response?.data?.message || "Thêm vào giỏ hàng không thành công",
-      )
-    }
+      .catch(() => {}) // nuốt lỗi ở đây vì toast đã báo rồi, không cần throw tiếp lên UI
   }
   return (
     <div className="container p-0 product">

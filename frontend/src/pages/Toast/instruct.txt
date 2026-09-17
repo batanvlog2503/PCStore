@@ -1,0 +1,80 @@
+Bước 1 — Gắn <ToastContainer /> một lần duy nhất
+
+Đặt ở gốc app, chỗ nào bọc toàn bộ router (thường là App.jsx). Chỉ đặt một lần, không đặt lại ở từng trang.
+
+jsx
+// App.jsx
+import ToastContainer from "./components/Toast/ToastContainer"
+
+function App() {
+  return (
+    <>
+      <ToastContainer />
+      <RouterProvider router={router} />
+    </>
+  )
+}
+
+Từ giờ không cần đụng đến ToastContainer nữa — nó tự lắng nghe và hiển thị mọi toast được gọi từ bất cứ file nào.
+
+Bước 2 — Gọi toast ở nơi cần dùng
+
+Chỉ cần import, không cần hook, không cần Context:
+
+js
+import { toast } from "../../utils/toast" // sửa lại số cấp ../ cho khớp vị trí file
+5 trạng thái — dùng khi nào
+js
+toast.success("Thêm vào giỏ hàng thành công")
+// việc vừa làm xong, thành công
+
+toast.error(error.response?.data?.message || "Có lỗi xảy ra")
+// việc thất bại, thường trong khối catch
+
+toast.warning("Vui lòng chọn cấu hình sản phẩm")
+// người dùng thiếu bước, chưa phải lỗi hệ thống
+
+toast.info("Sản phẩm này sắp ra mắt")
+// thông báo trung tính, không tốt không xấu
+
+const id = toast.loading("Đang xử lý...")
+// việc đang chạy — toast này KHÔNG tự biến mất, phải tự đóng bằng update/dismiss
+
+Bốn cái đầu tự biến mất sau 4 giây. Riêng loading thì không — vì bạn cần giữ nó cho đến khi biết kết quả.
+
+Xử lý loading → kết quả (2 cách)
+
+Cách 1 — tự tay, khi bạn cần kiểm soát chi tiết:
+
+js
+const id = toast.loading("Đang thêm vào giỏ hàng...")
+try {
+  await axiosInstance.post("/cart-item/add", { variant_id, quantity })
+  toast.update(id, { type: "success", message: "Thêm vào giỏ hàng thành công" })
+} catch (error) {
+  toast.update(id, {
+    type: "error",
+    message: error.response?.data?.message || "Thêm vào giỏ hàng thất bại",
+  })
+}
+
+Cách 2 — gọn hơn, dùng toast.promise khi chỉ cần 3 câu chữ:
+
+js
+await toast.promise(
+  axiosInstance.post("/cart-item/add", { variant_id, quantity }),
+  {
+    loading: "Đang thêm vào giỏ hàng...",
+    success: "Thêm vào giỏ hàng thành công",
+    error: (err) => err.response?.data?.message || "Thêm vào giỏ hàng thất bại",
+  },
+)
+
+toast.promise tự làm đúng việc mà Cách 1 viết tay: hiện loading, chờ promise, tự đổi thành success hoặc error. Dùng cách này cho 90% trường hợp gọi API + báo kết quả; chỉ quay lại Cách 1 khi bạn cần logic rẽ nhánh phức tạp hơn (ví dụ tuỳ theo mã lỗi trả về mà hiện thông báo khác nhau).
+
+Vài thứ ít dùng nhưng nên biết
+toast.dismiss(id) — đóng một toast cụ thể bằng tay, trước khi nó tự hết giờ.
+toast.clear() — đóng hết toàn bộ toast đang hiện (hữu ích khi logout, chuyển trang lớn).
+Muốn một toast hiện lâu hơn/ngắn hơn 4 giây mặc định: toast.success("...", { duration: 8000 }), hoặc { duration: null } để nó không tự tắt như loading.
+
+Nếu bạn dán file Product.jsx (hoặc bất kỳ file nào đang dùng alert()) vào đây, tôi đổi trực tiếp sang toast cho bạn xem mẫu thật thay vì ví dụ chung chung.
