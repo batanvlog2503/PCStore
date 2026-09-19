@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import axiosInstance from "../../utils/axiosInstance"
 import "./OrderSuccess.scss"
+import { toast } from "../Toast/Toast"
 
 const PAYMENT_LABELS = {
   cod: "Thanh toán khi nhận hàng (COD)",
@@ -43,6 +44,9 @@ const OrderSuccess = () => {
       setOrder(response.data.order) // setOrder
     } catch (error) {
       setLoadError(
+        error.response?.data?.message || "Không tìm thấy đơn hàng này",
+      )
+      toast.error(
         error.response?.data?.message || "Không tìm thấy đơn hàng này",
       )
     } finally {

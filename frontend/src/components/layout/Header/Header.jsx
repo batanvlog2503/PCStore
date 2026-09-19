@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import "./Header.scss"
 import axiosInstance from "../../../utils/axiosInstance.js"
+import { toast } from "../../../pages/Toast/Toast.jsx"
 export const Header = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
@@ -41,13 +42,15 @@ export const Header = () => {
         },
       )
 
-      alert("Đăng xuất thành công")
       localStorage.removeItem("user")
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
-      window.location.href = "/login"
-    } catch (err) {
-      alert("Có lỗi xảy ra khi đăng xuất")
+      toast.success("Đăng xuất thành công")
+      navigate("/login")
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Có lỗi xảy ra khi đăng xuất",
+      )
     }
   }
 
@@ -185,12 +188,7 @@ export const Header = () => {
             <li>
               <Link to="/">Trang chủ</Link>
             </li>
-            <li>
-              <Link>Sản phẩm</Link>
-            </li>
-            <li>
-              <Link>PC Build</Link>
-            </li>
+
             <li>
               <Link to="/home/voucher">Khuyến mãi</Link>
             </li>
@@ -198,7 +196,7 @@ export const Header = () => {
               <Link>Tin Tức</Link>
             </li>
             <li>
-              <Link>Liên hệ</Link>
+              <Link to="/home/contact">Liên hệ</Link>
             </li>
           </ul>
         </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import axiosInstance from "../../../utils/axiosInstance"
 import "./MyOrder.scss"
+import { toast } from "../../Toast/Toast"
 
 const TABS = [
   { key: "all", label: "Tất cả" },
@@ -77,7 +78,7 @@ const MyOrder = () => {
       setTotal(response.data.total || 0)
       setTotalPages(response.data.totalPages || 1)
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Không tải được danh sách đơn hàng",
       )
     } finally {
@@ -122,7 +123,7 @@ const MyOrder = () => {
         prev.map((o) => (o._id === id ? { ...o, status: "cancelled" } : o)),
       )
     } catch (error) {
-      alert(error.response?.data?.message || "Huỷ đơn hàng thất bại")
+      toast.error(error.response?.data?.message || "Huỷ đơn hàng thất bại")
     } finally {
       setCancellingId(null)
     }
@@ -294,6 +295,11 @@ const MyOrder = () => {
 
                   {order.status === "shipping" && (
                     <button className="track-btn">Theo dõi đơn hàng</button>
+                  )}
+                  {order.status === "completed" && (
+                    <button className="track-btn">
+                      Theo dõi đđâsdsadasơn hàng
+                    </button>
                   )}
                 </div>
 

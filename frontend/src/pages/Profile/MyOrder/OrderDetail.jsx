@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import axiosInstance from "../../../utils/axiosInstance"
 import "./OrderDetail.scss"
+import { toast } from "../../Toast/Toast"
 
 const PAYMENT_LABELS = {
   cod: "Thanh toán khi nhận hàng (COD)",
@@ -89,7 +90,7 @@ const OrderDetail = () => {
       setOrder((prev) => ({ ...prev, status: "cancelled" }))
       setShowCancelModal(false)
     } catch (error) {
-      alert(error.response?.data?.message || "Huỷ đơn hàng thất bại")
+      toast.error(error.response?.data?.message || "Huỷ đơn hàng thất bại")
     } finally {
       setIsCancelling(false)
     }
@@ -157,7 +158,7 @@ const OrderDetail = () => {
           </span>
         </div>
 
-        {/* ============ TIMELINE TRẠNG THÁI ============ */}
+        {/* Time line hiện trạng thái*/}
         {!isCancelled ? (
           <div className="status-timeline">
             {STATUS_STEPS.map((step, index) => (

@@ -19,9 +19,9 @@ export const items = [
     label: "Địa chỉ của tôi",
     icon: "fa-solid fa-location-dot",
   },
-  {
-    to: "/account/log",
-    label: "Lịch sử mua đồ",
-    icon: "fa-solid fa-clock-rotate-left",
-  },
+  // {
+  //   to: "/account/log",
+  //   label: "Lịch sử mua đồ",
+  //   icon: "fa-solid fa-clock-rotate-left",
+  // },
 ]

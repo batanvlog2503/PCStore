@@ -1,11 +1,11 @@
-import React from "react"
+import React, { useState } from "react"
 import "../Login/Login.scss"
 import axiosInstance from "../../utils/axiosInstance"
-import axios from "axios"
-
+import { toast } from "../Toast/Toast"
 import { useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
+
 const gioiThieu = ["/gioithieu.png"]
+
 export const Register = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState({
@@ -14,23 +14,12 @@ export const Register = () => {
     password: "",
     email: "",
   })
-  const [toast, setToast] = useState({
-    show: false,
-    message: "",
-    type: "success",
-  })
-  const showToast = (message, type = "success") => {
-    setToast({ show: true, message, type })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-    setTimeout(() => {
-      setToast({ show: false, message: "", type: "success" })
-    }, 3000)
-  }
-
-  const [message, setMessage] = useState("")
-  const [type, setType] = useState("")
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
     try {
       const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/auth/register`,
@@ -38,17 +27,20 @@ export const Register = () => {
       )
 
       if (response.data.success) {
-        console.log("Register SuccessFully", response.data.message)
-        alert("Register Successfully")
+        toast.success("Đăng ký thành công")
         navigate("/login")
       }
     } catch (error) {
-      alert(error.response?.data.message || "Error Submit Register")
+      toast.error(error.response?.data?.message || "Đăng ký không thành công")
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
   const handleInputChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value })
   }
+
   return (
     <div className="container-fluid login p-0">
       <div className="privacy">
@@ -58,14 +50,11 @@ export const Register = () => {
         />
       </div>
       <div className="form-login">
-        <h2>Đăng nhập PC Store</h2>
-        <form
-          action=""
-          onSubmit={handleSubmit}
-        >
-          <label htmlFor="">Username</label>
-
+        <h2>Đăng ký PC Store</h2>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username</label>
           <input
+            id="username"
             type="text"
             value={user.username}
             name="username"
@@ -74,9 +63,10 @@ export const Register = () => {
             onChange={handleInputChange}
             required
           />
-          <label htmlFor="">Số điện thoại</label>
 
+          <label htmlFor="phone">Số điện thoại</label>
           <input
+            id="phone"
             type="text"
             value={user.phone}
             name="phone"
@@ -85,9 +75,10 @@ export const Register = () => {
             placeholder="Nhập số điện thoại của bạn"
             required
           />
-          <label htmlFor="">Email</label>
 
+          <label htmlFor="email">Email</label>
           <input
+            id="email"
             type="email"
             value={user.email}
             name="email"
@@ -96,21 +87,38 @@ export const Register = () => {
             onChange={handleInputChange}
             placeholder="Email"
           />
-          <label htmlFor="">Mật khẩu</label>
 
+          <label htmlFor="password">Mật khẩu</label>
           <input
+            id="password"
             type="password"
             value={user.password}
             name="password"
             onChange={handleInputChange}
             className="password input"
-            placeholder="Vui lòng nhập mật khẩu !"
+            placeholder="Vui lòng nhập mật khẩu!"
             required
           />
-          <button type="submit">Đăng Ký</button>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Đang đăng ký..." : "Đăng Ký"}
+          </button>
         </form>
-        <p onClick={() => navigate("/login")}>
-          Bạn đã có tài khoản? <a href="">Đăng nhập ngay</a>
+
+        <p>
+          Bạn đã có tài khoản?{" "}
+          <a
+            href="/login"
+            onClick={(e) => {
+              e.preventDefault()
+              navigate("/login")
+            }}
+          >
+            Đăng nhập ngay
+          </a>
         </p>
         <p>
           Mua sắm và sửa chữa tại <b>PC Store</b>

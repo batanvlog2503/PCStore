@@ -2,35 +2,36 @@ import React, { useEffect, useState } from "react"
 import AddressModal from "./AddressModal.jsx"
 import "./MyAddress.scss"
 import axiosInstance from "../../../utils/axiosInstance.js"
+import { toast } from "../../Toast/Toast.jsx"
+
 const MyAddress = () => {
   const [addresses, setAddresses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // sửa address
   const [editingAddress, setEditingAddress] = useState(null)
 
   useEffect(() => {
     getAllAddresses()
-    setIsLoading(false)
   }, [])
-  // lấy hết địa chỉ
+
   const getAllAddresses = async () => {
     try {
+      setIsLoading(true)
       const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/address/all`,
       )
-
       setAddresses(response.data.addresses)
-
-      setIsLoading(false)
     } catch (error) {
-      alert("Lỗi khi lấy danh sách địa chỉ: " + error.message)
+      toast.error(
+        error.response?.data?.message || "Lỗi khi lấy danh sách địa chỉ",
+      )
+    } finally {
+      setIsLoading(false)
     }
   }
-  // id đây là addressId được chọn làm mặc định, gửi lên backend để set default
+
   const handleSetDefault = async (id) => {
     try {
-      // id này là id của address được chọn làm mặc định
       const response = await axiosInstance.patch(
         `${import.meta.env.VITE_APP_URL}/address/${id}/default`,
       )
@@ -42,58 +43,44 @@ const MyAddress = () => {
           })),
         )
       }
-      alert(response.data.message || "Đặt địa chỉ mặc định thành công")
+      toast.success(response.data.message || "Đặt địa chỉ mặc định thành công")
     } catch (error) {
-      alert("Lỗi khi đặt địa chỉ mặc định: " + error.message)
-    }
-  }
-
-  // thêm địa chỉ
-  const handleAddAddress = async (formData) => {
-    try {
-      const response = await axiosInstance.post(
-        `${import.meta.env.VITE_APP_URL}/address/add`,
-        formData,
+      toast.error(
+        error.response?.data?.message || "Lỗi khi đặt địa chỉ mặc định",
       )
-
-      alert("Add address successfully")
-    } catch (error) {
-      alert(error.response?.data?.message || "Add address failed")
     }
   }
 
   const handleSubmitAddress = async (formData) => {
     try {
       if (editingAddress) {
-        const response = await axiosInstance.put(
+        await axiosInstance.put(
           `${import.meta.env.VITE_APP_URL}/address/update/${editingAddress._id}`,
           formData,
         )
-
-        alert("Cập nhật địa chỉ thành công")
+        toast.success("Cập nhật địa chỉ thành công")
       } else {
-        const response = await axiosInstance.post(
+        await axiosInstance.post(
           `${import.meta.env.VITE_APP_URL}/address/add`,
           formData,
         )
-        alert("Thêm địa chỉ thành công")
+        toast.success("Thêm địa chỉ thành công")
       }
       await getAllAddresses()
     } catch (error) {
-      alert(error.response?.data?.message || "Có lỗi xảy ra")
+      toast.error(error.response?.data?.message || "Có lỗi xảy ra")
     }
   }
-  // xóa địa chỉ
 
   const handleDeleteAddress = async (id) => {
     try {
-      const response = await axiosInstance.delete(
+      await axiosInstance.delete(
         `${import.meta.env.VITE_APP_URL}/address/delete/${id}`,
       )
-      alert("Xóa địa chỉ thành công")
-      await getAllAddresses() // lấy lại danh sách mới
+      toast.success("Xóa địa chỉ thành công")
+      await getAllAddresses()
     } catch (error) {
-      alert(error.response?.data?.message || "Xóa địa chỉ failed")
+      toast.error(error.response?.data?.message || "Xóa địa chỉ thất bại")
     }
   }
 
@@ -162,7 +149,7 @@ const MyAddress = () => {
               <button
                 className="edit"
                 onClick={() => {
-                  setEditingAddress(a) // ← thêm dòng này
+                  setEditingAddress(a)
                   setIsModalOpen(true)
                 }}
               >

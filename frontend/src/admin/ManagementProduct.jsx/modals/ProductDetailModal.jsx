@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./ProductDetailModal.scss"
 import axiosInstance from "../../../utils/axiosInstance" // chỉnh lại đường dẫn cho đúng project của bạn
+import { toast } from "../../../pages/Toast/Toast"
 
 const STATUS_LABEL = {
   active: "Đang hoạt động",
@@ -42,6 +43,7 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
         setError(
           err.response?.data?.message || "Không thể tải chi tiết sản phẩm",
         )
+        toast.error(err.response?.data?.message || "Lỗi lấy sản phẩm chi tiết")
       } finally {
         setLoading(false)
       }

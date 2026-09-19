@@ -31,6 +31,7 @@ const LatestProduct = () => {
         setPage(response.data.data.page || pageNumber)
       }
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Lỗi lấy sản phẩm mới nhất")
       console.error("Lỗi lấy sản phẩm mới nhất:", error)
     } finally {
       setLoading(false)

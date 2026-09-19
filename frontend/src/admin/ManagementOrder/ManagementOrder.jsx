@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react"
 import "./ManagementOrder.scss"
 import axiosInstance from "../../utils/axiosInstance.js"
-
+import { toast } from "../../pages/Toast/Toast.jsx"
 import OrderFilter from "./components/OrderFilter.jsx"
 import OrderTable from "./components/OrderTable.jsx"
 import OrderStatusModal from "./components/OrderStatusModal.jsx"
@@ -78,6 +78,9 @@ const ManagementOrder = () => {
       setTotal(response.data.total)
       setStats(response.data.stats)
     } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Lỗi lấy danh sách đơn hàng",
+      )
       console.error("Lỗi lấy danh sách đơn hàng:", error)
     } finally {
       setLoading(false)
@@ -104,7 +107,7 @@ const ManagementOrder = () => {
   }
 
   const handleExportExcel = () => {
-    alert("Chức năng xuất Excel — nối API export khi backend sẵn sàng.")
+    toast.info("Chức năng xuất Excel — nối API export khi backend sẵn sàng.")
   }
   const handleRefresh = () => {
     getOrders()
@@ -120,13 +123,17 @@ const ManagementOrder = () => {
         },
       )
 
-      alert(response.data.message)
+      toast.success(
+        response.data.message || "Cập nhật trạng thái đơn hàng thành công !",
+      )
 
       setStatusModalOrder(null)
 
       await getOrders()
     } catch (error) {
-      alert(error.response?.data?.message || "Cập nhật trạng thái thất bại")
+      toast.error(
+        error.response?.data?.message || "Cập nhật trạng thái thất bại",
+      )
     } finally {
       setSubmittingStatus(false)
     }
@@ -145,11 +152,11 @@ const ManagementOrder = () => {
         },
       )
 
-      alert(response.data.message || "Hủy đơn hàng thành công")
+      toast.success(response.data.message || "Hủy đơn hàng thành công")
 
       await getOrders()
     } catch (error) {
-      alert(error.response?.data?.message || "Hủy đơn hàng thất bại")
+      toast.error(error.response?.data?.message || "Hủy đơn hàng thất bại")
     }
   }
 

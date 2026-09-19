@@ -3,6 +3,7 @@ import "./Dashboard.scss"
 import LatestProduct from "./LatestProduct.jsx"
 import axiosInstance from "../../utils/axiosInstance"
 import TopProducts from "./TopProducts.jsx"
+import { toast } from "../../pages/Toast/Toast.jsx"
 
 const ACTIVITIES = [
   {
@@ -181,6 +182,7 @@ const Dashboard = () => {
         setDashboardData(response.data.data)
       }
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Lỗi lấy Dashboard")
       console.error("Lỗi lấy dashboard:", error)
     } finally {
       setLoading(false)
@@ -216,6 +218,7 @@ const Dashboard = () => {
         setOrdersChart(response.data.data)
       }
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Lỗi lấy biểu đồ chart")
       console.error("Lỗi lấy biểu đồ đơn hàng:", error)
     } finally {
       setLoadingOrders(false)
@@ -233,6 +236,7 @@ const Dashboard = () => {
         setOrderStatusData(response.data.data || [])
       }
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Lỗi lấy Thống kê đơn hàng")
       console.error("Lỗi lấy thống kê trạng thái đơn hàng:", error)
     } finally {
       setLoadingStatus(false)

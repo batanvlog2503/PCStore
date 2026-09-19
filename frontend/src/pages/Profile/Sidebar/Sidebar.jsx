@@ -3,21 +3,25 @@ import { NavLink } from "react-router-dom"
 import "./Sidebar.scss"
 import axiosInstance from "../../../utils/axiosInstance.js"
 import { items } from "./items.js"
+import { toast } from "../../Toast/Toast.jsx"
 const Sidebar = () => {
   const handleLogout = async (e) => {
     e.preventDefault()
     try {
-      await axiosInstance.post(`${import.meta.env.VITE_APP_URL}/auth/logout`, {
-        refreshToken: localStorage.getItem("refreshToken"),
-      })
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/auth/logout`,
+        {
+          refreshToken: localStorage.getItem("refreshToken"),
+        },
+      )
 
-      alert("Đăng xuất thành công")
       localStorage.removeItem("user")
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
+      toast.success("Đăng xuất thành công")
       window.location.href = "/login"
     } catch (err) {
-      alert("Có lỗi xảy ra khi đăng xuất")
+      toast.error(err?.response?.data?.message || "Có lỗi xảy ra khi đăng xuất")
     }
   }
 

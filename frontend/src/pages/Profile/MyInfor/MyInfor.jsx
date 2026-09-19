@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import "./MyInfor.scss"
 import axiosInstance from "../../../utils/axiosInstance"
+import { toast } from "../../Toast/Toast"
 const formatDate = (dateString) => {
   if (!dateString) return ""
   const date = new Date(dateString)
@@ -40,9 +41,9 @@ const MyInfor = () => {
       }
       setUser(updatedUser)
       localStorage.setItem("user", JSON.stringify(updatedUser))
-      alert(response.data.message || "Profile updated successfully")
+      toast.success(response.data.message || "Profile updated successfully")
     } catch (error) {
-      alert(error.response?.data?.message || "Unable to update profile")
+      toast.error(error.response?.data?.message || "Unable to update profile")
     } finally {
       setIsSubmitting(false)
     }

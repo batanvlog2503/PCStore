@@ -178,13 +178,6 @@ export const Introduction = () => {
               tốt nhất.
             </p>
           </section>
-
-          <div className="introduction-image">
-            <img
-              src="/laptop-do-hoa-banner.jpg"
-              alt="Laptop đồ họa"
-            />
-          </div>
         </div>
 
         {/* ================= MỤC LỤC BÊN PHẢI — STICKY ================= */}

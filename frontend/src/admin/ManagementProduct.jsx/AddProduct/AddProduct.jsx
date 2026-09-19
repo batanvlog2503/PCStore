@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import "./AddProduct.scss"
 import axiosInstance from "../../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
+import { toast } from "../../../pages/Toast/Toast"
 const emptyVariant = () => ({
   _key: crypto.randomUUID(),
   sku: "",
@@ -89,6 +90,9 @@ const AddProduct = () => {
       setCategories(categoryResponse.data.categories || [])
       setBrands(brandResponse.data.brands || [])
     } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Không thể lấy sản phẩm trong đơn hàng",
+      )
       console.error("Lỗi lấy danh mục / thương hiệu:", err)
     }
   }
@@ -250,12 +254,12 @@ const AddProduct = () => {
         { headers: { "Content-Type": "multipart/form-data" } },
       )
 
-      alert("Tạo sản phẩm thành công!")
+      toast.success(response?.data?.message || "Tạo sản phẩm thành công!")
 
       navigate("/admin/products")
     } catch (err) {
       console.error("Lỗi tạo sản phẩm:", err)
-      alert(err.response?.data?.message || "Tạo sản phẩm thất bại")
+      toast.error(err.response?.data?.message || "Tạo sản phẩm thất bại")
     } finally {
       setSubmitting(false)
     }

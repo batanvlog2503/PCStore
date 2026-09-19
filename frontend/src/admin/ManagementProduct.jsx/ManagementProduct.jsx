@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import ProductDetailModal from "./modals/ProductDetailModal.jsx"
 import ProductEditModal from "./modals/ProductEditModal.jsx"
 import ConfirmDeleteModal from "./modals/ConfirmDeleteModal.jsx"
-
+import { toast } from "../../pages/Toast/Toast.jsx"
 const STATUS_LABEL = {
   active: "Đang hoạt động",
   hidden: "Tạm ẩn",
@@ -106,6 +106,10 @@ const ManagementProduct = () => {
       setProducts(response.data.data.products)
       setTotal(response.data.data.total)
     } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          "Không thể lấy sản phẩm trong đơn hàng",
+      )
       console.error("Lỗi lấy danh sách sản phẩm:", error)
     } finally {
       setLoading(false)
@@ -122,6 +126,7 @@ const ManagementProduct = () => {
 
       setStats(response.data.data)
     } catch (error) {
+      toast.error(error?.response?.data?.message || "Lỗi thống kê sản phẩm")
       console.error("Lỗi lấy thống kê sản phẩm:", error)
     }
   }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axiosInstance from "../../utils/axiosInstance"
 import "./TopProduct.scss"
+import { toast } from "../Toast/Toast"
 
 const TopProduct = () => {
   const navigate = useNavigate()
@@ -26,7 +27,9 @@ const TopProduct = () => {
       )
       setProducts(response.data.data.variants || [])
     } catch (error) {
-      console.error(error)
+      toast.error(
+        error?.response?.data?.message || "Có lỗi khi lấy 10 sản phẩm nổi bật",
+      )
     } finally {
       setIsLoading(false)
     }

@@ -122,19 +122,17 @@ const Product = () => {
         const response = await axiosInstance.delete(
           `${import.meta.env.VITE_APP_URL}/wishlist/remove/${id}`,
         )
-        alert(response.data.message)
+        toast.success(response.data.message)
         setIsWishlisted(false)
       } else {
         const response = await axiosInstance.post(
           `${import.meta.env.VITE_APP_URL}/wishlist/add/${id}`,
         )
-        alert(response.data.message)
+        toast.success(response.data.message)
         setIsWishlisted(true)
       }
     } catch (error) {
-      console.log("WISHLIST ERROR:", error.response?.data)
-      console.log("STATUS:", error.response?.status)
-      alert(
+      toast.error(
         error.response?.data?.message ||
           "Không thể cập nhật sản phẩm yêu thích",
       )
@@ -204,20 +202,33 @@ const Product = () => {
       return toast.warning("Vui lòng chọn cấu hình sản phẩm")
     if (selectedVariant.stock <= 0) return toast.warning("Sản phẩm đã hết hàng")
 
-    await toast
-      .promise(
-        axiosInstance.post(`${import.meta.env.VITE_APP_URL}/cart-item/add`, {
-          variant_id: selectedVariant._id,
-          quantity,
-        }),
-        {
-          loading: "Đang thêm vào giỏ hàng...",
-          success: "Thêm vào giỏ hàng thành công",
-          error: (err) =>
-            err.response?.data?.message || "Thêm vào giỏ hàng không thành công",
-        },
+    const toastId = toast.loading("Đang thêm vào giỏ hàng...")
+
+    try {
+      const response = await axiosInstance.post(
+        `${import.meta.env.VITE_APP_URL}/cart-item/add`,
+        { variant_id: selectedVariant._id, quantity },
       )
-      .catch(() => {}) // nuốt lỗi ở đây vì toast đã báo rồi, không cần throw tiếp lên UI
+
+      if (!response.data.success) {
+        toast.update(toastId, {
+          type: "error",
+          message: "Thêm vào giỏ hàng không thành công",
+        })
+        return
+      }
+
+      toast.update(toastId, {
+        type: "success",
+        message: "Thêm vào giỏ hàng thành công",
+      })
+    } catch (error) {
+      toast.update(toastId, {
+        type: "error",
+        message:
+          error.response?.data?.message || "Thêm vào giỏ hàng không thành công",
+      })
+    }
   }
   return (
     <div className="container p-0 product">

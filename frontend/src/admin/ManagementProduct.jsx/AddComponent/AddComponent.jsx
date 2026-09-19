@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 
 import "./AddComponent.scss" // style riêng cho bảng thông số động
 import axiosInstance from "../../../utils/axiosInstance"
-
+import { toast } from "../../../pages/Toast/Toast"
 const emptyAttribute = () => ({
   _key: crypto.randomUUID(),
   name: "",
@@ -71,6 +71,9 @@ const AddComponent = () => {
         setCategories(catRes.data.data || [])
         setBrands(brandRes.data.data || [])
       } catch (err) {
+        toast.error(
+          err?.response?.data?.message || "Lỗi lấy danh mục / thương hiệu",
+        )
         console.error("Lỗi lấy danh mục / thương hiệu:", err)
       }
     }
@@ -224,16 +227,16 @@ const AddComponent = () => {
       }))
       fd.append("variants", JSON.stringify(variantsPayload))
 
-      await axiosInstance.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/admin/products`,
         fd,
         { headers: { "Content-Type": "multipart/form-data" } },
       )
 
-      alert("Tạo linh kiện thành công!")
+      toast.success(response?.data?.message || "Tạo linh kiện thành công!")
     } catch (err) {
       console.error("Lỗi tạo linh kiện:", err)
-      alert(err.response?.data?.message || "Tạo linh kiện thất bại")
+      toast.error(err.response?.data?.message || "Tạo linh kiện thất bại")
     } finally {
       setSubmitting(false)
     }

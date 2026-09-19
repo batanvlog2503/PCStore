@@ -5,6 +5,7 @@ const gioiThieu = ["/gioithieu.png"]
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { toast } from "../Toast/Toast"
 export const Login = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState({
@@ -25,19 +26,13 @@ export const Login = () => {
       const refreshToken = response.data.refreshToken
       const userData = response.data.user
 
-      console.log("User đăng nhập:", userData)
-      console.log("Role:", userData.role)
-
       if (response.data.success) {
-        console.log("Login Successfully:", response.data.message)
-
         localStorage.setItem("accessToken", accessToken)
         localStorage.setItem("refreshToken", refreshToken)
         localStorage.setItem("user", JSON.stringify(userData))
 
-        alert("Login Successfully")
+        toast.success("Đăng nhập thành công")
 
-        // Kiểm tra role của user lấy từ API
         if (userData.role === "admin") {
           navigate("/admin")
         } else {
@@ -45,7 +40,7 @@ export const Login = () => {
         }
       }
     } catch (error) {
-      alert(error.response?.data.message || "Error Submit Login")
+      toast.error(error.response?.data?.message || "Đăng nhập không thành công")
     }
   }
 

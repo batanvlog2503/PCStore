@@ -149,7 +149,7 @@ class AddressService {
 
     // Nếu đặt địa chỉ này thành mặc định
     if (is_default) {
-      await AddressRepo.clearDefault(userId)
+      await AddressRepo.clearDefaultAddress(userId)
     }
 
     const updatedAddress = await AddressRepo.updateAddress(addressId, data)

@@ -3,30 +3,16 @@ import { MdDelete, MdCheckCircle, MdError } from "react-icons/md"
 import "./Cart.scss"
 import axiosInstance from "../../utils/axiosInstance"
 import { Link, useNavigate } from "react-router-dom"
+import { toast } from "../Toast/Toast"
 const formatVND = (value) => value.toLocaleString("vi-VN") + "đ"
 
 export default function Cart() {
   const [items, setItems] = useState([])
-  const [couponInput, setCouponInput] = useState("")
-  const [couponMessage, setCouponMessage] = useState(null)
+
   const navigate = useNavigate()
   const [itemToDelete, setItemToDelete] = useState(null) // item đang chờ xác nhận xoá
   const [deletingId, setDeletingId] = useState(null) // _id đang gọi API xoá (để hiện spinner)
   const [isLoading, setIsLoading] = useState(true)
-
-  // Toast đơn giản, tự viết — không cần cài thêm thư viện ngoài
-  const [toast, setToast] = useState(null) // { type: "success" | "error", message: string }
-  const [selectItemIds, setSelectItemIds] = useState([])
-  const showToast = (type, message) => {
-    setToast({ type, message })
-  }
-
-  // Toast tự ẩn sau 2.5s
-  useEffect(() => {
-    if (!toast) return
-    const timer = setTimeout(() => setToast(null), 2500)
-    return () => clearTimeout(timer)
-  }, [toast])
 
   const getMyCart = async () => {
     try {
@@ -43,7 +29,7 @@ export default function Cart() {
         setItems(formatItems)
       }
     } catch (error) {
-      alert(error?.response?.data?.message || "Get My Cart failed ")
+      toast.error(error?.response?.data?.message || "Get My Cart failed ")
     } finally {
       setIsLoading(false)
     }
@@ -100,13 +86,8 @@ export default function Cart() {
       ? Math.round(((item.price - item.discount_price) / item.price) * 100)
       : 0
 
-  const shippingFee = 0
-  const total = subtotal
-
-  const handleApplyCoupon = (e) => {
-    e.preventDefault()
-    // TODO: gọi API POST /vouchers/apply với couponInput + subtotal - productDiscount
-  }
+  const shippingFee = 20000
+  const total = Math.max(0, subtotal + shippingFee)
 
   const handleOpenDeleteConfirm = (item) => {
     setItemToDelete(item)
@@ -129,12 +110,9 @@ export default function Cart() {
         `${import.meta.env.VITE_APP_URL}/cart-item/delete/${id}`,
       )
       setItems((prev) => prev.filter((it) => it._id !== id))
-      showToast("success", `Đã xoá "${name}" khỏi giỏ hàng`)
+      toast.success(`Đã xoá "${name}" khỏi giỏ hàng`)
     } catch (error) {
-      showToast(
-        "error",
-        error.response?.data?.message || "Xoá sản phẩm thất bại",
-      )
+      toast.error(error.response?.data?.message || "Xoá sản phẩm thất bại")
     } finally {
       setDeletingId(null)
     }
@@ -380,36 +358,11 @@ export default function Cart() {
                   </div>
                 )}
 
-                <form
-                  className="coupon-form"
-                  onSubmit={handleApplyCoupon}
-                >
-                  <input
-                    type="text"
-                    className="coupon-form__input"
-                    placeholder="Nhập mã giảm giá"
-                    value={couponInput}
-                    onChange={(e) => {
-                      setCouponInput(e.target.value)
-                      if (couponMessage) setCouponMessage(null)
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    className="coupon-form__btn"
-                  >
-                    Áp dụng
-                  </button>
-                </form>
-                {couponMessage && (
-                  <p className="coupon-form__message">{couponMessage}</p>
-                )}
-
                 <div className="order-summary__row">
                   <span className="order-summary__ship-label">
                     <b>Phí vận chuyển: </b>
                   </span>
-                  <span className="order-summary__free">Miễn phí</span>
+                  <span className="order-summary__free">{shippingFee}đ</span>
                 </div>
                 <hr />
 
@@ -470,14 +423,6 @@ export default function Cart() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ================= TOAST ================= */}
-      {toast && (
-        <div className={`toast toast--${toast.type}`}>
-          {toast.type === "success" ? <MdCheckCircle /> : <MdError />}
-          <span>{toast.message}</span>
         </div>
       )}
     </div>

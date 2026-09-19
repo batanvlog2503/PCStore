@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { NAV_ITEMS } from "./NAV_ITEMS"
+import { toast } from "../../pages/Toast/Toast"
 
 const AdminSidebar = ({ isSidebarOpen, onCloseSidebar }) => {
   const navigate = useNavigate()
@@ -14,6 +15,7 @@ const AdminSidebar = ({ isSidebarOpen, onCloseSidebar }) => {
     localStorage.removeItem("user")
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
+    toast.success("Đăng xuất thành công")
     navigate("/login")
   }
 

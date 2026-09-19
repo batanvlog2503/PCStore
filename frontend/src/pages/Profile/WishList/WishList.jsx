@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import "./WishList.scss"
 import axiosInstance from "../../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
+import { toast } from "../../Toast/Toast"
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Mới nhất" },
@@ -45,7 +46,7 @@ const WishList = () => {
       console.log("Account wishlist", response.data.wishlists)
       setItems(response.data.wishlists || [])
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Không tải được danh sách yêu thích",
       )
     } finally {
@@ -84,7 +85,9 @@ const WishList = () => {
       }, 280) // khớp thời lượng animation fade-out trong SCSS
     } catch (error) {
       setRemovingIds((prev) => prev.filter((id) => id !== productId))
-      alert(error.response?.data?.message || "Không bỏ thích được sản phẩm")
+      toast.error(
+        error.response?.data?.message || "Không bỏ thích được sản phẩm",
+      )
     }
   }
 

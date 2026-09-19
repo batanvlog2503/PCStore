@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance"
 import "./AddressSelectModal.scss"
+import { toast } from "../Toast/Toast"
 
 // onConfirm(address) — trả về địa chỉ được chọn khi bấm "Xác nhận"
 // onAddNew() — mở form thêm địa chỉ mới (tái dùng AddressModal đã có ở Profile)
@@ -25,7 +26,9 @@ const AddressSelectModal = ({ isOpen, onClose, onConfirm }) => {
       const defaultAddr = list.find((a) => a.is_default) || list[0]
       setSelectedId(defaultAddr?._id || null)
     } catch (error) {
-      alert(error.response?.data?.message || "Không tải được danh sách địa chỉ")
+      toast.error(
+        error.response?.data?.message || "Không tải được danh sách địa chỉ",
+      )
     } finally {
       setIsLoading(false)
     }

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
 import "./EditProduct.scss"
 import axiosInstance from "../../../utils/axiosInstance"
+import { toast } from "../../../pages/Toast/Toast"
 
 // ================= CONST =================
 const PRODUCT_STATUS_OPTIONS = [
@@ -91,7 +92,7 @@ const EditProduct = () => {
       setCategories(categoryRes.data.categories || [])
       setBrands(brandRes.data.brands || [])
     } catch (error) {
-      console.error("Lỗi lấy dữ liệu sản phẩm:", error.response?.data || error)
+      toast.error("Lỗi lấy dữ liệu sản phẩm:", error.response?.data || error)
 
       setError(
         error.response?.data?.message || "Không thể tải thông tin sản phẩm",
@@ -104,10 +105,9 @@ const EditProduct = () => {
   useEffect(() => {
     getData()
   }, [productId])
-
   // ==========================================================================
   // Product fields
-  // ==========================================================================
+
   const handleProductChange = (field, value) => {
     setProduct((prev) => ({ ...prev, [field]: value }))
   }
@@ -162,9 +162,8 @@ const EditProduct = () => {
     e.target.value = "" // reset input để chọn lại cùng 1 file vẫn bắn onChange
   }
 
-  // ==========================================================================
   // Variant form (khớp ProductVariant: sku, config_name, specs{...}, price, discount_price, stock, status)
-  // ==========================================================================
+
   const openAddVariant = () => {
     setVariantForm({ ...EMPTY_VARIANT, specs: { ...EMPTY_VARIANT.specs } })
     setVariantErrors({})
@@ -283,12 +282,10 @@ const EditProduct = () => {
           prev.map((v) => (v._id === payload._id ? updatedVariant : v)),
         )
 
-        alert("Cập nhật phiên bản thành công!")
+        toast.success(response.data.message || "Cập nhật phiên bản thành công!")
       }
-
       // ===============================
       // THÊM VARIANT
-      // ===============================
       else {
         response = await axiosInstance.post(
           `${import.meta.env.VITE_APP_URL}/admin/products/${productId}/variants`,
@@ -299,14 +296,16 @@ const EditProduct = () => {
 
         setVariants((prev) => [...prev, newVariant])
 
-        alert("Thêm phiên bản mới thành công!")
+        toast.success(
+          response?.data?.message || "Thêm phiên bản mới thành công!",
+        )
       }
 
       setVariantForm(null)
     } catch (error) {
       console.error("Lỗi lưu variant:", error)
 
-      alert(error.response?.data?.message || "❌ Lưu phiên bản thất bại")
+      toast.error(error.response?.data?.message || "Lưu phiên bản thất bại")
     } finally {
       setSavingVariant(false)
     }
@@ -361,13 +360,13 @@ const EditProduct = () => {
 
       setDeletedImageIds([])
 
-      alert("Cập nhật sản phẩm thành công!")
+      toast.success("Cập nhật sản phẩm thành công!")
 
       await getData()
     } catch (error) {
       console.error(error)
 
-      alert(error.response?.data?.message || "Lưu sản phẩm thất bại")
+      toast.error(error.response?.data?.message || "Lưu sản phẩm thất bại")
     } finally {
       setSaving(false)
     }

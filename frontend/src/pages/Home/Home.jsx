@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import "./Home.scss"
 import axiosInstance from "../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
-import CommentPublic from "./CommentPublic"
+import Question from "./Question"
 import TopProduct from "./TopProduct"
 import { Introduction } from "./Introduction"
 import {
@@ -12,6 +12,7 @@ import {
   SORT_OPTIONS,
   CRITERIA_TABS,
 } from "./OPTIONS"
+import { toast } from "../Toast/Toast"
 
 const INITIAL_FILTERS = {
   useCase: "",
@@ -85,7 +86,9 @@ export const Home = () => {
       )
       setVouchers(response.data.vouchers)
     } catch (error) {
-      alert(error.response?.data?.message)
+      toast.error(
+        error.response?.data?.message || "Có lỗi xảy ra khi hiện Vouchers",
+      )
     }
   }
 
@@ -96,7 +99,9 @@ export const Home = () => {
       )
       setBrands(response.data.brands)
     } catch (error) {
-      alert(error.response?.data?.message)
+      toast.error(
+        error.response?.data?.message || "Có lỗi xảy ra khi hiện Brands ",
+      )
     }
   }
 
@@ -139,7 +144,7 @@ export const Home = () => {
       setTotalPages(response.data.totalPages)
       setPage(response.data.page)
     } catch (error) {
-      alert(error.response?.data?.message || "Không tải được sản phẩm")
+      toast.error(error.response?.data?.message || "Không tải được sản phẩm")
     } finally {
       setIsLoadingMore(false)
       setIsLoadingList(false)
@@ -692,7 +697,7 @@ export const Home = () => {
         </div>
       </div>
       <Introduction></Introduction>
-      <CommentPublic></CommentPublic>
+      <Question></Question>
 
       {detailVoucher && (
         <div

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import "./ModalOrderDetail.scss"
 import axiosInstance from "../../utils/axiosInstance"
+import { toast } from "../../pages/Toast/Toast"
 const STATUS_LABEL = {
   pending: "Chờ xác nhận",
   shipping: "Đang giao",
@@ -48,6 +49,7 @@ const ModalOrderDetail = ({ order, onClose }) => {
 
       setItems(response.data.items || [])
     } catch (error) {
+      toast.error("Không thể lấy sản phẩm trong đơn hàng")
       console.error("Không thể lấy sản phẩm trong đơn hàng:", error)
       setItems([])
     } finally {

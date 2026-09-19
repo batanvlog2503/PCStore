@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/axiosInstance"
 import AddressSelectModal from "./AddressSelectModal.jsx"
 import "./Checkout.scss"
 import { PAYMENT_METHODS } from "./PaymentMethod.js"
+import { toast } from "../Toast/Toast.jsx"
 
 const Checkout = () => {
   const savedUser = localStorage.getItem("user")
@@ -157,6 +158,7 @@ const Checkout = () => {
         handleSelectAddress(defaultAddress) // ← tái dùng lại đúng hàm đã có, không viết code trùng lặp
       }
     } catch (error) {
+      toast.error(error.response?.data?.message || "Xoá sản phẩm thất bại")
       console.error(error) // im lặng bỏ qua, không chặn cả trang nếu lỗi
     }
   }
@@ -294,7 +296,9 @@ const Checkout = () => {
         setAppliedShippingVoucher(null)
         setSelectedShippingVoucherId(null)
       }
-      alert(error.response?.data?.message || "Không thể áp dụng voucher này")
+      toast.success(
+        error.response?.data?.message || "Không thể áp dụng voucher này",
+      )
     } finally {
       setApplyingVoucherId(null)
     }
@@ -345,7 +349,7 @@ const Checkout = () => {
         return
       }
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Đặt hàng thất bại, vui lòng thử lại",
       )
     } finally {

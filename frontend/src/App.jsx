@@ -38,6 +38,7 @@ import ManagementProduct from "./admin/ManagementProduct.jsx/ManagementProduct"
 import AddProduct from "./admin/ManagementProduct.jsx/AddProduct/AddProduct"
 import EditProduct from "./admin/ManagementProduct.jsx/EditProduct/EditProduct"
 import AddComponent from "./admin/ManagementProduct.jsx/AddComponent/AddComponent"
+import Contact from "./pages/Contact/Contact"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -55,6 +56,10 @@ const router = createBrowserRouter(
           path="home/voucher"
           element={<Voucher />}
         />
+        <Route
+          path="home/contact"
+          element={<Contact></Contact>}
+        ></Route>
         <Route
           path="product/:id"
           element={<Product />}
