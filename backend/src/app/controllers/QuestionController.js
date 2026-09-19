@@ -37,7 +37,7 @@ class QuestionController {
   // Admin: lấy tất cả câu hỏi
   async getAll(req, res, next) {
     try {
-      const data = await QuestionService.getAllQuestions()
+      const data = await QuestionService.getAllQuestions(req)
 
       return res.status(200).json({
         success: true,

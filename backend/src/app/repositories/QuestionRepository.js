@@ -1,15 +1,28 @@
 const Question = require("../models/Question")
-
+const filterAllQuestions = require("../../helpers/filterAllQuestions")
 class QuestionRepository {
   async create(data) {
     return await Question.create(data)
   }
 
-  async findAll() {
-    return await Question.find()
-      .populate("user_id", "username email")
-      .sort({ created_at: -1 })
-      .lean()
+  async findAll(req, skip = 0, limit = 5) {
+    const filter = filterAllQuestions(req)
+
+    const [questions, total] = await Promise.all([
+      Question.find(filter)
+        .populate("user_id", "username email")
+        .sort({ created_at: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+
+      Question.countDocuments(filter),
+    ])
+
+    return {
+      questions,
+      total,
+    }
   }
 
   async findById(id) {

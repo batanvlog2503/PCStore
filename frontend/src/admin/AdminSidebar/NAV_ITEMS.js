@@ -15,4 +15,5 @@ export const NAV_ITEMS = [
   { to: "/admin/vouchers", label: "Voucher", icon: "fa-solid fa-ticket" },
   { to: "/admin/reviews", label: "Đánh giá", icon: "fa-solid fa-star" },
   { to: "/admin/settings", label: "Thiết lập", icon: "fa-solid fa-gear" },
+  { to: "/admin/questions", label: "Câu hỏi", icon: "fa-solid fa-question" },
 ]

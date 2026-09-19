@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import axiosInstance from "../../utils/axiosInstance"
+import LoginRequiredModal from "../LoginRequiredModal"
 import "./Product.scss"
 import { toast } from "../Toast/Toast"
+import axios from "axios"
 const Product = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -10,6 +11,8 @@ const Product = () => {
   const [variants, setVariants] = useState([])
   const [images, setImages] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   const [selectedVariantId, setSelectedVariantId] = useState(null)
   const [activeImageUrl, setActiveImageUrl] = useState(null)
@@ -25,7 +28,7 @@ const Product = () => {
   const [isBuyingNow, setIsBuyingNow] = useState(false)
   const checkWishlist = async () => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/wishlist/check/${id}`,
       )
 
@@ -37,7 +40,7 @@ const Product = () => {
   const getProduct = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/product/${id}`,
       )
       const productData = response.data.product
@@ -57,14 +60,19 @@ const Product = () => {
       const mainImage = imagesData.find((img) => img.is_main) || imagesData[0]
       setActiveImageUrl(mainImage?.image_url || null)
     } catch (error) {
-      alert(error.response?.data?.message || "Không tải được sản phẩm")
+      toast.error(error.response?.data?.message || "Không tải được sản phẩm")
     } finally {
       setIsLoading(false)
     }
   }
   const handleBuyNow = async (e) => {
     e.preventDefault()
+    const user = localStorage.getItem("user")
 
+    if (!user) {
+      setIsLoginModalOpen(true)
+      return
+    }
     if (!selectedVariant) {
       toast.warning("Vui lòng chọn cấu hình sản phẩm")
       return
@@ -78,7 +86,7 @@ const Product = () => {
 
     try {
       setIsBuyingNow(true)
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/cart-item/add`,
         { variant_id: selectedVariant._id, quantity },
       )
@@ -119,13 +127,13 @@ const Product = () => {
       setIsWishlistLoading(true)
 
       if (isWishlisted) {
-        const response = await axiosInstance.delete(
+        const response = await axios.delete(
           `${import.meta.env.VITE_APP_URL}/wishlist/remove/${id}`,
         )
         toast.success(response.data.message)
         setIsWishlisted(false)
       } else {
-        const response = await axiosInstance.post(
+        const response = await axios.post(
           `${import.meta.env.VITE_APP_URL}/wishlist/add/${id}`,
         )
         toast.success(response.data.message)
@@ -198,6 +206,12 @@ const Product = () => {
 
   const handleAddCartItem = async (e) => {
     e.preventDefault()
+    const user = localStorage.getItem("user")
+
+    if (!user) {
+      setIsLoginModalOpen(true)
+      return
+    }
     if (!selectedVariant)
       return toast.warning("Vui lòng chọn cấu hình sản phẩm")
     if (selectedVariant.stock <= 0) return toast.warning("Sản phẩm đã hết hàng")
@@ -205,7 +219,7 @@ const Product = () => {
     const toastId = toast.loading("Đang thêm vào giỏ hàng...")
 
     try {
-      const response = await axiosInstance.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_APP_URL}/cart-item/add`,
         { variant_id: selectedVariant._id, quantity },
       )
@@ -494,6 +508,10 @@ const Product = () => {
           />
         </div>
       )}
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   )
 }

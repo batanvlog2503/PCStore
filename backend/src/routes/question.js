@@ -23,12 +23,7 @@ router.get(
 )
 
 // Admin xem chi tiết câu hỏi
-router.get(
-  "/admin/:id",
-  auth,
-  authorize("admin", "user"),
-  QuestionController.getById,
-)
+router.get("/admin/:id", auth, authorize("admin"), QuestionController.getById)
 
 // Admin trả lời câu hỏi
 router.patch(

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance.js"
-import { toast } from "../../utils/toast.js"
+import { toast } from "../../pages/Toast/Toast.jsx"
 import "./AdminQuestion.scss"
 
 const MAX_REPLY_LENGTH = 1000
@@ -17,6 +17,38 @@ function formatDateTime(dateStr) {
   )}:${pad2(d.getMinutes())}`
 }
 
+// Sinh danh sách số trang có dấu "..." khi quá nhiều trang, kiểu 1 ... 4 5 [6] 7 8 ... 20
+function getPageNumbers(current, total) {
+  const delta = 1
+  const range = []
+  const withDots = []
+  let last
+
+  for (let i = 1; i <= total; i++) {
+    if (
+      i === 1 ||
+      i === total ||
+      (i >= current - delta && i <= current + delta)
+    ) {
+      range.push(i)
+    }
+  }
+
+  for (const i of range) {
+    if (last !== undefined) {
+      if (i - last === 2) {
+        withDots.push(last + 1)
+      } else if (i - last > 2) {
+        withDots.push("...")
+      }
+    }
+    withDots.push(i)
+    last = i
+  }
+
+  return withDots
+}
+
 const AdminQuestion = () => {
   const [questions, setQuestions] = useState([])
   const [total, setTotal] = useState(0)
@@ -24,7 +56,11 @@ const AdminQuestion = () => {
 
   const [search, setSearch] = useState("")
   const [answeredFilter, setAnsweredFilter] = useState("all") // "all" | "answered" | "unanswered"
-  const [timeRange, setTimeRange] = useState("all") // "all" | "today" | "7d" | "30d"
+  const [page, setPage] = useState(1)
+  const [limit] = useState(5)
+  const [totalPages, setTotalPages] = useState(1)
+  const [hasNextPage, setHasNextPage] = useState(false)
+  const [hasPrevPage, setHasPrevPage] = useState(false)
 
   // nội dung đang gõ cho từng câu hỏi, key là question._id
   const [replyDrafts, setReplyDrafts] = useState({})
@@ -36,18 +72,29 @@ const AdminQuestion = () => {
   const getQuestions = async () => {
     try {
       setIsLoading(true)
+
       const response = await axiosInstance.get(
-        `${import.meta.env.VITE_APP_URL}/admin/question/all`,
+        `${import.meta.env.VITE_APP_URL}/question/admin/all`,
         {
           params: {
-            search: search || undefined,
-            answered: answeredFilter === "all" ? undefined : answeredFilter,
-            range: timeRange === "all" ? undefined : timeRange,
+            page,
+            limit,
+            search: search.trim() || undefined,
+            status: answeredFilter === "all" ? undefined : answeredFilter,
           },
         },
       )
-      setQuestions(response.data.questions || [])
-      setTotal(response.data.total ?? response.data.questions?.length ?? 0)
+
+      const data = response.data.data
+
+      setQuestions(data.questions)
+      setTotal(data.pagination?.total ?? 0)
+      setTotalPages(data.pagination?.totalPages ?? 1)
+      setHasNextPage(
+        data.pagination?.hasNextPage ??
+          page < (data.pagination?.totalPages ?? 1),
+      )
+      setHasPrevPage(data.pagination?.hasPrevPage ?? page > 1)
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Không tải được danh sách câu hỏi",
@@ -57,12 +104,20 @@ const AdminQuestion = () => {
     }
   }
 
-  // debounce ô tìm kiếm, các dropdown thì áp dụng ngay
+  // debounce ô tìm kiếm 400ms, tránh gọi API mỗi lần gõ 1 ký tự
   useEffect(() => {
     const t = setTimeout(getQuestions, 400)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, answeredFilter, timeRange])
+  }, [page, search, answeredFilter])
+
+  const pageNumbers = useMemo(
+    () => getPageNumbers(page, totalPages),
+    [page, totalPages],
+  )
+
+  const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1
+  const rangeEnd = Math.min(page * limit, total)
 
   const handleReplyChange = (id, value) => {
     setReplyDrafts((prev) => ({ ...prev, [id]: value }))
@@ -83,7 +138,7 @@ const AdminQuestion = () => {
     try {
       setSubmittingId(question._id)
       const response = await axiosInstance.patch(
-        `${import.meta.env.VITE_APP_URL}/admin/question/${question._id}/reply`,
+        `${import.meta.env.VITE_APP_URL}/question/admin/${question._id}/reply`,
         { admin_reply: text },
       )
 
@@ -135,27 +190,24 @@ const AdminQuestion = () => {
             type="text"
             placeholder="Tìm theo tên người dùng, nội dung..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1) // đổi filter -> luôn quay về trang 1
+            }}
           />
         </div>
 
         <select
           value={answeredFilter}
-          onChange={(e) => setAnsweredFilter(e.target.value)}
+          onChange={(e) => {
+            setAnsweredFilter(e.target.value)
+            setPage(1)
+          }}
         >
           <option value="all">Tất cả trạng thái</option>
-          <option value="unanswered">Chưa trả lời</option>
-          <option value="answered">Đã trả lời</option>
-        </select>
-
-        <select
-          value={timeRange}
-          onChange={(e) => setTimeRange(e.target.value)}
-        >
-          <option value="all">Tất cả thời gian</option>
-          <option value="today">Hôm nay</option>
-          <option value="7d">7 ngày qua</option>
-          <option value="30d">30 ngày qua</option>
+          <option value="pending">Chưa trả lời</option>
+          <option value="approved">Đã trả lời</option>
+          <option value="hidden">Đã ẩn</option>
         </select>
 
         <button
@@ -167,7 +219,6 @@ const AdminQuestion = () => {
         </button>
       </div>
 
-      {/* ================= LIST ================= */}
       {isLoading && <p className="aq-empty">Đang tải câu hỏi...</p>}
 
       {!isLoading && questions.length === 0 && (
@@ -290,6 +341,58 @@ const AdminQuestion = () => {
           )
         })}
       </div>
+
+      {/* ================= PHÂN TRANG ================= */}
+      {!isLoading && total > 0 && (
+        <div className="aq-pagination">
+          <span className="aq-pagination__range">
+            Hiển thị {rangeStart}–{rangeEnd} trong tổng số {total} câu hỏi
+          </span>
+
+          <div className="aq-pagination__controls">
+            <button
+              type="button"
+              className="aq-page-btn aq-page-btn--nav"
+              disabled={!hasPrevPage}
+              onClick={() => setPage((p) => p - 1)}
+              aria-label="Trang trước"
+            >
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+
+            {pageNumbers.map((n, idx) =>
+              n === "..." ? (
+                <span
+                  key={`dots-${idx}`}
+                  className="aq-page-dots"
+                >
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={n}
+                  type="button"
+                  className={`aq-page-btn ${n === page ? "is-active" : ""}`}
+                  onClick={() => setPage(n)}
+                  aria-current={n === page ? "page" : undefined}
+                >
+                  {n}
+                </button>
+              ),
+            )}
+
+            <button
+              type="button"
+              className="aq-page-btn aq-page-btn--nav"
+              disabled={!hasNextPage}
+              onClick={() => setPage((p) => p + 1)}
+              aria-label="Trang sau"
+            >
+              <i className="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

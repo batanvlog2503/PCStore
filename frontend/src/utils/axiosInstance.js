@@ -32,7 +32,7 @@ axiosInstance.interceptors.response.use(
       const refreshToken = localStorage.getItem("refreshToken")
       if (!refreshToken) {
         localStorage.clear()
-        window.location.href = "/login"
+        window.location.href = "/401"
         return Promise.reject(error)
       }
       try {
@@ -53,6 +53,7 @@ axiosInstance.interceptors.response.use(
         window.location.href = "/login"
       }
     }
+
     return Promise.reject(error)
   },
 )

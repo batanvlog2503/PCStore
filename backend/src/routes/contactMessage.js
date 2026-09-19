@@ -5,7 +5,7 @@ const auth = require("../app/middlewares/auth")
 const router = express.Router()
 const authorize = require("../app/middlewares/authorize")
 router.get(
-  "/contact-message/all",
+  "/contact-message",
   auth,
   authorize("admin", "user"),
   ContactMessageController.getAll,

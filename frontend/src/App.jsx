@@ -39,7 +39,10 @@ import AddProduct from "./admin/ManagementProduct.jsx/AddProduct/AddProduct"
 import EditProduct from "./admin/ManagementProduct.jsx/EditProduct/EditProduct"
 import AddComponent from "./admin/ManagementProduct.jsx/AddComponent/AddComponent"
 import Contact from "./pages/Contact/Contact"
+import AdminQuestion from "./admin/AdminQuestion/AdminQuestion"
 
+// error
+import UnauthorizedPage from "./errors/401/UnauthorizedPage"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -132,6 +135,10 @@ const router = createBrowserRouter(
         path="/register"
         element={<Register />}
       />
+      <Route
+        path="/401"
+        element={<UnauthorizedPage></UnauthorizedPage>}
+      ></Route>
       <Route element={<ProtectRoute allowedRoles={["admin"]} />}>
         <Route
           path="/admin"
@@ -166,6 +173,10 @@ const router = createBrowserRouter(
             path="components/new"
             element={<AddComponent />}
           />
+          <Route
+            path="questions"
+            element={<AdminQuestion />}
+          />
           {/* <Route
             path="products"
             element={<ProductList />}
@@ -174,10 +185,7 @@ const router = createBrowserRouter(
             path="products/new"
             element={<ProductForm />}
           />
-          <Route
-            path="categories"
-            element={<CategoryList />}
-          />
+         
          
           {/* customers, vouchers, reviews, settings làm tiếp sau */}
         </Route>
@@ -189,6 +197,7 @@ function App() {
   return (
     <>
       <ToastContainer />
+
       <RouterProvider router={router} />
     </>
   )

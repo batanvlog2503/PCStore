@@ -376,3 +376,88 @@
     flex-direction: column;
   }
 }
+
+/* ================= PHÂN TRANG ================= */
+.aq-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.aq-pagination__range {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.aq-pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aq-page-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+
+  &:hover:not(:disabled):not(.is-active) {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  &.is-active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+    cursor: default;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--nav {
+    color: var(--ink-soft);
+  }
+}
+
+.aq-page-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  color: #9aa3b2;
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .aq-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .aq-pagination__controls {
+    flex-wrap: wrap;
+  }
+}

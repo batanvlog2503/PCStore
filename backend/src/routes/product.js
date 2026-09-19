@@ -21,5 +21,5 @@ router.put(
   ProductController.updateProduct,
 )
 router.get("/bestseller", auth, ProductController.getBestSeller)
-router.get("/:productId", auth, ProductController.getProductDetail)
+router.get("/:productId", ProductController.getProductDetail)
 module.exports = router

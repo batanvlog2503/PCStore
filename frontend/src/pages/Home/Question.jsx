@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axiosInstance from "../../utils/axiosInstance.js"
 import { toast } from "../Toast/Toast.jsx"
+import axios from "axios"
 import "./Question.scss"
 
 const LIMIT = 5
@@ -49,7 +50,7 @@ const Question = () => {
     try {
       append ? setIsLoadingMore(true) : setIsLoading(true)
 
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/question/approved`,
         {
           params: {
@@ -101,7 +102,7 @@ const Question = () => {
 
     try {
       setIsSubmitting(true)
-      await axiosInstance.post(`${import.meta.env.VITE_APP_URL}/question/add`, {
+      await axios.post(`${import.meta.env.VITE_APP_URL}/question/add`, {
         content: trimmed,
       })
       toast.success("Đã gửi câu hỏi, câu hỏi sẽ hiển thị sau khi được duyệt")

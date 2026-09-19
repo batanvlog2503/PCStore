@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import "./Home.scss"
 import axiosInstance from "../../utils/axiosInstance"
+import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Question from "./Question"
 import TopProduct from "./TopProduct"
@@ -81,7 +82,7 @@ export const Home = () => {
 
   const getVouchers = async () => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/voucher/intro`,
       )
       setVouchers(response.data.vouchers)
@@ -94,7 +95,7 @@ export const Home = () => {
 
   const getBrands = async () => {
     try {
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/brand/all`,
       )
       setBrands(response.data.brands)
@@ -131,7 +132,7 @@ export const Home = () => {
       if (pageNumber > 1) setIsLoadingMore(true)
       else setIsLoadingList(true)
 
-      const response = await axiosInstance.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_APP_URL}/product-variant/image/all`,
         { params: buildParams(pageNumber) },
       )

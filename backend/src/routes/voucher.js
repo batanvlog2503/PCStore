@@ -11,8 +11,7 @@ const router = express.Router()
 
 router.get(
   "/intro",
-  auth,
-  authorize("user"),
+
   VoucherController.getIntroVouchers,
 )
 router.get(

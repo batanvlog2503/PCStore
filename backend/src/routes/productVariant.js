@@ -9,14 +9,12 @@ const authorize = require("../app/middlewares/authorize")
 const ProductVariantController = require("../app/controllers/ProductVariantController")
 router.get(
   "/image/all",
-  auth,
-  authorize("user"),
+
   ProductVariantController.getAllVariantsAndImage,
 )
 router.get(
   "/top-selling",
-  auth,
-  authorize("user", "admin"),
+
   ProductVariantController.getTopSelling,
 )
 router.get("/all/id", auth, ProductVariantController.getAllId)
@@ -27,7 +25,7 @@ router.get(
   ProductVariantController.getVariantsByProduct,
 )
 // Lấy 1 variant theo ID
-router.get("/:id", auth, ProductVariantController.getVariantById)
+router.get("/:id", ProductVariantController.getVariantById)
 router.post(
   "/add",
   auth,

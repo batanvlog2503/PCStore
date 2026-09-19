@@ -36,7 +36,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage: storage, fileFilter: fileFilter })
 
-router.get("/all", auth, BrandController.getAllBrands)
+router.get("/all", BrandController.getAllBrands)
 router.post(
   "/add",
   auth,
@@ -48,7 +48,7 @@ router.put(
   "/update/:id",
   auth,
   upload.single("logo_url"),
-  updateBrandValidator, 
+  updateBrandValidator,
   BrandController.updateBrand,
 )
 router.delete("/delete/:id", auth, BrandController.deleteBrand)
