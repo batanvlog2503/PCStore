@@ -9,6 +9,7 @@ const {
   addBrandValidator,
   updateBrandValidator,
 } = require("../helpers/validationBrand")
+const authorize = require("../app/middlewares/authorize")
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const typeFile = ["image/jpeg", "image/jpg", "image/png"]
@@ -36,20 +37,21 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage: storage, fileFilter: fileFilter })
 
-router.get("/all", BrandController.getAllBrands)
+router.get("/admin/all", BrandController.getAllBrands)
 router.post(
-  "/add",
+  "/admin/add",
   auth,
+  authorize("admin", "user"),
   upload.single("logo_url"),
   addBrandValidator,
   BrandController.addBrand,
 )
 router.put(
-  "/update/:id",
+  "/admin/update/:id",
   auth,
   upload.single("logo_url"),
   updateBrandValidator,
   BrandController.updateBrand,
 )
-router.delete("/delete/:id", auth, BrandController.deleteBrand)
+router.delete("/admin/delete/:id", auth, BrandController.deleteBrand)
 module.exports = router

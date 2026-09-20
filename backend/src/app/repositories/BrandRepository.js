@@ -11,7 +11,9 @@ class BrandRepository {
   async findById(id) {
     return await Brand.findById(id)
   }
-
+  async findBySlug(slug) {
+    return await Brand.findOne({ slug })
+  }
   async create(data) {
     return await Brand.create(data)
   }

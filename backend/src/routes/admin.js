@@ -225,7 +225,7 @@ router.post(
   addVoucherValidator,
   VoucherController.createVoucher,
 )
-
+// ==================CATEGORY==================
 router.get("/category/all", CategoryController.getAllCategories)
 router.get("/category/all/tree", CategoryController.getAllTreeCategories)
 router.delete(
@@ -240,4 +240,5 @@ router.put(
 
   CategoryController.updateCategory,
 )
+
 module.exports = router

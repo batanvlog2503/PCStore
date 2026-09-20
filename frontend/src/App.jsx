@@ -42,7 +42,7 @@ import Contact from "./pages/Contact/Contact"
 import AdminQuestion from "./admin/AdminQuestion/AdminQuestion"
 import ManagementVoucher from "./admin/ManagementVoucher/ManagementVoucher"
 import ManagementCategory from "./admin/ManagementCategory/ManagementCategory"
-
+import ManagementBrand from "./admin/ManagementBrand/ManagementBrand"
 // error
 import UnauthorizedPage from "./errors/401/UnauthorizedPage"
 
@@ -187,6 +187,10 @@ const router = createBrowserRouter(
           <Route
             path="categories"
             element={<ManagementCategory />}
+          />
+          <Route
+            path="brands"
+            element={<ManagementBrand />}
           />
           {/* 
         

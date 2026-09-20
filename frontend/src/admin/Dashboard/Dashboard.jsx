@@ -5,42 +5,12 @@ import axiosInstance from "../../utils/axiosInstance"
 import TopProducts from "./TopProducts.jsx"
 import { toast } from "../../pages/Toast/Toast.jsx"
 
-const ACTIVITIES = [
-  {
-    text: "Đơn hàng #DH10045 đã được giao",
-    time: "2 phút trước",
-    icon: "fa-solid fa-circle-check",
-    tone: "green",
-  },
-  {
-    text: "Khách hàng Nguyễn Văn A đã đặt hàng",
-    time: "10 phút trước",
-    icon: "fa-solid fa-cart-shopping",
-    tone: "blue",
-  },
-  {
-    text: "Sản phẩm MacBook Air M3 đã được cập nhật",
-    time: "25 phút trước",
-    icon: "fa-solid fa-pen",
-    tone: "cyan",
-  },
-  {
-    text: "Đơn hàng #DH10044 đã bị huỷ",
-    time: "30 phút trước",
-    icon: "fa-solid fa-circle-xmark",
-    tone: "red",
-  },
-]
-
-// ================= CHART HELPERS =================
 const CHART_W = 600
 const CHART_H = 240
 const PAD_X = 44
 const PAD_TOP = 20
 const PAD_BOTTOM = 34
-const Y_TICKS = 4 // số vạch chia trục Y (không tính vạch 0)
-
-// Làm tròn "đẹp" cho trục Y (vd 32.990.000 -> 35.000.000) thay vì số lẻ khó đọc
+const Y_TICKS = 4
 const niceMax = (value) => {
   if (!value || value <= 0) return 10
   const exponent = Math.floor(Math.log10(value))
@@ -144,15 +114,13 @@ const buildBars = (data) => {
 
 const Dashboard = () => {
   const [mounted, setMounted] = useState(false)
-  const [page, setPage] = useState(1)
-  // dashboard
+
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
   // revenue data
   const [revenueData, setRevenueData] = useState([])
   const [loadingRevenue, setLoadingRevenue] = useState(true) // thêm dòng này
-  const totalPages = 18
-  // orders chart
+
   const [ordersChart, setOrdersChart] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(true)
   // orders statistic
@@ -387,7 +355,6 @@ const Dashboard = () => {
             ))}
       </div>
 
-      {/* ===== CHARTS ===== */}
       <div className="dashboard-grid">
         <div className="card chart-card area-revenue">
           <div className="card-head">

@@ -1,9 +1,39 @@
-const Brand = require("../models/Brand")
 const BrandRepo = require("../repositories/BrandRepository")
 const AppError = require("../utils/AppError")
 const fs = require("fs")
+const slugify = require("slugify")
 const path = require("path")
 class BrandService {
+  async generateUniqueSlug(name, excludeId = null) {
+    const baseSlug = slugify(name, {
+      lower: true,
+      strict: true,
+      locale: "vi",
+      trim: true,
+    })
+
+    if (!baseSlug) {
+      throw new AppError(400, "Brand name is invalid")
+    }
+
+    let slug = baseSlug
+    let counter = 1
+
+    while (true) {
+      const existingBrand = await BrandRepo.findBySlug(slug)
+
+      if (
+        !existingBrand ||
+        (excludeId && String(existingBrand._id) === String(excludeId))
+      ) {
+        return slug
+      }
+
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+  }
+
   async getAllBrands() {
     return await BrandRepo.getAll()
   }
@@ -17,17 +47,33 @@ class BrandService {
     return brand
   }
   async createBrand(data) {
-    if (!data.name) {
+    if (!data.name?.trim()) {
       throw new AppError(400, "Brand name is required")
     }
 
-    const existingBrand = await BrandRepo.findByName(data.name)
+    const name = data.name.trim()
+
+    const existingBrand = await BrandRepo.findByName(name)
 
     if (existingBrand) {
       throw new AppError(400, "Brand already exists")
     }
 
-    return await BrandRepo.create(data)
+    const slug = await this.generateUniqueSlug(name)
+
+    try {
+      return await BrandRepo.create({
+        ...data,
+        name,
+        slug,
+      })
+    } catch (err) {
+      if (err.code === 11000) {
+        throw new AppError(400, "Slug already exists")
+      }
+
+      throw err
+    }
   }
 
   async updateBrand(id, data, file) {
