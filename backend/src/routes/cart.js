@@ -4,7 +4,7 @@ const router = express.Router()
 const CartController = require("../app/controllers/CartController")
 router.get("/all", CartController.getAllCarts)
 router.get("/my-cart/all", CartController.getMyCartItems)
-router.get("/:id", CartController.getCartById)
+router.get("/:id", auth, CartController.getCartById)
 
 router.get("/user/:userId", CartController.getCartByUserId)
 

@@ -353,3 +353,42 @@ $bp-lg: 992px;
     }
   }
 }
+.login {
+  position: relative;
+
+  .back-home {
+    position: absolute;
+    top: 24px;
+    left: 30px;
+    z-index: 20;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 15px;
+
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+    cursor: pointer;
+    transition: 0.25s ease;
+
+    i {
+      font-size: 13px;
+    }
+
+    &:hover {
+      color: #d70018;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      transform: translateX(-3px);
+    }
+  }
+}

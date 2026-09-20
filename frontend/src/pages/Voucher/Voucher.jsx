@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react"
 import "./Voucher.scss"
 import axiosInstance from "../../utils/axiosInstance"
-
+import { toast } from "../Toast/Toast"
+import LoginRequiredModal from "../LoginRequiredModal"
 const FILTER_TABS = [
   { value: "all", label: "Tất cả voucher", icon: "fa-solid fa-ticket" },
   { value: "product", label: "Giảm giá sản phẩm", icon: "fa-solid fa-percent" },
@@ -82,14 +83,16 @@ const getPageNumbers = (current, total) => {
 }
 
 export const Voucher = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+
   const [vouchers, setVouchers] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [filterType, setFilterType] = useState("all")
   const [sort, setSort] = useState("newest")
+
   const [claimedIds, setClaimedIds] = useState([])
   const [claimingId, setClaimingId] = useState(null)
   const [detailVoucher, setDetailVoucher] = useState(null)
-  const [cartTotal, setCartTotal] = useState(0)
 
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -115,22 +118,14 @@ export const Voucher = () => {
       setTotalPages(response.data.pagination?.totalPages || 1)
       setTotalCount(response.data.pagination?.total || 0)
     } catch (error) {
-      alert(error.response?.data?.message || "Không tải được danh sách voucher")
+      toast.error(
+        error.response?.data?.message || "Không tải được danh sách voucher",
+      )
     } finally {
       setIsLoading(false)
     }
   }
 
-  const getCartTotal = async () => {
-    try {
-      const response = await axiosInstance.get(
-        `${import.meta.env.VITE_APP_URL}/cart/total`,
-      )
-      setCartTotal(response.data.total || 0)
-    } catch (error) {
-      setCartTotal(0)
-    }
-  }
   // lấy id voucher đã lấy để k spam nhận
   const getClaimedIds = async () => {
     try {
@@ -144,7 +139,6 @@ export const Voucher = () => {
   }
 
   useEffect(() => {
-    getCartTotal()
     getClaimedIds()
   }, [])
 
@@ -160,6 +154,12 @@ export const Voucher = () => {
   }, [currentPage, filterType, sort])
 
   const handleClaim = async (voucher) => {
+    const user = localStorage.getItem("user")
+
+    if (!user) {
+      setIsLoginModalOpen(true)
+      return
+    }
     const flag = getVoucherStatusFlag(voucher)
     if (flag !== "available" || claimedIds.includes(voucher._id)) return
 
@@ -192,15 +192,10 @@ export const Voucher = () => {
       ?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
-  const isEligible = (voucher) => cartTotal >= (voucher.min_order_value || 0)
-
   const pageNumbers = getPageNumbers(currentPage, totalPages)
 
   return (
     <div className="voucher-page container">
-      <div className="voucher-breadcrumb">Trang chủ &gt; Voucher</div>
-
-      {/* ================= HERO ================= */}
       <div className="voucher-hero">
         <div className="hero-left">
           <div className="hero-icon">
@@ -471,7 +466,7 @@ export const Voucher = () => {
           className="voucher-modal-overlay"
           onClick={() => setDetailVoucher(null)}
         >
-          <div
+          <gdiv
             className="voucher-modal"
             onClick={(e) => e.stopPropagation()}
           >
@@ -527,52 +522,14 @@ export const Voucher = () => {
                 Số lượng còn lại: <strong>{detailVoucher.quantity}</strong>
               </li>
             </ul>
-
-            <div
-              className={`eligibility-box ${isEligible(detailVoucher) ? "eligible" : "not-eligible"}`}
-            >
-              {isEligible(detailVoucher) ? (
-                <>
-                  <i className="fa-solid fa-circle-check"></i>
-                  <span>
-                    Giỏ hàng của bạn ({formatPrice(cartTotal)}) đã đủ điều kiện
-                    áp dụng voucher này!
-                  </span>
-                </>
-              ) : (
-                <>
-                  <i className="fa-solid fa-triangle-exclamation"></i>
-                  <span>
-                    Bạn cần mua thêm{" "}
-                    <strong>
-                      {formatPrice(
-                        Math.max(
-                          (detailVoucher.min_order_value || 0) - cartTotal,
-                          0,
-                        ),
-                      )}
-                    </strong>{" "}
-                    nữa để đủ điều kiện áp dụng voucher này.
-                  </span>
-                </>
-              )}
-            </div>
-
-            <button
-              type="button"
-              className={`claim-btn modal-claim-btn ${
-                claimedIds.includes(detailVoucher._id) ? "claimed" : ""
-              } ${claimingId === detailVoucher._id ? "claiming" : ""}`}
-              disabled={
-                getVoucherStatusFlag(detailVoucher) !== "available" ||
-                claimedIds.includes(detailVoucher._id) ||
-                claimingId === detailVoucher._id
-              }
-              onClick={() => handleClaim(detailVoucher)}
-            ></button>
-          </div>
+          </gdiv>
         </div>
       )}
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   )
 }

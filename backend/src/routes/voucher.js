@@ -16,46 +16,48 @@ router.get(
 )
 router.get(
   "/my",
-  auth,
-  authorize("user", "admin"),
+
   VoucherController.getMyVouchers,
 )
-router.post("/apply", auth, authorize("user"), VoucherController.applyVoucher)
+router.post("/apply", VoucherController.applyVoucher)
 router.get(
   "/claimed-ids",
-  auth,
-  authorize("user"),
+
   VoucherController.getClaimedIds,
 )
-router.get("/all", auth, authorize("user"), VoucherController.getAll)
+router.get("/all", VoucherController.getAll)
 router.get(
   "/active",
-  auth,
-  authorize("user"),
+
   VoucherController.getActiveVouchers,
 )
 router.get(
   "/code/:code",
   auth,
-  authorize("user"),
+  authorize("admin", "user"),
   VoucherController.getVoucherByCode,
 )
 
-router.get("/:id", auth, authorize("user"), VoucherController.getVoucherById)
+router.get(
+  "/:id",
+  auth,
+  authorize("admin", "user"),
+  VoucherController.getVoucherById,
+)
 
 router.post(
   "/add",
   auth,
-  authorize("user"),
+  authorize("admin"),
   addVoucherValidator,
   VoucherController.createVoucher,
 )
 // Nhận voucher
-router.post("/claim", auth, authorize("user"), VoucherController.claimVoucher)
+router.post("/claim", auth, authorize("admin"), VoucherController.claimVoucher)
 router.put(
   "/update/:id",
   auth,
-  authorize("user"),
+  authorize("admin"),
   updateVoucherValidator,
   VoucherController.updateVoucher,
 )
@@ -63,7 +65,7 @@ router.put(
 router.delete(
   "/delete/:id",
   auth,
-  authorize("user"),
+  authorize("admin"),
   VoucherController.deleteVoucher,
 )
 

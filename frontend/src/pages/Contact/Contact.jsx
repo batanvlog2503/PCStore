@@ -4,6 +4,7 @@ import axiosInstance from "../../utils/axiosInstance.js"
 import { toast } from "../Toast/Toast.jsx"
 import "./Contact.scss"
 import { CONTACT_INFO } from "./ContactInfo.js"
+import LoginRequiredModal from "../LoginRequiredModal.jsx"
 const INITIAL_FORM = {
   name: "",
   phone: "",
@@ -14,6 +15,7 @@ const INITIAL_FORM = {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const Contact = () => {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [form, setForm] = useState(INITIAL_FORM)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -48,6 +50,12 @@ const Contact = () => {
     e.preventDefault()
     if (!validate()) return
 
+    const user = localStorage.getItem("user")
+
+    if (!user) {
+      setIsLoginModalOpen(true)
+      return
+    }
     const toastId = toast.loading("Đang gửi liên hệ...")
     try {
       setIsSubmitting(true)
@@ -202,6 +210,11 @@ const Contact = () => {
           </form>
         </section>
       </div>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   )
 }

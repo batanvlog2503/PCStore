@@ -46,7 +46,7 @@ export const Header = () => {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
       toast.success("Đăng xuất thành công")
-      navigate("/login")
+      navigate("/")
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Có lỗi xảy ra khi đăng xuất",
@@ -165,20 +165,27 @@ export const Header = () => {
         </div>
 
         <div className="header-middle-3">
-          <div className="love">
-            <i className="fa-regular fa-heart"></i>{" "}
-            <span onClick={() => navigate("/account/wishlist")}>Yêu thích</span>
-          </div>
-          <div className="my-cart">
-            <Link
-              to="/cart"
-              style={{ color: "white", textDecoration: "none" }}
-              className="navigate-cart"
-            >
-              <i className="fa-solid fa-cart-shopping"></i>{" "}
-              <span>Giỏ hàng</span>
-            </Link>
-          </div>
+          {user && (
+            <>
+              <div className="love">
+                <i className="fa-regular fa-heart"></i>{" "}
+                <span onClick={() => navigate("/account/wishlist")}>
+                  Yêu thích
+                </span>
+              </div>
+
+              <div className="my-cart">
+                <Link
+                  to="/cart"
+                  style={{ color: "white", textDecoration: "none" }}
+                  className="navigate-cart"
+                >
+                  <i className="fa-solid fa-cart-shopping"></i>{" "}
+                  <span>Giỏ hàng</span>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -192,9 +199,7 @@ export const Header = () => {
             <li>
               <Link to="/home/voucher">Khuyến mãi</Link>
             </li>
-            <li>
-              <Link>Tin Tức</Link>
-            </li>
+
             <li>
               <Link to="/home/contact">Liên hệ</Link>
             </li>

@@ -4,7 +4,7 @@ import axiosInstance from "../../utils/axiosInstance.js"
 import { toast } from "../Toast/Toast.jsx"
 import axios from "axios"
 import "./Question.scss"
-
+import LoginRequiredModal from "../LoginRequiredModal.jsx"
 const LIMIT = 5
 const MAX_LENGTH = 1000
 
@@ -46,6 +46,7 @@ const Question = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const getQuestions = async (targetPage, { append = false } = {}) => {
     try {
       append ? setIsLoadingMore(true) : setIsLoading(true)
@@ -84,9 +85,10 @@ const Question = () => {
   const handleAsk = async (e) => {
     e.preventDefault()
 
+    const user = localStorage.getItem("user")
+
     if (!user) {
-      toast.warning("Vui lòng đăng nhập để đặt câu hỏi")
-      navigate("/login")
+      setIsLoginModalOpen(true)
       return
     }
 
@@ -195,6 +197,11 @@ const Question = () => {
           </div>
         )}
       </div>
+
+      <LoginRequiredModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   )
 }

@@ -124,6 +124,12 @@ const Product = () => {
   }, [id])
   const handleToggleWishlist = async () => {
     try {
+      const user = localStorage.getItem("user")
+
+      if (!user) {
+        setIsLoginModalOpen(true)
+        return
+      }
       setIsWishlistLoading(true)
 
       if (isWishlisted) {

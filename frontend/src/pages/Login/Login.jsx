@@ -49,6 +49,14 @@ export const Login = () => {
   }
   return (
     <div className="container-fluid login p-0">
+      <button
+        type="button"
+        className="back-home"
+        onClick={() => navigate("/")}
+      >
+        <i className="fa-solid fa-arrow-left"></i>
+        <span>Trang chủ</span>
+      </button>
       <div className="privacy">
         <img
           src={gioiThieu[0]}

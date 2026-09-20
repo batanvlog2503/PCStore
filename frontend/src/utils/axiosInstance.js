@@ -32,7 +32,7 @@ axiosInstance.interceptors.response.use(
       const refreshToken = localStorage.getItem("refreshToken")
       if (!refreshToken) {
         localStorage.clear()
-        window.location.href = "/401"
+        window.location.href = "/"
         return Promise.reject(error)
       }
       try {

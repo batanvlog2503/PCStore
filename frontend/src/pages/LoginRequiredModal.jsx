@@ -1,20 +1,17 @@
 // components/LoginRequiredModal/LoginRequiredModal.jsx
 import React from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate} from "react-router-dom"
 import "./LoginRequiredModal.css"
 
 const LoginRequiredModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate()
-  const location = useLocation()
 
   if (!isOpen) return null
 
   const handleLogin = () => {
-    const redirectTo = location.pathname + location.search + location.hash
-
     onClose()
 
-    navigate(`/login?redirect=${encodeURIComponent(redirectTo)}`)
+    navigate(`/login`)
   }
 
   return (
