@@ -11,6 +11,7 @@ class VoucherController {
         message: "Lấy danh sách voucher thành công",
 
         pagination: result.pagination,
+        stats: result.stats,
         vouchers: result.vouchers,
       })
     } catch (error) {

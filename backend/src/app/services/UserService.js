@@ -138,6 +138,9 @@ class UserService {
       throw new AppError("400", "User doesn't exists")
     }
 
+    if (user.status === "blocked") {
+      throw new Error("Tài khoản của bạn đã bị khóa vô thời hạn")
+    }
     const passwordMatch = await bcrypt.compare(password, user.password)
 
     if (!passwordMatch) {

@@ -339,10 +339,6 @@ const Dashboard = () => {
             Trang chủ <i className="fa-solid fa-chevron-right"></i> Dashboard
           </p>
         </div>
-        <button className="date-range-btn">
-          <i className="fa-regular fa-calendar"></i>
-          01/05/2025 - 09/05/2025
-        </button>
       </div>
 
       {/* ===== STAT CARDS ===== */}
@@ -396,9 +392,7 @@ const Dashboard = () => {
         <div className="card chart-card area-revenue">
           <div className="card-head">
             <h3>Doanh thu</h3>
-            <button className="select-btn">
-              7 ngày qua <i className="fa-solid fa-chevron-down"></i>
-            </button>
+            <button className="select-btn">7 ngày qua</button>
           </div>
 
           {loadingRevenue ? (
@@ -620,30 +614,8 @@ const Dashboard = () => {
             <p className="chart-empty">Chưa có đơn hàng nào</p>
           )}
         </div>
-
-        <LatestProduct></LatestProduct>
-
-        {/* ===== SIDE WIDGETS ===== */}
-        <div className="card area-side">
-          <TopProducts></TopProducts>
-          <div className="card-head activity-head">
-            <h3>Hoạt động gần đây</h3>
-          </div>
-          <ul className="activity-list">
-            {ACTIVITIES.map((a, i) => (
-              <li key={i}>
-                <span className={`activity-icon tone-${a.tone}`}>
-                  <i className={a.icon}></i>
-                </span>
-                <div>
-                  <p>{a.text}</p>
-                  <span className="time">{a.time}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
+      <LatestProduct></LatestProduct>
     </div>
   )
 }

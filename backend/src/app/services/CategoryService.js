@@ -1,13 +1,37 @@
 const CategoryRepo = require("../repositories/CategoryRepository")
 const AppError = require("../utils/AppError")
+const slugify = require("slugify")
 class CategoryService {
+  async generateUniqueSlug(name, excludeId = null) {
+    const baseSlug = slugify(name, {
+      lower: true,
+      strict: true,
+      locale: "vi",
+      trim: true,
+    })
+
+    let slug = baseSlug
+    let counter = 1
+
+    while (true) {
+      const existingCategory = await CategoryRepo.findBySlug(slug)
+
+      if (
+        !existingCategory ||
+        (excludeId && String(existingCategory._id) === String(excludeId))
+      ) {
+        return slug
+      }
+
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+  }
   async getAllCategories() {
     return await CategoryRepo.getAll()
   }
 
   async getCategoryTree() {
-    // trả về dạng cây cha con
-
     const categories = await CategoryRepo.getAll()
 
     const buildTree = (parentId = null) => {
@@ -18,17 +42,23 @@ class CategoryService {
           children: buildTree(category._id),
         }))
     }
-    //     Kết quả cuối cùng (buildTree(null)):
-    // [
-    //   { name: "Laptop", children: [] },
-    //   { name: "Linh kiện", children: [
-    //       { name: "RAM", children: [] },
-    //       { name: "SSD", children: [] }
-    //     ]
-    //   }
-    // ]
 
-    return buildTree()
+    const tree = buildTree()
+
+    const total = categories.length
+    const parents = categories.filter(
+      (category) => category.parent_id === null,
+    ).length
+    const children = total - parents
+
+    return {
+      stats: {
+        total,
+        parents,
+        children,
+      },
+      categories: tree,
+    }
   }
 
   async getCategoryBySlug(slug) {
@@ -43,11 +73,9 @@ class CategoryService {
   }
 
   async createCategory(data) {
-    if (!data.name || !data.slug) {
-      throw new AppError(400, "Name and slug are required")
+    if (!data.name) {
+      throw new AppError(400, "Name is required")
     }
-
-    // nếu có parend_id thì phải check xem tồn tại không
 
     if (data.parent_id) {
       const parentCategory = await CategoryRepo.findById(data.parent_id)
@@ -56,11 +84,11 @@ class CategoryService {
       }
     }
 
+    const slug = await this.generateUniqueSlug(data.name)
+
     try {
-      return await CategoryRepo.create(data)
+      return await CategoryRepo.create({ ...data, slug })
     } catch (err) {
-      // Bắt lỗi trùng slug (unique index) trả về message thân thiện,
-      // thay vì để lỗi MongoDB thô (E11000 duplicate key) hiện ra
       if (err.code === 11000) {
         throw new AppError(400, "Slug already exists")
       }
@@ -74,8 +102,6 @@ class CategoryService {
       throw new AppError(404, "Category not found")
     }
 
-    // Chặn trường hợp đơn giản nhất: tự đặt mình làm cha của chính mình
-    // (chưa chặn được vòng lặp sâu hơn, VD: A -> B -> C -> A, coi như giới hạn cơ bản)
     if (data.parent_id && String(data.parent_id) === String(id)) {
       throw new AppError(400, "A category cannot be its own parent")
     }
@@ -87,8 +113,15 @@ class CategoryService {
       }
     }
 
+    const updateData = { ...data }
+
+    // Đổi tên -> sinh lại slug mới (trừ trường hợp trùng tên cũ)
+    if (data.name && data.name !== category.name) {
+      updateData.slug = await this.generateUniqueSlug(data.name, id)
+    }
+
     try {
-      return await CategoryRepo.updateById(id, data)
+      return await CategoryRepo.updateById(id, updateData)
     } catch (err) {
       if (err.code === 11000) {
         throw new AppError(400, "Slug already exists")
@@ -112,10 +145,6 @@ class CategoryService {
         "Cannot delete a category that still has child categories",
       )
     }
-
-    // TODO: khi đã có Product model, nên check thêm:
-    // const productCount = await ProductRepo.countByCategoryId(id)
-    // if (productCount > 0) throw new AppError(400, "Cannot delete category that still has products")
 
     await CategoryRepo.deleteById(id)
     return { message: "Category deleted successfully" }

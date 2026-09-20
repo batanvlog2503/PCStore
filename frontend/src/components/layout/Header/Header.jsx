@@ -46,7 +46,7 @@ export const Header = () => {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
       toast.success("Đăng xuất thành công")
-      navigate("/")
+      navigate("/login")
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Có lỗi xảy ra khi đăng xuất",

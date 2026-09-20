@@ -4,6 +4,7 @@ import LoginRequiredModal from "../LoginRequiredModal"
 import "./Product.scss"
 import { toast } from "../Toast/Toast"
 import axios from "axios"
+import axiosInstance from "../../utils/axiosInstance"
 const Product = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ const Product = () => {
   const [isBuyingNow, setIsBuyingNow] = useState(false)
   const checkWishlist = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/wishlist/check/${id}`,
       )
 
@@ -40,7 +41,7 @@ const Product = () => {
   const getProduct = async () => {
     try {
       setIsLoading(true)
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/product/${id}`,
       )
       const productData = response.data.product
@@ -86,7 +87,7 @@ const Product = () => {
 
     try {
       setIsBuyingNow(true)
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/cart-item/add`,
         { variant_id: selectedVariant._id, quantity },
       )
@@ -133,13 +134,13 @@ const Product = () => {
       setIsWishlistLoading(true)
 
       if (isWishlisted) {
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `${import.meta.env.VITE_APP_URL}/wishlist/remove/${id}`,
         )
         toast.success(response.data.message)
         setIsWishlisted(false)
       } else {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           `${import.meta.env.VITE_APP_URL}/wishlist/add/${id}`,
         )
         toast.success(response.data.message)
@@ -225,7 +226,7 @@ const Product = () => {
     const toastId = toast.loading("Đang thêm vào giỏ hàng...")
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${import.meta.env.VITE_APP_URL}/cart-item/add`,
         { variant_id: selectedVariant._id, quantity },
       )
@@ -314,14 +315,7 @@ const Product = () => {
             )}
 
             <div className="star-judge judge sold-out">
-              <p className="star">
-                {"★".repeat(Math.round(product.rating_avg || 0))}
-                {"☆".repeat(5 - Math.round(product.rating_avg || 0))}
-              </p>
-              <span>
-                {product.rating_avg?.toFixed(1) || 0} | Đã bán{" "}
-                {product.sold_count || 0}
-              </span>
+              <span>Đã bán {product.sold_count || 0}</span>
             </div>
 
             <div className="price price-discount">

@@ -8,32 +8,42 @@ class VoucherService {
   async getAll(req) {
     const filter = filterAllVouchers(req)
     const sort = sortableVouchers(req)
+
     const page = Math.max(Number(req.query.page) || 1, 1)
     const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100)
+
     const skip = (page - 1) * limit
-    const [vouchers, total] = await Promise.all([
+
+    const [vouchers, total, active, expired, hidden] = await Promise.all([
       VoucherRepo.getAll(filter, sort, skip, limit),
       VoucherRepo.count(filter),
+      VoucherRepo.countActive({}),
+      VoucherRepo.countExpired({}),
+      VoucherRepo.countInactive({}),
     ])
+
     const totalPages = Math.ceil(total / limit)
+
     return {
+      vouchers,
+
+      stats: {
+        total,
+        active,
+        expired,
+        hidden,
+      },
+
       pagination: {
         page,
-
         limit,
-
         total,
-
         totalPages,
-
         hasNextPage: page < totalPages,
-
         hasPrevPage: page > 1,
       },
-      vouchers,
     }
   }
-
   async getVoucherById(id) {
     if (!id) {
       throw new AppError(404, "Id is required")

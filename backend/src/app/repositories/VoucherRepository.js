@@ -79,7 +79,15 @@ class VoucherRepository {
       end_date: { $gte: now },
     })
   }
-
+  async countActive() {
+    return await Voucher.countDocuments({ status: "active" })
+  }
+  async countInactive() {
+    return await Voucher.countDocuments({ status: "inactive" })
+  }
+  async countExpired() {
+    return await Voucher.countDocuments({ status: "expired" })
+  }
   // Tìm voucher theo code
   async findVoucherByCode(code) {
     return await Voucher.findOne({

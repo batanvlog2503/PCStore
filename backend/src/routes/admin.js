@@ -11,6 +11,12 @@ const BrandController = require("../app/controllers/BrandController")
 const ProductVariantController = require("../app/controllers/ProductVariantController")
 const CategoryController = require("../app/controllers/CategoryController")
 const ProductImageController = require("../app/controllers/ProductImageController")
+const VoucherController = require("../app/controllers/VoucherController")
+
+const {
+  addVoucherValidator,
+  updateVoucherValidator,
+} = require("../helpers/validationVoucher")
 const multer = require("multer")
 const path = require("path")
 const storage = multer.diskStorage({
@@ -197,4 +203,41 @@ router.get(
   CategoryController.getAllCategories,
 )
 
+router.delete(
+  "/voucher/delete/:id",
+  auth,
+  authorize("admin"),
+  VoucherController.deleteVoucher,
+)
+
+router.put(
+  "/voucher/update/:id",
+  auth,
+  authorize("admin"),
+  updateVoucherValidator,
+  VoucherController.updateVoucher,
+)
+
+router.post(
+  "/voucher/add",
+  auth,
+  authorize("admin"),
+  addVoucherValidator,
+  VoucherController.createVoucher,
+)
+
+router.get("/category/all", CategoryController.getAllCategories)
+router.get("/category/all/tree", CategoryController.getAllTreeCategories)
+router.delete(
+  "/category/delete/:id",
+  auth,
+  authorize("admin"),
+  CategoryController.deleteCategory,
+)
+router.post("/category/add", auth, CategoryController.createCategory)
+router.put(
+  "/category/update/:id",
+
+  CategoryController.updateCategory,
+)
 module.exports = router

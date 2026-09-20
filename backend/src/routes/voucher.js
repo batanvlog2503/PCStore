@@ -45,29 +45,8 @@ router.get(
   VoucherController.getVoucherById,
 )
 
-router.post(
-  "/add",
-  auth,
-  authorize("admin"),
-  addVoucherValidator,
-  VoucherController.createVoucher,
-)
 // Nhận voucher
 router.post("/claim", auth, authorize("admin"), VoucherController.claimVoucher)
-router.put(
-  "/update/:id",
-  auth,
-  authorize("admin"),
-  updateVoucherValidator,
-  VoucherController.updateVoucher,
-)
-
-router.delete(
-  "/delete/:id",
-  auth,
-  authorize("admin"),
-  VoucherController.deleteVoucher,
-)
 
 router.post(
   "/validate",

@@ -4,11 +4,15 @@ const CategoryService = require("../services/CategoryService")
 class CategoryController {
   async getAllCategories(req, res, next) {
     try {
-      const categories = await CategoryService.getAllCategories()
+      const { search = "" } = req.query
+
+      const data = await CategoryService.getAllCategories(search)
+
       return res.status(200).json({
         success: true,
-        message: "Get All Categories Category successfully !!!",
-        categories,
+        message: "Get all categories successfully",
+        categories: data.categories,
+        stats: data.stats,
       })
     } catch (err) {
       next(err)
@@ -16,11 +20,13 @@ class CategoryController {
   }
   async getAllTreeCategories(req, res, next) {
     try {
-      const categories = await CategoryService.getCategoryTree()
+      const result = await CategoryService.getCategoryTree()
+
       return res.status(200).json({
         success: true,
         message: "get all tree category successfully!!!",
-        categories,
+        stats: result.stats,
+        categories: result.categories,
       })
     } catch (err) {
       next(err)

@@ -40,9 +40,12 @@ import EditProduct from "./admin/ManagementProduct.jsx/EditProduct/EditProduct"
 import AddComponent from "./admin/ManagementProduct.jsx/AddComponent/AddComponent"
 import Contact from "./pages/Contact/Contact"
 import AdminQuestion from "./admin/AdminQuestion/AdminQuestion"
+import ManagementVoucher from "./admin/ManagementVoucher/ManagementVoucher"
+import ManagementCategory from "./admin/ManagementCategory/ManagementCategory"
 
 // error
 import UnauthorizedPage from "./errors/401/UnauthorizedPage"
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -177,14 +180,16 @@ const router = createBrowserRouter(
             path="questions"
             element={<AdminQuestion />}
           />
-          {/* <Route
-            path="products"
-            element={<ProductList />}
+          <Route
+            path="vouchers"
+            element={<ManagementVoucher />}
           />
           <Route
-            path="products/new"
-            element={<ProductForm />}
+            path="categories"
+            element={<ManagementCategory />}
           />
+          {/* 
+        
          
          
           {/* customers, vouchers, reviews, settings làm tiếp sau */}
