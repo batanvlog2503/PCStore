@@ -189,6 +189,12 @@ router.delete(
   ProductController.softDeleteProduct,
 )
 
+router.delete(
+  "/variants/:variantId",
+  auth,
+  authorize("admin"),
+  ProductVariantController.deleteVariant,
+)
 router.get(
   "/brands/all",
   auth,
@@ -226,7 +232,7 @@ router.post(
   VoucherController.createVoucher,
 )
 // ==================CATEGORY==================
-router.get("/category/all", CategoryController.getAllCategories)
+
 router.get("/category/all/tree", CategoryController.getAllTreeCategories)
 router.delete(
   "/category/delete/:id",

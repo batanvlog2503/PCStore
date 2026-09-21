@@ -10,11 +10,6 @@ const LatestProduct = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [loading, setLoading] = useState(true)
 
-  const formatPrice = (price) => {
-    if (price == null) return ""
-    return price.toLocaleString("vi-VN") + "đ"
-  }
-
   const getLatestProducts = async (pageNumber = 1) => {
     try {
       setLoading(true)

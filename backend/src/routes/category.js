@@ -7,7 +7,7 @@ const CategoryController = require("../app/controllers/CategoryController")
 
 router.get("/test", CategoryController.test)
 
-router.get("/:slug", CategoryController.getCategoryBySlug)
+router.get("/:slug", auth, CategoryController.getCategoryBySlug)
 
 router.put("/update/:id", CategoryController.updateCategory)
 router.delete("/delete/:id", CategoryController.deleteCategory)

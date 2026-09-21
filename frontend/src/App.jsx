@@ -45,7 +45,7 @@ import ManagementCategory from "./admin/ManagementCategory/ManagementCategory"
 import ManagementBrand from "./admin/ManagementBrand/ManagementBrand"
 // error
 import UnauthorizedPage from "./errors/401/UnauthorizedPage"
-
+import ForbiddenPage from "./errors/403/ForbiddenPage"
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -199,6 +199,15 @@ const router = createBrowserRouter(
           {/* customers, vouchers, reviews, settings làm tiếp sau */}
         </Route>
       </Route>
+      <Route
+        path="/401"
+        element={<UnauthorizedPage />}
+      />
+
+      <Route
+        path="/403"
+        element={<ForbiddenPage />}
+      />
     </>,
   ),
 )
@@ -213,12 +222,3 @@ function App() {
 }
 
 export default App
-// Admin
-//     <Route element={<ProtectRoute allowedRoles={["admin"]} />}>
-//       <Route
-//         path="/admin"
-//         element={<AdminLayout />}
-//       >
-//         {/* Admin routes */}
-//       </Route>
-//     </Route>

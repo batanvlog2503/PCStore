@@ -9,7 +9,7 @@ const STATUS_LABEL = {
   deleted: "Đã xoá",
 }
 
-const ProductDetailModal = ({ product, onClose, onEdit }) => {
+const ProductDetailModal = ({ product, onClose }) => {
   const [detail, setDetail] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -256,13 +256,6 @@ const ProductDetailModal = ({ product, onClose, onEdit }) => {
             onClick={onClose}
           >
             Đóng
-          </button>
-          <button
-            className="pdm-edit-action"
-            onClick={() => onEdit(product)}
-            disabled={loading}
-          >
-            <i className="fa-regular fa-pen-to-square"></i> Chỉnh sửa
           </button>
         </div>
       </div>

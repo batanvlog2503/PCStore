@@ -37,6 +37,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage: storage, fileFilter: fileFilter })
 
+// =========================GUEST====================
 router.get("/admin/all", BrandController.getAllBrands)
 router.post(
   "/admin/add",

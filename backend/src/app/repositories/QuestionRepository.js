@@ -1,12 +1,47 @@
 const Question = require("../models/Question")
 const filterAllQuestions = require("../../helpers/filterAllQuestions")
+const User = require("../models/User")
 class QuestionRepository {
   async create(data) {
     return await Question.create(data)
   }
 
   async findAll(req, skip = 0, limit = 5) {
-    const filter = filterAllQuestions(req)
+    const search = req.query.search?.trim()
+
+    let userIds = null
+
+    if (search) {
+      const users = await User.find({
+        $or: [
+          {
+            username: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+          {
+            email: {
+              $regex: search,
+              $options: "i",
+            },
+          },
+        ],
+      })
+        .select("_id")
+        .lean()
+
+      userIds = users.map((user) => user._id)
+
+      if (userIds.length === 0) {
+        return {
+          questions: [],
+          total: 0,
+        }
+      }
+    }
+
+    const filter = filterAllQuestions(req, userIds)
 
     const [questions, total] = await Promise.all([
       Question.find(filter)

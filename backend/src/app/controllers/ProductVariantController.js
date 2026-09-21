@@ -108,11 +108,14 @@ class ProductVariantController {
 
   async deleteVariant(req, res, next) {
     try {
-      const result = await ProductVariantService.deleteVariant(req.params.id)
+      const { variantId } = req.params
+
+      const variant = await ProductVariantService.deleteVariant(variantId)
 
       return res.status(200).json({
         success: true,
-        ...result,
+        message: "Xóa phiên bản thành công",
+        variant,
       })
     } catch (err) {
       next(err)

@@ -1,10 +1,5 @@
 import React, { useMemo } from "react"
 
-const DISCOUNT_TYPE_LABEL = {
-  percent: "Giảm theo %",
-  fixed: "Giảm tiền",
-}
-
 function pad2(n) {
   return String(n).padStart(2, "0")
 }
@@ -93,8 +88,6 @@ const ListVoucher = ({
     () => getPageNumbers(page, totalPages),
     [page, totalPages],
   )
-  const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1
-  const rangeEnd = Math.min(page * limit, total)
 
   const STAT_CARDS = [
     {
@@ -199,7 +192,6 @@ const ListVoucher = ({
         </div>
       </div>
 
-      {/* ================= TABLE ================= */}
       <div className="mv-table-wrap">
         <table className="mv-table">
           <thead>

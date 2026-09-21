@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance"
+import { toast } from "../../pages/Toast/Toast"
 
 const TopProducts = () => {
   const [topProducts, setTopProducts] = useState([])
@@ -17,6 +18,7 @@ const TopProducts = () => {
         setTopProducts(response.data.products || [])
       }
     } catch (error) {
+      toast.error("Lỗi lấy top sản phẩm bán chạy")
       console.error("Lỗi lấy top sản phẩm bán chạy:", error)
     } finally {
       setLoading(false)

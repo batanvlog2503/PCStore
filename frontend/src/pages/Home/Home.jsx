@@ -96,7 +96,7 @@ export const Home = () => {
   const getBrands = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_APP_URL}/brand/all`,
+        `${import.meta.env.VITE_APP_URL}/brand/admin/all`,
       )
       setBrands(response.data.brands)
     } catch (error) {
@@ -163,7 +163,6 @@ export const Home = () => {
 
   useEffect(() => {
     getProductVariants(1)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters])
 
   useEffect(() => {

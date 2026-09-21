@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance"
 import "./ModalEditUser.scss"
+import { toast } from "../../pages/Toast/Toast"
 
 const ROLE_LABEL = {
   admin: "Admin",
@@ -74,6 +75,9 @@ const ModalEditUser = ({ user, onClose, onSuccess }) => {
       )
       onClose?.()
     } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Cập nhật người dùng thất bại",
+      )
       setErrors({
         submit: error.response?.data?.message || "Cập nhật người dùng thất bại",
       })

@@ -1,31 +1,16 @@
-module.exports = (req) => {
+module.exports = (req, userIds = null) => {
   const filter = {}
 
-  const { search, status } = req.query
+  const { status } = req.query
 
-  // =========================
-  // SEARCH USERNAME / EMAIL
-  // =========================
-  if (search) {
-    filter.$or = [
-      {
-        "user_id.username": {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        "user_id.email": {
-          $regex: search,
-          $options: "i",
-        },
-      },
-    ]
+  // Search theo User
+  if (userIds) {
+    filter.user_id = {
+      $in: userIds,
+    }
   }
 
-  // =========================
-  // STATUS
-  // =========================
+  // Search theo status
   if (status) {
     filter.status = status
   }

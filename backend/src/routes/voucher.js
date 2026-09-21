@@ -2,10 +2,7 @@ const express = require("express")
 const auth = require("../app/middlewares/auth")
 
 const VoucherController = require("../app/controllers/VoucherController")
-const {
-  addVoucherValidator,
-  updateVoucherValidator,
-} = require("../helpers/validationVoucher")
+
 const authorize = require("../app/middlewares/authorize")
 const router = express.Router()
 
@@ -14,12 +11,8 @@ router.get(
 
   VoucherController.getIntroVouchers,
 )
-router.get(
-  "/my",
-
-  VoucherController.getMyVouchers,
-)
-router.post("/apply", VoucherController.applyVoucher)
+router.get("/my", auth, authorize("user"), VoucherController.getMyVouchers)
+router.post("/apply", auth, authorize("user"), VoucherController.applyVoucher)
 router.get(
   "/claimed-ids",
 

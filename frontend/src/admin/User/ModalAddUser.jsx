@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import axiosInstance from "../../utils/axiosInstance"
+import { toast } from "../../pages/Toast/Toast"
 
 const INITIAL_FORM = {
   username: "",
@@ -53,7 +54,7 @@ const ModalAddUser = ({ onClose, onSuccess }) => {
         `${import.meta.env.VITE_APP_URL}/admin/add/users`,
         form,
       )
-      alert(response.data.message)
+      toast.success(response.data.message)
     } catch (error) {
       setErrors({
         submit: error.response?.data?.message || "Thêm người dùng thất bại",

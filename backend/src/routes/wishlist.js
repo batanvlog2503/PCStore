@@ -11,10 +11,10 @@ router.delete(
   WishlistController.remove,
 )
 
+// ============GUEST===============
 router.get(
   "/check/:productId",
-  auth,
-  authorize("user"),
+
   WishlistController.check,
 )
 

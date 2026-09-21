@@ -3,6 +3,7 @@ import axiosInstance from "../../utils/axiosInstance"
 import ModalAddUser from "./ModalAddUser"
 import ModalEditUser from "./ModalEditUser"
 import "./ManagementUser.scss"
+import { toast } from "../../pages/Toast/Toast"
 
 const ROLE_LABEL = {
   admin: "Admin",
@@ -81,7 +82,7 @@ const ManagementUser = () => {
       setTotal(response.data.total || 0)
       setTotalPages(response.data.totalPages || 1)
     } catch (error) {
-      alert(
+      toast.error(
         error.response?.data?.message || "Không tải được danh sách người dùng",
       )
     } finally {
@@ -97,6 +98,7 @@ const ManagementUser = () => {
       )
       setStats(response.data.data)
     } catch (error) {
+      toast.error(error?.response?.data?.message)
       console.error(error)
     }
   }
@@ -139,18 +141,11 @@ const ManagementUser = () => {
       document.removeEventListener("keydown", handleEsc)
       document.body.style.overflow = ""
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [confirmLockUser])
 
-  // ==========================================================================
-  // ---- Thêm người dùng ----
-  // ==========================================================================
   const handleOpenAddModal = () => setShowAddModal(true)
   const handleCloseAddModal = () => setShowAddModal(false)
 
-  // ==========================================================================
-  // ---- Khoá / Mở khoá tài khoản ----
-  // ==========================================================================
   const handleOpenConfirmLock = (user) => {
     setConfirmLockUser(user)
   }
@@ -180,7 +175,9 @@ const ManagementUser = () => {
       setConfirmLockUser(null)
       getStats()
     } catch (error) {
-      alert(error.response?.data?.message || "Cập nhật trạng thái thất bại")
+      toast.error(
+        error.response?.data?.message || "Cập nhật trạng thái thất bại",
+      )
     } finally {
       setIsConfirmingLock(false)
       setTogglingId(null)
@@ -220,35 +217,32 @@ const ManagementUser = () => {
     URL.revokeObjectURL(url)
   }
   // vì có stats nên dùng use memoo
-  const STAT_CARDS = useMemo(
-    () => [
-      {
-        label: "Tổng người dùng",
-        value: stats.totalUsers,
-        icon: "fa-solid fa-users",
-        color: "purple",
-      },
-      {
-        label: "Người dùng hoạt động",
-        value: stats.activeUsers,
-        icon: "fa-solid fa-user-check",
-        color: "green",
-      },
-      {
-        label: "Tài khoản bị khóa",
-        value: stats.blockedUsers,
-        icon: "fa-solid fa-user-slash",
-        color: "orange",
-      },
-      {
-        label: "Người dùng mới",
-        value: stats.newUsers,
-        icon: "fa-solid fa-user-plus",
-        color: "blue",
-      },
-    ],
-    [stats],
-  )
+  const STAT_CARDS = [
+    {
+      label: "Tổng người dùng",
+      value: stats.totalUsers,
+      icon: "fa-solid fa-users",
+      color: "purple",
+    },
+    {
+      label: "Người dùng hoạt động",
+      value: stats.activeUsers,
+      icon: "fa-solid fa-user-check",
+      color: "green",
+    },
+    {
+      label: "Tài khoản bị khóa",
+      value: stats.blockedUsers,
+      icon: "fa-solid fa-user-slash",
+      color: "orange",
+    },
+    {
+      label: "Người dùng mới",
+      value: stats.newUsers,
+      icon: "fa-solid fa-user-plus",
+      color: "blue",
+    },
+  ]
 
   const isUnlockAction = confirmLockUser?.status === "blocked"
 
@@ -259,7 +253,6 @@ const ManagementUser = () => {
         <p>Quản lý tài khoản người dùng trong hệ thống</p>
       </div>
 
-      {/* ================= 4 THẺ THỐNG KÊ ================= */}
       <div className="stat-grid">
         {STAT_CARDS.map((card, index) => (
           <div

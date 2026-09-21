@@ -78,9 +78,11 @@ const EditProduct = () => {
           `${import.meta.env.VITE_APP_URL}/product/${productId}`,
         ),
 
-        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/category`),
+        axiosInstance.get(
+          `${import.meta.env.VITE_APP_URL}/admin/categories/all`,
+        ),
 
-        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/brand/all`),
+        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/brand/admin/all`),
       ])
 
       const productData = productRes.data
@@ -105,8 +107,6 @@ const EditProduct = () => {
   useEffect(() => {
     getData()
   }, [productId])
-  // ==========================================================================
-  // Product fields
 
   const handleProductChange = (field, value) => {
     setProduct((prev) => ({ ...prev, [field]: value }))
@@ -284,7 +284,7 @@ const EditProduct = () => {
 
         toast.success(response.data.message || "Cập nhật phiên bản thành công!")
       }
-      // ===============================
+
       // THÊM VARIANT
       else {
         response = await axiosInstance.post(
@@ -310,11 +310,22 @@ const EditProduct = () => {
       setSavingVariant(false)
     }
   }
-
-  const handleDeleteVariant = (variant) => {
+  const handleDeleteVariant = async (variant) => {
     if (!window.confirm(`Xoá phiên bản "${variant.config_name}"?`)) return
-    // await axiosInstance.delete(`.../admin/variants/${variant._id}`)
-    setVariants((prev) => prev.filter((v) => v._id !== variant._id))
+
+    try {
+      await axiosInstance.delete(
+        `${import.meta.env.VITE_APP_URL}/admin/variants/${variant._id}`,
+      )
+
+      setVariants((prev) => prev.filter((v) => v._id !== variant._id))
+
+      toast.success("Xóa phiên bản thành công")
+    } catch (error) {
+      console.error("Lỗi xóa variant:", error)
+
+      toast.error(error.response?.data?.message || "Xóa phiên bản thất bại")
+    }
   }
 
   const handleSaveProduct = async () => {
@@ -376,8 +387,6 @@ const EditProduct = () => {
     if (price == null || price === "") return "—"
     return Number(price).toLocaleString("vi-VN") + "đ"
   }
-
-  const mainImage = useMemo(() => images.find((i) => i.is_main), [images])
 
   if (loading) {
     return (

@@ -7,7 +7,7 @@ const authorize = require("../app/middlewares/authorize")
 const QuestionController = require("../app/controllers/QuestionController")
 
 // Khách đã đăng nhập gửi câu hỏi
-router.post("/add", auth, authorize("user"), QuestionController.create)
+router.post("/add", auth, authorize("user", "admin"), QuestionController.create)
 
 // Public xem các câu hỏi đã được admin trả lời
 router.get("/approved", QuestionController.getApproved)

@@ -3,7 +3,7 @@ import "./ManagementProduct.scss"
 import axiosInstance from "../../utils/axiosInstance"
 import { useNavigate } from "react-router-dom"
 import ProductDetailModal from "./modals/ProductDetailModal.jsx"
-import ProductEditModal from "./modals/ProductEditModal.jsx"
+
 import ConfirmDeleteModal from "./modals/ConfirmDeleteModal.jsx"
 import { toast } from "../../pages/Toast/Toast.jsx"
 const STATUS_LABEL = {
@@ -41,8 +41,6 @@ const INITIAL_FILTERS = {
   priceTo: "",
 }
 
-// ================= MOCK
-
 const ManagementProduct = () => {
   const navigate = useNavigate()
   const [mounted, setMounted] = useState(false)
@@ -68,15 +66,10 @@ const ManagementProduct = () => {
 
   // modal state — mỗi modal chỉ cần biết đang thao tác với sản phẩm nào (null = đóng)
   const [detailProduct, setDetailProduct] = useState(null)
-  const [editProduct, setEditProduct] = useState(null)
-  const [deleteProduct, setDeleteProduct] = useState(null)
-  const [savingEdit, setSavingEdit] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setMounted(true))
-    return () => cancelAnimationFrame(t)
-  }, [])
+  const [deleteProduct, setDeleteProduct] = useState(null)
+
+  const [deleting, setDeleting] = useState(false)
 
   const getProducts = async () => {
     try {
@@ -156,32 +149,6 @@ const ManagementProduct = () => {
   // ===== Modal: xem chi tiết =====
   const handleView = (product) => setDetailProduct(product)
 
-  // ===== Modal: chỉnh sửa (có thể mở trực tiếp từ bảng, hoặc từ nút "Chỉnh sửa" trong modal chi tiết) =====
-  const handleEdit = (product) => {
-    setDetailProduct(null)
-    setEditProduct(product)
-  }
-
-  const handleSaveEdit = async (formData) => {
-    try {
-      setSavingEdit(true)
-
-      // await axiosInstance.put(
-      //   `${import.meta.env.VITE_APP_URL}/admin/products/${formData._id}`,
-      //   formData,
-      // )
-
-      setProducts((prev) =>
-        prev.map((p) => (p._id === formData._id ? { ...p, ...formData } : p)),
-      )
-      setEditProduct(null)
-    } catch (error) {
-      alert(error.response?.data?.message || "Cập nhật sản phẩm thất bại")
-    } finally {
-      setSavingEdit(false)
-    }
-  }
-
   // ===== Modal: xoá =====
   const handleDelete = (product) => setDeleteProduct(product)
 
@@ -197,7 +164,7 @@ const ManagementProduct = () => {
       setTotal((prev) => prev - 1)
       setDeleteProduct(null)
     } catch (error) {
-      alert(error.response?.data?.message || "Xoá sản phẩm thất bại")
+      toast.error(error.response?.data?.message || "Xoá sản phẩm thất bại")
     } finally {
       setDeleting(false)
     }
@@ -644,16 +611,6 @@ const ManagementProduct = () => {
         <ProductDetailModal
           product={detailProduct}
           onClose={() => setDetailProduct(null)}
-          onEdit={handleEdit}
-        />
-      )}
-
-      {editProduct && (
-        <ProductEditModal
-          product={editProduct}
-          onClose={() => setEditProduct(null)}
-          onSubmit={handleSaveEdit}
-          submitting={savingEdit}
         />
       )}
 

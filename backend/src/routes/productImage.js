@@ -4,7 +4,7 @@ const path = require("path")
 const auth = require("../app/middlewares/auth")
 const router = express.Router()
 const ProductImageController = require("../app/controllers/ProductImageController")
-
+const authorize = require("../app/middlewares/authorize")
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const typeFile = ["image/jpeg", "image/jpg", "image/png"]
@@ -34,15 +34,27 @@ router.get("/:productId", auth, ProductImageController.getAllImages)
 router.post(
   "/add",
   auth,
+  authorize("admin"),
   upload.array("image_url", 10),
   ProductImageController.addImages,
 )
 router.put(
   "/update/:productId",
   auth,
+  authorize("admin"),
   upload.single("image_url"),
   ProductImageController.updateImage,
 )
-router.delete("/delete/:id", auth, ProductImageController.deleteImage)
-router.put("/set-main/:id", auth, ProductImageController.setMainImage)
+router.delete(
+  "/delete/:id",
+  auth,
+  authorize("admin"),
+  ProductImageController.deleteImage,
+)
+router.put(
+  "/set-main/:id",
+  auth,
+  authorize("admin"),
+  ProductImageController.setMainImage,
+)
 module.exports = router

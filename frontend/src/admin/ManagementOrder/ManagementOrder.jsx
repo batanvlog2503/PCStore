@@ -45,11 +45,6 @@ const ManagementOrder = () => {
   const [detailModalOrder, setDetailModalOrder] = useState(null)
   const [submittingStatus, setSubmittingStatus] = useState(false)
 
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setMounted(true))
-    return () => cancelAnimationFrame(t)
-  }, [])
-
   const getOrders = async () => {
     try {
       setLoading(true)

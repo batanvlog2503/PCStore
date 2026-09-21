@@ -33,8 +33,6 @@ const ManagementBrand = () => {
     getBrands()
   }, [getBrands])
 
-  // ================= CRUD =================
-
   const handleOpenCreate = () => {
     setEditingBrand(null)
     setIsPanelOpen(true)

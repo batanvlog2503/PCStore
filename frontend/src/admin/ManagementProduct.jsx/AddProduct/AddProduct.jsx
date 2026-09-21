@@ -85,7 +85,7 @@ const AddProduct = () => {
         axiosInstance.get(
           `${import.meta.env.VITE_APP_URL}/admin/categories/all`,
         ),
-        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/admin/brands/all`),
+        axiosInstance.get(`${import.meta.env.VITE_APP_URL}/brand/admin/all`),
       ])
       setCategories(categoryResponse.data.categories || [])
       setBrands(brandResponse.data.brands || [])

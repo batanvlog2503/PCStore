@@ -29,13 +29,20 @@ router.get("/:id", ProductVariantController.getVariantById)
 router.post(
   "/add",
   auth,
+  authorize("admin"),
   addProductVariantValidator,
   ProductVariantController.addVariant,
 )
-router.delete("/delete/:id", auth, ProductVariantController.deleteVariant)
+router.delete(
+  "/delete/:id",
+  auth,
+  authorize("admin"),
+  ProductVariantController.deleteVariant,
+)
 router.put(
   "/update/:id",
   auth,
+  authorize("admin"),
   updateProductVariantValidator,
   ProductVariantController.updateVariant,
 )

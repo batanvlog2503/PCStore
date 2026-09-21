@@ -83,37 +83,55 @@ class BrandService {
       throw new AppError(404, "Brand not found")
     }
 
-    const existed = await BrandRepo.findByName(data.name)
+    const name = data.name?.trim()
+
+    if (!name) {
+      throw new AppError(400, "Brand name is required")
+    }
+
+    const existed = await BrandRepo.findByName(name)
 
     if (existed && existed._id.toString() !== id) {
       throw new AppError(400, "Brand already exists")
     }
 
+    // Tạo slug mới từ name
+    const slug = await this.generateUniqueSlug(name, id)
+
     const updateData = {
       ...data,
+      name,
+      slug,
     }
 
     if (file) {
       updateData.logo_url = `/brand/${file.filename}`
     }
 
-    const brand = await BrandRepo.updateById(id, updateData)
+    try {
+      const brand = await BrandRepo.updateById(id, updateData)
 
-    if (file && oldBrand.logo_url) {
-      const oldFilePath = path.join(
-        __dirname,
-        "../../public",
-        oldBrand.logo_url,
-      )
+      if (file && oldBrand.logo_url) {
+        const oldFilePath = path.join(
+          __dirname,
+          "../../public",
+          oldBrand.logo_url,
+        )
 
-      if (fs.existsSync(oldFilePath)) {
-        await fs.promises.unlink(oldFilePath)
+        if (fs.existsSync(oldFilePath)) {
+          await fs.promises.unlink(oldFilePath)
+        }
       }
+
+      return brand
+    } catch (err) {
+      if (err.code === 11000) {
+        throw new AppError(400, "Slug already exists")
+      }
+
+      throw err
     }
-
-    return brand
   }
-
   async deleteBrand(id) {
     const brand = await BrandRepo.findById(id)
 

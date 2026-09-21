@@ -1,6 +1,7 @@
 import React from "react"
 import { Header } from "../../components/layout/Header/Header"
 import { Outlet } from "react-router-dom"
+import Footer from "../../components/layout/Footer/Footer"
 export const MainLayout = () => {
   return (
     <div className="container-fluid main-layout p-0">
@@ -10,7 +11,9 @@ export const MainLayout = () => {
       <div className="container main p-0">
         <Outlet></Outlet>
       </div>
-      <div className="container-fluid footer p-0"></div>
+      <div className="container-fluid footer p-0">
+        <Footer></Footer>
+      </div>
     </div>
   )
 }

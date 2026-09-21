@@ -27,8 +27,31 @@ class CategoryService {
       counter++
     }
   }
-  async getAllCategories() {
-    return await CategoryRepo.getAll()
+  async getAllCategories(search = "") {
+    const categories = await CategoryRepo.getAll()
+
+    const keyword = search.trim().toLowerCase()
+
+    const filteredCategories = keyword
+      ? categories.filter(
+          (category) =>
+            category.name.toLowerCase().includes(keyword) ||
+            category.slug.toLowerCase().includes(keyword),
+        )
+      : categories
+
+    const parents = categories.filter((category) => category.parent_id === null)
+
+    const stats = {
+      total: categories.length,
+      parents: parents.length,
+      children: categories.length - parents.length,
+    }
+
+    return {
+      stats,
+      categories: filteredCategories,
+    }
   }
 
   async getCategoryTree() {

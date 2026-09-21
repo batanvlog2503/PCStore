@@ -8,7 +8,6 @@ const STATIC_BASE_URL = (import.meta.env.VITE_APP_URL || "").replace(
 const BrandList = ({ rows, isLoading, onAddNew, onEdit, onDelete }) => {
   return (
     <div className="mb-list">
-      {/* ================= HEADER ================= */}
       <div className="mb-header">
         <div className="mb-header__icon">
           <i className="fa-solid fa-tag"></i>
@@ -26,7 +25,6 @@ const BrandList = ({ rows, isLoading, onAddNew, onEdit, onDelete }) => {
         </button>
       </div>
 
-      {/* ================= TABLE ================= */}
       <div className="mb-table-wrap">
         <table className="mb-table">
           <thead>

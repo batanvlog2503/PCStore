@@ -51,7 +51,7 @@ const Question = () => {
     try {
       append ? setIsLoadingMore(true) : setIsLoading(true)
 
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${import.meta.env.VITE_APP_URL}/question/approved`,
         {
           params: {
@@ -104,7 +104,7 @@ const Question = () => {
 
     try {
       setIsSubmitting(true)
-      await axios.post(`${import.meta.env.VITE_APP_URL}/question/add`, {
+      await axiosInstance.post(`${import.meta.env.VITE_APP_URL}/question/add`, {
         content: trimmed,
       })
       toast.success("Đã gửi câu hỏi, câu hỏi sẽ hiển thị sau khi được duyệt")
