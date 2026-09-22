@@ -40,7 +40,7 @@ router.get(
 )
 
 // Nhận voucher
-router.post("/claim", auth, authorize("admin"), VoucherController.claimVoucher)
+router.post("/claim", auth, authorize("user"), VoucherController.claimVoucher)
 
 router.post(
   "/validate",
