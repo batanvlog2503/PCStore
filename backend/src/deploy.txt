@@ -1,0 +1,11 @@
+Link FE
+https://pcstore-frontend.vercel.app/
+Link BE
+https://pcstore-4pes.onrender.com/
+
+Account user test:
+TK: tanden1357@gmail.com
+MK: Phamtan2503@
+Account admin test
+TK: tantanai2503@gmail.com
+MK: 123456
