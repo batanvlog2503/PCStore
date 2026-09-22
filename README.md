@@ -10,12 +10,12 @@ The system is built as a **React SPA** communicating with a **Node.js REST API**
 
 **PC Store** is an online retail platform focused on computer hardware—primarily laptops and PC components. It solves the problem of selling products with multiple configuration variants (CPU, RAM, storage, GPU, screen size), each with its own price, discount, and stock level.
 
-| Aspect | Description |
-|---|---|
-| **Application type** | Full-stack e-commerce web application |
-| **Main purpose** | Allow customers to browse products, manage carts, place orders, and pay online or on delivery; allow admins to manage catalog, orders, users, vouchers, and customer questions |
-| **Architecture style** | Monorepo with separate `frontend/` and `backend/` packages |
-| **API style** | RESTful JSON API (routes mounted at the backend root, e.g. `/auth`, `/product`) |
+| Aspect                 | Description                                                                                                                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Application type**   | Full-stack e-commerce web application                                                                                                                                          |
+| **Main purpose**       | Allow customers to browse products, manage carts, place orders, and pay online or on delivery; allow admins to manage catalog, orders, users, vouchers, and customer questions |
+| **Architecture style** | Monorepo with separate `frontend/` and `backend/` packages                                                                                                                     |
+| **API style**          | RESTful JSON API (routes mounted at the backend root, e.g. `/auth`, `/product`)                                                                                                |
 
 ---
 
@@ -113,48 +113,48 @@ The system is built as a **React SPA** communicating with a **Node.js REST API**
 
 ### Frontend
 
-| Technology | Purpose |
-|---|---|
-| React 19 | UI library |
-| Vite 8 | Build tool and dev server |
-| React Router DOM 7 | Client-side routing |
-| Axios | HTTP client with auth interceptors |
-| Sass | Component styling |
-| React Icons | Icon set |
-| Oxlint | Linting |
+| Technology         | Purpose                            |
+| ------------------ | ---------------------------------- |
+| React 19           | UI library                         |
+| Vite 8             | Build tool and dev server          |
+| React Router DOM 7 | Client-side routing                |
+| Axios              | HTTP client with auth interceptors |
+| Sass               | Component styling                  |
+| React Icons        | Icon set                           |
+| Oxlint             | Linting                            |
 
 ### Backend
 
-| Technology | Purpose |
-|---|---|
-| Node.js | Runtime |
-| Express 5 | HTTP server and routing |
-| Mongoose 9 | MongoDB ODM |
-| JSON Web Token (`jsonwebtoken`) | Access and refresh tokens |
-| bcrypt | Password hashing |
-| express-validator | Request validation |
-| Multer | Image upload handling |
-| CORS | Cross-origin requests |
-| Morgan | HTTP request logging |
-| slugify | Slug generation |
-| mongoose-delete | Soft delete for products |
-| express-handlebars | Legacy server-side view engine (alongside REST API) |
-| dotenv | Environment variable loading |
+| Technology                      | Purpose                                             |
+| ------------------------------- | --------------------------------------------------- |
+| Node.js                         | Runtime                                             |
+| Express 5                       | HTTP server and routing                             |
+| Mongoose 9                      | MongoDB ODM                                         |
+| JSON Web Token (`jsonwebtoken`) | Access and refresh tokens                           |
+| bcrypt                          | Password hashing                                    |
+| express-validator               | Request validation                                  |
+| Multer                          | Image upload handling                               |
+| CORS                            | Cross-origin requests                               |
+| Morgan                          | HTTP request logging                                |
+| slugify                         | Slug generation                                     |
+| mongoose-delete                 | Soft delete for products                            |
+| express-handlebars              | Legacy server-side view engine (alongside REST API) |
+| dotenv                          | Environment variable loading                        |
 
 ### Database
 
-| Technology | Purpose |
-|---|---|
-| MongoDB | Primary database |
-| Mongoose | Schema modeling, indexing, transactions |
+| Technology | Purpose                                 |
+| ---------- | --------------------------------------- |
+| MongoDB    | Primary database                        |
+| Mongoose   | Schema modeling, indexing, transactions |
 
 ### Deployment
 
-| Platform | Component |
-|---|---|
-| [Vercel](https://vercel.com) | Frontend (`vercel.json` SPA rewrites) |
-| [Render](https://render.com) | Backend (uses `process.env.PORT`) |
-| MongoDB Atlas (or compatible) | Database (via `MONGO_URL`) |
+| Platform                      | Component                             |
+| ----------------------------- | ------------------------------------- |
+| [Vercel](https://vercel.com)  | Frontend (`vercel.json` SPA rewrites) |
+| [Render](https://render.com)  | Backend (uses `process.env.PORT`)     |
+| MongoDB Atlas (or compatible) | Database (via `MONGO_URL`)            |
 
 ---
 
@@ -178,15 +178,15 @@ Models (Mongoose schemas)
 MongoDB
 ```
 
-| Layer | Responsibility |
-|---|---|
-| **Frontend** | UI rendering, routing, local auth state, API calls |
-| **Routes** | HTTP endpoint mapping, middleware attachment |
-| **Controllers** | Parse requests, call services, format JSON responses |
-| **Services** | Business rules, calculations, MongoDB transactions |
-| **Repositories** | Data access abstraction over Mongoose |
-| **Models** | Schema definitions, indexes, relationships |
-| **MongoDB** | Persistent data storage |
+| Layer            | Responsibility                                       |
+| ---------------- | ---------------------------------------------------- |
+| **Frontend**     | UI rendering, routing, local auth state, API calls   |
+| **Routes**       | HTTP endpoint mapping, middleware attachment         |
+| **Controllers**  | Parse requests, call services, format JSON responses |
+| **Services**     | Business rules, calculations, MongoDB transactions   |
+| **Repositories** | Data access abstraction over Mongoose                |
+| **Models**       | Schema definitions, indexes, relationships           |
+| **MongoDB**      | Persistent data storage                              |
 
 ```mermaid
 flowchart LR
@@ -316,15 +316,15 @@ All API calls use `import.meta.env.VITE_APP_URL` as the backend base URL.
 
 ### Important frontend modules
 
-| Module | Purpose |
-|---|---|
-| `pages/Home/Home.jsx` | Product listing with filters and pagination |
-| `pages/Product/Product.jsx` | Product detail, variant selection, add to cart, wishlist |
-| `pages/Cart/Cart.jsx` | Cart management and checkout navigation |
-| `pages/Checkout/Checkout.jsx` | Address, vouchers, payment method, place order |
-| `pages/Payment/Payment.jsx` | Bank transfer QR and payment polling |
-| `admin/Dashboard/Dashboard.jsx` | Admin analytics charts |
-| `pages/Toast/ToastContainer.jsx` | Global toast notifications |
+| Module                           | Purpose                                                  |
+| -------------------------------- | -------------------------------------------------------- |
+| `pages/Home/Home.jsx`            | Product listing with filters and pagination              |
+| `pages/Product/Product.jsx`      | Product detail, variant selection, add to cart, wishlist |
+| `pages/Cart/Cart.jsx`            | Cart management and checkout navigation                  |
+| `pages/Checkout/Checkout.jsx`    | Address, vouchers, payment method, place order           |
+| `pages/Payment/Payment.jsx`      | Bank transfer QR and payment polling                     |
+| `admin/Dashboard/Dashboard.jsx`  | Admin analytics charts                                   |
+| `pages/Toast/ToastContainer.jsx` | Global toast notifications                               |
 
 ---
 
@@ -362,27 +362,27 @@ On error, `AppError` is thrown with a status code and caught by `errorHandler`, 
 
 Route modules are mounted in `routes/index.js` without an `/api` prefix:
 
-| Mount path | Module |
-|---|---|
-| `/auth` | Authentication |
-| `/user` | User profile |
-| `/address` | Delivery addresses |
-| `/category` | Categories |
-| `/brand` | Brands |
-| `/product` | Products |
-| `/product-variant` | Product variants |
-| `/product-image` | Product images |
-| `/cart` | Shopping carts |
-| `/cart-item` | Cart line items |
-| `/order` | Orders |
-| `/order-item` | Order line items |
-| `/voucher` | Vouchers |
-| `/review` | Reviews |
-| `/payment` | Payment webhooks |
-| `/wishlist` | Wishlists |
-| `/contact` | Contact messages |
-| `/question` | Customer questions |
-| `/admin` | Admin-only endpoints |
+| Mount path         | Module               |
+| ------------------ | -------------------- |
+| `/auth`            | Authentication       |
+| `/user`            | User profile         |
+| `/address`         | Delivery addresses   |
+| `/category`        | Categories           |
+| `/brand`           | Brands               |
+| `/product`         | Products             |
+| `/product-variant` | Product variants     |
+| `/product-image`   | Product images       |
+| `/cart`            | Shopping carts       |
+| `/cart-item`       | Cart line items      |
+| `/order`           | Orders               |
+| `/order-item`      | Order line items     |
+| `/voucher`         | Vouchers             |
+| `/review`          | Reviews              |
+| `/payment`         | Payment webhooks     |
+| `/wishlist`        | Wishlists            |
+| `/contact`         | Contact messages     |
+| `/question`        | Customer questions   |
+| `/admin`           | Admin-only endpoints |
 
 ### Controllers, services, repositories
 
@@ -392,11 +392,11 @@ Route modules are mounted in `routes/index.js` without an `/api` prefix:
 
 ### Middlewares
 
-| Middleware | Purpose |
-|---|---|
-| `auth.js` | Verifies JWT access token from `Authorization: Bearer` header |
-| `authorize.js` | Role-based access control (`authorize("admin")`, `authorize("user")`) |
-| `errorHandler.js` | Centralized error response formatting |
+| Middleware        | Purpose                                                               |
+| ----------------- | --------------------------------------------------------------------- |
+| `auth.js`         | Verifies JWT access token from `Authorization: Bearer` header         |
+| `authorize.js`    | Role-based access control (`authorize("admin")`, `authorize("user")`) |
+| `errorHandler.js` | Centralized error response formatting                                 |
 
 ### Error handling
 
@@ -448,10 +448,10 @@ Services throw `AppError(statusCode, message)`. The global handler logs the erro
 
 ### Role-based authorization
 
-| Role | Access |
-|---|---|
-| `user` | Customer endpoints (cart, orders, addresses, wishlist, checkout) |
-| `admin` | All admin routes under `/admin/*` |
+| Role    | Access                                                           |
+| ------- | ---------------------------------------------------------------- |
+| `user`  | Customer endpoints (cart, orders, addresses, wishlist, checkout) |
+| `admin` | All admin routes under `/admin/*`                                |
 
 Admin routes use `auth` + `authorize("admin")` middleware.
 
@@ -468,27 +468,27 @@ MongoDB stores all application data. Mongoose schemas define 19 models.
 
 ### Core models
 
-| Model | Key fields |
-|---|---|
-| **User** | username, email, phone, password, role, status |
-| **RefreshToken** | user_id, refreshToken |
-| **Address** | user_id, receiver_name, phone, province, district, ward, detail, is_default |
-| **Category** | parent_id, name, slug |
-| **Brand** | name, slug, logo_url |
-| **Product** | category_id, brand_id, name, slug, description, use_case, rating_avg, sold_count, status, image_url |
-| **ProductVariant** | product_id, sku, config_name, specs, price, discount_price, stock, status |
-| **ProductImage** | product_id, image_url, is_main |
-| **Cart** | user_id (unique) |
-| **CartItem** | cart_id, variant_id, quantity |
-| **Order** | user_id, address_id, order_code, subtotal, discounts, shipping_fee, total_amount, status, payment_method, payment_status |
-| **OrderItem** | order_id, product_id, variant_id, snapshot fields, price, quantity, subtotal |
-| **Voucher** | code, voucher_type, discount_type, discount_value, max_discount, min_order_value, quantity, dates, status |
-| **UserVoucher** | user_id, voucher_id, status (available/used) |
-| **Wishlist** | user_id, product_id |
-| **Review** | product_id, variant_id, user_id, rating, comment |
-| **Question** | user_id, content, status, admin_reply |
-| **ContactMessage** | user_id, name, email, phone, message, status |
-| **Payment** | order_id, method, status, transaction_id |
+| Model              | Key fields                                                                                                               |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **User**           | username, email, phone, password, role, status                                                                           |
+| **RefreshToken**   | user_id, refreshToken                                                                                                    |
+| **Address**        | user_id, receiver_name, phone, province, district, ward, detail, is_default                                              |
+| **Category**       | parent_id, name, slug                                                                                                    |
+| **Brand**          | name, slug, logo_url                                                                                                     |
+| **Product**        | category_id, brand_id, name, slug, description, use_case, rating_avg, sold_count, status, image_url                      |
+| **ProductVariant** | product_id, sku, config_name, specs, price, discount_price, stock, status                                                |
+| **ProductImage**   | product_id, image_url, is_main                                                                                           |
+| **Cart**           | user_id (unique)                                                                                                         |
+| **CartItem**       | cart_id, variant_id, quantity                                                                                            |
+| **Order**          | user_id, address_id, order_code, subtotal, discounts, shipping_fee, total_amount, status, payment_method, payment_status |
+| **OrderItem**      | order_id, product_id, variant_id, snapshot fields, price, quantity, subtotal                                             |
+| **Voucher**        | code, voucher_type, discount_type, discount_value, max_discount, min_order_value, quantity, dates, status                |
+| **UserVoucher**    | user_id, voucher_id, status (available/used)                                                                             |
+| **Wishlist**       | user_id, product_id                                                                                                      |
+| **Review**         | product_id, variant_id, user_id, rating, comment                                                                         |
+| **Question**       | user_id, content, status, admin_reply                                                                                    |
+| **ContactMessage** | user_id, name, email, phone, message, status                                                                             |
+| **Payment**        | order_id, method, status, transaction_id                                                                                 |
 
 ### Key relationships
 
@@ -580,13 +580,13 @@ The backend computes all monetary fields; the client sends only `cart_item_ids`,
 
 ### Order status flow
 
-| Status | Meaning |
-|---|---|
-| `pending` | New order, awaiting confirmation |
-| `confirmed` | Order confirmed by admin |
-| `shipping` | Order is being delivered |
+| Status      | Meaning                                   |
+| ----------- | ----------------------------------------- |
+| `pending`   | New order, awaiting confirmation          |
+| `confirmed` | Order confirmed by admin                  |
+| `shipping`  | Order is being delivered                  |
 | `completed` | Order fulfilled; `sold_count` incremented |
-| `cancelled` | Order cancelled; stock restored |
+| `cancelled` | Order cancelled; stock restored           |
 
 **Admin allowed transitions** (enforced in frontend; backend validates status values):
 
@@ -637,10 +637,10 @@ stateDiagram-v2
 
 ### Payment status vs. order status
 
-| Field | Values | Notes |
-|---|---|---|
-| `payment_status` | `pending`, `paid`, `failed`, `refunded` | Tracks payment completion |
-| `status` | `pending`, `confirmed`, `shipping`, `completed`, `cancelled` | Tracks fulfillment lifecycle |
+| Field            | Values                                                       | Notes                        |
+| ---------------- | ------------------------------------------------------------ | ---------------------------- |
+| `payment_status` | `pending`, `paid`, `failed`, `refunded`                      | Tracks payment completion    |
+| `status`         | `pending`, `confirmed`, `shipping`, `completed`, `cancelled` | Tracks fulfillment lifecycle |
 
 For bank transfer orders, `payment_status` remains `pending` until SePay confirms the transfer. Order fulfillment status (`status`) is managed separately by admin.
 
@@ -707,139 +707,139 @@ Base URL: backend server root (e.g. `http://localhost:3000`). There is no `/api`
 Standard response shape:
 
 ```json
-{ "success": true, "message": "...", "data": { } }
+{ "success": true, "message": "...", "data": {} }
 ```
 
 ### Authentication
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| POST | `/auth/register` | Register a new account | Public |
-| POST | `/auth/login` | Login, receive tokens | Public |
-| POST | `/auth/refresh-token` | Refresh access token | Public |
-| POST | `/auth/logout` | Invalidate refresh token | User |
+| Method | Path                  | Purpose                  | Auth   |
+| ------ | --------------------- | ------------------------ | ------ |
+| POST   | `/auth/register`      | Register a new account   | Public |
+| POST   | `/auth/login`         | Login, receive tokens    | Public |
+| POST   | `/auth/refresh-token` | Refresh access token     | Public |
+| POST   | `/auth/logout`        | Invalidate refresh token | User   |
 
 ### Users
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/user/me` | Get current user profile | User |
-| PATCH | `/user/me` | Update profile | User |
-| PUT | `/user/update/me` | Update profile | User |
-| GET | `/admin/all-users` | List users (search, filter, paginate) | Admin |
-| GET | `/admin/users/stats` | User statistics | Admin |
-| POST | `/admin/add/users` | Create user | Admin |
-| PATCH | `/admin/users/:id/status` | Update user status | Admin |
-| PATCH | `/admin/users/update/:id` | Update user info | Admin |
+| Method | Path                      | Purpose                               | Auth  |
+| ------ | ------------------------- | ------------------------------------- | ----- |
+| GET    | `/user/me`                | Get current user profile              | User  |
+| PATCH  | `/user/me`                | Update profile                        | User  |
+| PUT    | `/user/update/me`         | Update profile                        | User  |
+| GET    | `/admin/all-users`        | List users (search, filter, paginate) | Admin |
+| GET    | `/admin/users/stats`      | User statistics                       | Admin |
+| POST   | `/admin/add/users`        | Create user                           | Admin |
+| PATCH  | `/admin/users/:id/status` | Update user status                    | Admin |
+| PATCH  | `/admin/users/update/:id` | Update user info                      | Admin |
 
 ### Products
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/product/all` | List products (filter, paginate) | Public |
-| GET | `/product/:productId` | Product detail with variants and images | Public |
-| GET | `/product/slug/:slug` | Get product by slug | Public |
-| GET | `/product-variant/top-selling` | Top-selling variants | Public |
-| GET | `/product-variant/image/all` | Variants with images for home listing | Public |
-| POST | `/admin/products/add` | Create product with images | Admin |
-| PUT | `/admin/products/update/:productId` | Update product | Admin |
-| DELETE | `/admin/products/:id/soft-delete` | Soft-delete product | Admin |
-| PUT | `/admin/variants/:variantId` | Update variant | Admin |
-| DELETE | `/admin/variants/:variantId` | Delete variant | Admin |
+| Method | Path                                | Purpose                                 | Auth   |
+| ------ | ----------------------------------- | --------------------------------------- | ------ |
+| GET    | `/product/all`                      | List products (filter, paginate)        | Public |
+| GET    | `/product/:productId`               | Product detail with variants and images | Public |
+| GET    | `/product/slug/:slug`               | Get product by slug                     | Public |
+| GET    | `/product-variant/top-selling`      | Top-selling variants                    | Public |
+| GET    | `/product-variant/image/all`        | Variants with images for home listing   | Public |
+| POST   | `/admin/products/add`               | Create product with images              | Admin  |
+| PUT    | `/admin/products/update/:productId` | Update product                          | Admin  |
+| DELETE | `/admin/products/:id/soft-delete`   | Soft-delete product                     | Admin  |
+| PUT    | `/admin/variants/:variantId`        | Update variant                          | Admin  |
+| DELETE | `/admin/variants/:variantId`        | Delete variant                          | Admin  |
 
 ### Categories
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/admin/category/all/tree` | Category tree | Public |
-| POST | `/admin/category/add` | Create category | Admin |
-| PUT | `/admin/category/update/:id` | Update category | Admin |
-| DELETE | `/admin/category/delete/:id` | Delete category | Admin |
+| Method | Path                         | Purpose         | Auth   |
+| ------ | ---------------------------- | --------------- | ------ |
+| GET    | `/admin/category/all/tree`   | Category tree   | Public |
+| POST   | `/admin/category/add`        | Create category | Admin  |
+| PUT    | `/admin/category/update/:id` | Update category | Admin  |
+| DELETE | `/admin/category/delete/:id` | Delete category | Admin  |
 
 ### Brands
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/brand/admin/all` | List all brands | Public |
-| POST | `/brand/admin/add` | Create brand with logo | Admin |
-| PUT | `/brand/admin/update/:id` | Update brand | Admin |
-| DELETE | `/brand/admin/delete/:id` | Delete brand | Admin |
+| Method | Path                      | Purpose                | Auth   |
+| ------ | ------------------------- | ---------------------- | ------ |
+| GET    | `/brand/admin/all`        | List all brands        | Public |
+| POST   | `/brand/admin/add`        | Create brand with logo | Admin  |
+| PUT    | `/brand/admin/update/:id` | Update brand           | Admin  |
+| DELETE | `/brand/admin/delete/:id` | Delete brand           | Admin  |
 
 ### Cart
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/cart/my-cart/all` | Get current user's cart items | User |
-| POST | `/cart-item/add` | Add variant to cart | User |
-| PUT | `/cart-item/update/:id` | Update item quantity | User |
-| DELETE | `/cart-item/delete/:id` | Remove cart item | User |
-| GET | `/cart-item/summary/:cartId` | Cart totals | User |
+| Method | Path                         | Purpose                       | Auth |
+| ------ | ---------------------------- | ----------------------------- | ---- |
+| GET    | `/cart/my-cart/all`          | Get current user's cart items | User |
+| POST   | `/cart-item/add`             | Add variant to cart           | User |
+| PUT    | `/cart-item/update/:id`      | Update item quantity          | User |
+| DELETE | `/cart-item/delete/:id`      | Remove cart item              | User |
+| GET    | `/cart-item/summary/:cartId` | Cart totals                   | User |
 
 ### Orders
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| POST | `/order/add` | Create order from cart | User |
-| GET | `/order/my-orders` | List current user's orders | User |
-| GET | `/order/:id` | Order detail with items | User |
-| PATCH | `/order/:id/cancel` | Cancel pending order | User |
-| GET | `/admin/orders` | List all orders | Admin |
-| PATCH | `/admin/orders/:id/status` | Update order status | Admin |
-| GET | `/admin/orders/:id/items` | Get order line items | Admin |
+| Method | Path                       | Purpose                    | Auth  |
+| ------ | -------------------------- | -------------------------- | ----- |
+| POST   | `/order/add`               | Create order from cart     | User  |
+| GET    | `/order/my-orders`         | List current user's orders | User  |
+| GET    | `/order/:id`               | Order detail with items    | User  |
+| PATCH  | `/order/:id/cancel`        | Cancel pending order       | User  |
+| GET    | `/admin/orders`            | List all orders            | Admin |
+| PATCH  | `/admin/orders/:id/status` | Update order status        | Admin |
+| GET    | `/admin/orders/:id/items`  | Get order line items       | Admin |
 
 ### Payments
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| POST | `/payment/sepay/webhook` | SePay bank transfer webhook | Webhook API key |
+| Method | Path                     | Purpose                     | Auth            |
+| ------ | ------------------------ | --------------------------- | --------------- |
+| POST   | `/payment/sepay/webhook` | SePay bank transfer webhook | Webhook API key |
 
 ### Vouchers
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/voucher/intro` | Featured vouchers for home page | Public |
-| GET | `/voucher/all` | List vouchers | Public |
-| GET | `/voucher/my` | User's claimed vouchers | User |
-| POST | `/voucher/claim` | Claim a voucher | User |
-| POST | `/voucher/apply` | Validate and calculate voucher discount | User |
-| POST | `/admin/voucher/add` | Create voucher | Admin |
-| PUT | `/admin/voucher/update/:id` | Update voucher | Admin |
-| DELETE | `/admin/voucher/delete/:id` | Delete voucher | Admin |
+| Method | Path                        | Purpose                                 | Auth   |
+| ------ | --------------------------- | --------------------------------------- | ------ |
+| GET    | `/voucher/intro`            | Featured vouchers for home page         | Public |
+| GET    | `/voucher/all`              | List vouchers                           | Public |
+| GET    | `/voucher/my`               | User's claimed vouchers                 | User   |
+| POST   | `/voucher/claim`            | Claim a voucher                         | User   |
+| POST   | `/voucher/apply`            | Validate and calculate voucher discount | User   |
+| POST   | `/admin/voucher/add`        | Create voucher                          | Admin  |
+| PUT    | `/admin/voucher/update/:id` | Update voucher                          | Admin  |
+| DELETE | `/admin/voucher/delete/:id` | Delete voucher                          | Admin  |
 
 ### Questions
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/question/approved` | Public approved Q&A | Public |
-| POST | `/question/add` | Submit a question | User |
-| GET | `/question/admin/all` | List all questions | Admin |
-| PATCH | `/question/admin/:id/reply` | Admin reply | Admin |
-| PATCH | `/question/admin/:id/hide` | Hide question | Admin |
-| DELETE | `/question/admin/:id` | Delete question | Admin |
+| Method | Path                        | Purpose             | Auth   |
+| ------ | --------------------------- | ------------------- | ------ |
+| GET    | `/question/approved`        | Public approved Q&A | Public |
+| POST   | `/question/add`             | Submit a question   | User   |
+| GET    | `/question/admin/all`       | List all questions  | Admin  |
+| PATCH  | `/question/admin/:id/reply` | Admin reply         | Admin  |
+| PATCH  | `/question/admin/:id/hide`  | Hide question       | Admin  |
+| DELETE | `/question/admin/:id`       | Delete question     | Admin  |
 
 ### Admin (Dashboard)
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/admin/dashboard` | Dashboard summary stats | Admin |
-| GET | `/admin/revenue-chart` | Revenue chart (7 days) | Admin |
-| GET | `/admin/orders-chart` | Orders chart (7 days) | Admin |
-| GET | `/admin/order-statistic` | Order status breakdown | Admin |
-| GET | `/admin/latest-products` | Recently added products | Admin |
-| GET | `/admin/top-products` | Top-selling products | Admin |
+| Method | Path                     | Purpose                 | Auth  |
+| ------ | ------------------------ | ----------------------- | ----- |
+| GET    | `/admin/dashboard`       | Dashboard summary stats | Admin |
+| GET    | `/admin/revenue-chart`   | Revenue chart (7 days)  | Admin |
+| GET    | `/admin/orders-chart`    | Orders chart (7 days)   | Admin |
+| GET    | `/admin/order-statistic` | Order status breakdown  | Admin |
+| GET    | `/admin/latest-products` | Recently added products | Admin |
+| GET    | `/admin/top-products`    | Top-selling products    | Admin |
 
 ### Other endpoints
 
-| Method | Path | Purpose | Auth |
-|---|---|---|---|
-| GET | `/address/all` | List user addresses | User |
-| POST | `/address/add` | Add address | User |
-| PATCH | `/address/:id/default` | Set default address | User |
-| POST | `/wishlist/add/:productId` | Add to wishlist | User |
-| DELETE | `/wishlist/remove/:productId` | Remove from wishlist | User |
-| GET | `/wishlist/all` | List wishlist | User |
-| POST | `/contact/contact-message/add` | Submit contact form | User |
-| POST | `/review/add` | Create product review | User |
+| Method | Path                           | Purpose               | Auth |
+| ------ | ------------------------------ | --------------------- | ---- |
+| GET    | `/address/all`                 | List user addresses   | User |
+| POST   | `/address/add`                 | Add address           | User |
+| PATCH  | `/address/:id/default`         | Set default address   | User |
+| POST   | `/wishlist/add/:productId`     | Add to wishlist       | User |
+| DELETE | `/wishlist/remove/:productId`  | Remove from wishlist  | User |
+| GET    | `/wishlist/all`                | List wishlist         | User |
+| POST   | `/contact/contact-message/add` | Submit contact form   | User |
+| POST   | `/review/add`                  | Create product review | User |
 
 ---
 
@@ -847,7 +847,7 @@ Standard response shape:
 
 ### Backend (`.env`)
 
-```env
+````env
 PORT=3000
 SERVER_PORT=3000
 MONGO_URL=your_mongodb_connection_string
@@ -856,19 +856,13 @@ REFRESH_TOKEN_SECRET=your_refresh_token_secret
 SEPAY_WEBHOOK_API_KEY=your_sepay_webhook_api_key
 NODE_ENV=development
 
-# Optional — used by MoMo gateway code (not wired to active checkout routes)
-MOMO_ACCESS_KEY=your_momo_access_key
-MOMO_SECRET_KEY=your_momo_secret_key
-MOMO_PARTNER_CODE=your_momo_partner_code
-MOMO_REDIRECT_URL=http://localhost:5173/order-success
-MOMO_IPN_URL=https://your-backend-url/payment/momo/ipn
-```
+
 
 ### Frontend (`.env`)
 
 ```env
 VITE_APP_URL=http://localhost:3000
-```
+````
 
 ---
 
