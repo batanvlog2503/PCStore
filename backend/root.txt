@@ -1,0 +1,260 @@
+ ┣ 📂src
+ ┃ ┣ 📂app
+ ┃ ┃ ┣ 📂controllers
+ ┃ ┃ ┃ ┣ 📜AddressController.js
+ ┃ ┃ ┃ ┣ 📜BrandController.js
+ ┃ ┃ ┃ ┣ 📜CartController.js
+ ┃ ┃ ┃ ┣ 📜CartItemController.js
+ ┃ ┃ ┃ ┣ 📜CategoryController.js
+ ┃ ┃ ┃ ┣ 📜ContactMessageController.js
+ ┃ ┃ ┃ ┣ 📜DashboardController.js
+ ┃ ┃ ┃ ┣ 📜OrderController.js
+ ┃ ┃ ┃ ┣ 📜OrderItemController.js
+ ┃ ┃ ┃ ┣ 📜PaymentController.js
+ ┃ ┃ ┃ ┣ 📜ProductController.js
+ ┃ ┃ ┃ ┣ 📜ProductImageController.js
+ ┃ ┃ ┃ ┣ 📜ProductVariantController.js
+ ┃ ┃ ┃ ┣ 📜QuestionController.js
+ ┃ ┃ ┃ ┣ 📜RefreshTokenController.js
+ ┃ ┃ ┃ ┣ 📜ReviewController.js
+ ┃ ┃ ┃ ┣ 📜UserController.js
+ ┃ ┃ ┃ ┣ 📜VoucherController.js
+ ┃ ┃ ┃ ┗ 📜WishlistController.js
+ ┃ ┃ ┣ 📂gateway
+ ┃ ┃ ┃ ┣ 📜ConnectionLink.js
+ ┃ ┃ ┃ ┣ 📜MomoGateway.js
+ ┃ ┃ ┃ ┗ 📜sepayFlow.txt
+ ┃ ┃ ┣ 📂middlewares
+ ┃ ┃ ┃ ┣ 📜auth.js
+ ┃ ┃ ┃ ┣ 📜authorize.js
+ ┃ ┃ ┃ ┗ 📜errorHandler.js
+ ┃ ┃ ┣ 📂models
+ ┃ ┃ ┃ ┣ 📜ActivityLog.txt
+ ┃ ┃ ┃ ┣ 📜Address.js
+ ┃ ┃ ┃ ┣ 📜Brand.js
+ ┃ ┃ ┃ ┣ 📜Cart.js
+ ┃ ┃ ┃ ┣ 📜CartItem.js
+ ┃ ┃ ┃ ┣ 📜Category.js
+ ┃ ┃ ┃ ┣ 📜ContactMessage.js
+ ┃ ┃ ┃ ┣ 📜Order.js
+ ┃ ┃ ┃ ┣ 📜OrderItem.js
+ ┃ ┃ ┃ ┣ 📜Payment.js
+ ┃ ┃ ┃ ┣ 📜Product.js
+ ┃ ┃ ┃ ┣ 📜ProductImage.js
+ ┃ ┃ ┃ ┣ 📜ProductVariant.js
+ ┃ ┃ ┃ ┣ 📜Question.js
+ ┃ ┃ ┃ ┣ 📜RefreshToken.js
+ ┃ ┃ ┃ ┣ 📜Review.js
+ ┃ ┃ ┃ ┣ 📜User.js
+ ┃ ┃ ┃ ┣ 📜UserVoucher.js
+ ┃ ┃ ┃ ┣ 📜Voucher.js
+ ┃ ┃ ┃ ┗ 📜Wishlist.js
+ ┃ ┃ ┣ 📂repositories
+ ┃ ┃ ┃ ┣ 📜AddressRepository.js
+ ┃ ┃ ┃ ┣ 📜BrandRepository.js
+ ┃ ┃ ┃ ┣ 📜CartItemRepository.js
+ ┃ ┃ ┃ ┣ 📜CartRepository.js
+ ┃ ┃ ┃ ┣ 📜CategoryRepository.js
+ ┃ ┃ ┃ ┣ 📜checkout.txt
+ ┃ ┃ ┃ ┣ 📜ContactMessageRepository.js
+ ┃ ┃ ┃ ┣ 📜DashboardRepository.js
+ ┃ ┃ ┃ ┣ 📜OrderItemRepository.js
+ ┃ ┃ ┃ ┣ 📜OrderRepository.js
+ ┃ ┃ ┃ ┣ 📜PaymentRepository.js
+ ┃ ┃ ┃ ┣ 📜ProductImageRepository.js
+ ┃ ┃ ┃ ┣ 📜ProductRepository.js
+ ┃ ┃ ┃ ┣ 📜ProductVariantRepository.js
+ ┃ ┃ ┃ ┣ 📜QuestionRepository.js
+ ┃ ┃ ┃ ┣ 📜RefreshTokenRepository.js
+ ┃ ┃ ┃ ┣ 📜ReviewRepository.js
+ ┃ ┃ ┃ ┣ 📜UserRepository.js
+ ┃ ┃ ┃ ┣ 📜UserVoucherRepository.js
+ ┃ ┃ ┃ ┣ 📜VoucherRepository.js
+ ┃ ┃ ┃ ┗ 📜WishListRepository.js
+ ┃ ┃ ┣ 📂services
+ ┃ ┃ ┃ ┣ 📜AddressService.js
+ ┃ ┃ ┃ ┣ 📜BrandService.js
+ ┃ ┃ ┃ ┣ 📜CartItemService.js
+ ┃ ┃ ┃ ┣ 📜CartService.js
+ ┃ ┃ ┃ ┣ 📜CategoryService.js
+ ┃ ┃ ┃ ┣ 📜ContactMessageService.js
+ ┃ ┃ ┃ ┣ 📜DashboardService.js
+ ┃ ┃ ┃ ┣ 📜flowCreateOrder.txt
+ ┃ ┃ ┃ ┣ 📜OrderItemService.js
+ ┃ ┃ ┃ ┣ 📜OrderService.js
+ ┃ ┃ ┃ ┣ 📜PaymentService.js
+ ┃ ┃ ┃ ┣ 📜ProductImageService.js
+ ┃ ┃ ┃ ┣ 📜ProductService.js
+ ┃ ┃ ┃ ┣ 📜ProductVariantService.js
+ ┃ ┃ ┃ ┣ 📜QuestionService.js
+ ┃ ┃ ┃ ┣ 📜RefreshTokenService.js
+ ┃ ┃ ┃ ┣ 📜ReviewService.js
+ ┃ ┃ ┃ ┣ 📜UserService.js
+ ┃ ┃ ┃ ┣ 📜VoucherService.js
+ ┃ ┃ ┃ ┗ 📜WishlistService.js
+ ┃ ┃ ┗ 📂utils
+ ┃ ┃ ┃ ┗ 📜AppError.js
+ ┃ ┣ 📂config
+ ┃ ┃ ┣ 📂db
+ ┃ ┃ ┃ ┗ 📜index.js
+ ┃ ┃ ┗ 📂util
+ ┃ ┃ ┃ ┗ 📜mongoose.js
+ ┃ ┣ 📂helpers
+ ┃ ┃ ┣ 📜filterAllOrders.js
+ ┃ ┃ ┣ 📜filterAllProducts.js
+ ┃ ┃ ┣ 📜filterAllProductVariants.js
+ ┃ ┃ ┣ 📜filterAllQuestions.js
+ ┃ ┃ ┣ 📜filterAllUsers.js
+ ┃ ┃ ┣ 📜filterAllVouchers.js
+ ┃ ┃ ┣ 📜filterMyOrder.js
+ ┃ ┃ ┣ 📜filterOrder.js
+ ┃ ┃ ┣ 📜filterProduct.js
+ ┃ ┃ ┣ 📜filterVoucher.js
+ ┃ ┃ ┣ 📜helpers.js
+ ┃ ┃ ┣ 📜pagination.js
+ ┃ ┃ ┣ 📜search.js
+ ┃ ┃ ┣ 📜searchVoucher.js
+ ┃ ┃ ┣ 📜sortable.js
+ ┃ ┃ ┣ 📜sortableProductVariants.js
+ ┃ ┃ ┣ 📜sortableVouchers.js
+ ┃ ┃ ┣ 📜validation.js
+ ┃ ┃ ┣ 📜validationBrand.js
+ ┃ ┃ ┣ 📜validationOrder.js
+ ┃ ┃ ┣ 📜validationProduct.js
+ ┃ ┃ ┣ 📜validationProductVariant.js
+ ┃ ┃ ┣ 📜validationReview.js
+ ┃ ┃ ┗ 📜validationVoucher.js
+ ┃ ┣ 📂public
+ ┃ ┃ ┣ 📂brand
+ ┃ ┃ ┃ ┣ 📜brand1785945674960-asus.png
+ ┃ ┃ ┃ ┣ 📜brand1785947373236-dell.png
+ ┃ ┃ ┃ ┣ 📜brand1785947413393-msi.jpg
+ ┃ ┃ ┃ ┣ 📜brand1785947426611-macbook.jpg
+ ┃ ┃ ┃ ┣ 📜brand1785947467042-acer.jpg
+ ┃ ┃ ┃ ┣ 📜brand1785947476726-lg.jpg
+ ┃ ┃ ┃ ┣ 📜brand1785949189292-lenovo.jpg
+ ┃ ┃ ┃ ┗ 📜brand1789922665884-logohp.png
+ ┃ ┃ ┣ 📂image_logo
+ ┃ ┃ ┃ ┣ 📜acer.jpg
+ ┃ ┃ ┃ ┣ 📜asus.png
+ ┃ ┃ ┃ ┣ 📜dell.png
+ ┃ ┃ ┃ ┣ 📜gigabyte.png
+ ┃ ┃ ┃ ┣ 📜github-recovery-codes.txt
+ ┃ ┃ ┃ ┣ 📜hp.png
+ ┃ ┃ ┃ ┣ 📜lenovo.jpg
+ ┃ ┃ ┃ ┣ 📜lg.jpg
+ ┃ ┃ ┃ ┣ 📜macbook.jpg
+ ┃ ┃ ┃ ┗ 📜msi.jpg
+ ┃ ┃ ┗ 📂product
+ ┃ ┃ ┃ ┣ 📜product-1788757640508-879195693.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757640509-266555840.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757640509-634057187.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757640509-837361084.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757666587-427710529.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757666588-337726680.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757666588-482557476.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757666588-590219116.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757679611-199098482.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757679612-699780088.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757679612-810364998.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757679614-142601770.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757707132-461585745.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757707133-140183584.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757707133-187309561.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788757707133-467881950.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764906791-221458652.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764906791-505468189.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764906791-631961715.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764906791-779645538.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764923479-183219799.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764923479-609491198.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764923480-638816641.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764923480-923949286.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764954398-159643027.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764954398-465213336.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764954398-577506399.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788764954398-606432537.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788836347084-2991030.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788836347085-579196765.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788836347086-542923465.jpg
+ ┃ ┃ ┃ ┣ 📜product-1788836347087-435151749.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789125208171-586902244.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789125217491-797557931.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789964157879-446674654.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789964157880-320711716.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789964157880-989393740.jpg
+ ┃ ┃ ┃ ┣ 📜product-1789964974764-89999642.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002631432-asus-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002631432-asus-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002631432-asus-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002631433-asus-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002758789-dell-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002758789-dell-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002758790-dell-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002758791-dell-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002785586-hp-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002785586-hp-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002785587-hp-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002785587-hp-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002814550-msi-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002814551-msi-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002814551-msi-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002814551-msi-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002855768-macbook-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002855768-macbook-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002855768-macbook-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002855768-macbook-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002881484-lenovo-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002881484-lenovo-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002881484-lenovo-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002881484-lenovo-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002923512-acer-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002923512-acer-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002923512-acer-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002923512-acer-4.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002953518-lg-1 - Copy.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002953519-lg-2 - Copy.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002953521-lg-3 - Copy.jpg
+ ┃ ┃ ┃ ┣ 📜product1786002953521-lg-4 - Copy.jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798088-lg-1 - Copy - Copy.jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798089-lg-1 - Copy (2).jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798089-lg-1.jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798089-lg-2.jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798089-lg-3 - Copy (2).jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798089-lg-3.jpg
+ ┃ ┃ ┃ ┣ 📜product1786007798090-lg-4 - Copy (2).jpg
+ ┃ ┃ ┃ ┗ 📜product1786007798090-lg-4 - Copy - Copy.jpg
+ ┃ ┣ 📂resources
+ ┃ ┣ 📂routes
+ ┃ ┃ ┣ 📜address.js
+ ┃ ┃ ┣ 📜admin.js
+ ┃ ┃ ┣ 📜auth.js
+ ┃ ┃ ┣ 📜brand.js
+ ┃ ┃ ┣ 📜cart.js
+ ┃ ┃ ┣ 📜cartItem.js
+ ┃ ┃ ┣ 📜category.js
+ ┃ ┃ ┣ 📜contactMessage.js
+ ┃ ┃ ┣ 📜index.js
+ ┃ ┃ ┣ 📜order.js
+ ┃ ┃ ┣ 📜orderItem.js
+ ┃ ┃ ┣ 📜payment.js
+ ┃ ┃ ┣ 📜product.js
+ ┃ ┃ ┣ 📜productImage.js
+ ┃ ┃ ┣ 📜productVariant.js
+ ┃ ┃ ┣ 📜question.js
+ ┃ ┃ ┣ 📜review.js
+ ┃ ┃ ┣ 📜user.js
+ ┃ ┃ ┣ 📜voucher.js
+ ┃ ┃ ┗ 📜wishlist.js
+ ┃ ┣ 📜deploy.txt
+ ┃ ┣ 📜index.js
+ ┃ ┗ 📜PC-Store-API-Spec.md
+ ┣ 📜.env
+ ┣ 📜.gitignore
+ ┣ 📜github.txt
+ ┣ 📜list_api.txt
+ ┣ 📜mysql.txt
+ ┣ 📜nodemon.json
+ ┣ 📜package-lock.json
+ ┣ 📜package.json
+ ┗ 📜root.txt

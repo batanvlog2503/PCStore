@@ -1,0 +1,223 @@
+ ┣ 📂public
+ ┃ ┣ 📜favicon.svg
+ ┃ ┣ 📜gioithieu.png
+ ┃ ┣ 📜icons.svg
+ ┃ ┣ 📜logo-store.jpg
+ ┃ ┣ 📜logo-store1.jpg
+ ┃ ┣ 📜logo-store2.jpg
+ ┃ ┣ 📜logo.jpg
+ ┃ ┣ 📜logo1.jpg
+ ┃ ┣ 📜quangcao1.png
+ ┃ ┣ 📜quangcao2.png
+ ┃ ┣ 📜quangcao3.png
+ ┃ ┗ 📜quangcao4.png
+ ┣ 📂src
+ ┃ ┣ 📂admin
+ ┃ ┃ ┣ 📂AdminQuestion
+ ┃ ┃ ┃ ┣ 📜AdminQuestion.jsx
+ ┃ ┃ ┃ ┣ 📜AdminQuestion.scss
+ ┃ ┃ ┃ ┗ 📜image.png
+ ┃ ┃ ┣ 📂AdminSidebar
+ ┃ ┃ ┃ ┣ 📜AdminSidebar.jsx
+ ┃ ┃ ┃ ┗ 📜NAV_ITEMS.js
+ ┃ ┃ ┣ 📂Dashboard
+ ┃ ┃ ┃ ┣ 📜Dashboard.jsx
+ ┃ ┃ ┃ ┣ 📜Dashboard.scss
+ ┃ ┃ ┃ ┣ 📜demoDashboard.png
+ ┃ ┃ ┃ ┣ 📜LatestProduct.jsx
+ ┃ ┃ ┃ ┗ 📜TopProducts.jsx
+ ┃ ┃ ┣ 📂ManagementBrand
+ ┃ ┃ ┃ ┣ 📜BrandFormPanel.jsx
+ ┃ ┃ ┃ ┣ 📜BrandList.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementBrand.jsx
+ ┃ ┃ ┃ ┗ 📜ManagementBrand.scss
+ ┃ ┃ ┣ 📂ManagementCategory
+ ┃ ┃ ┃ ┣ 📜CategoryFormPanel.jsx
+ ┃ ┃ ┃ ┣ 📜CategoryList.jsx
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜ManagementCategory.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementCategory.scss
+ ┃ ┃ ┃ ┗ 📜VN_CHAR_MAP.js
+ ┃ ┃ ┣ 📂ManagementOrder
+ ┃ ┃ ┃ ┣ 📂components
+ ┃ ┃ ┃ ┃ ┣ 📜OrderFilter.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜OrderFilter.scss
+ ┃ ┃ ┃ ┃ ┣ 📜OrderStatusModal.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜OrderStatusModal.scss
+ ┃ ┃ ┃ ┃ ┣ 📜OrderTable.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜OrderTable.scss
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜ManagementOrder.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementOrder.scss
+ ┃ ┃ ┃ ┣ 📜ModalOrderDetail.jsx
+ ┃ ┃ ┃ ┗ 📜ModalOrderDetail.scss
+ ┃ ┃ ┣ 📂ManagementProduct.jsx
+ ┃ ┃ ┃ ┣ 📂AddComponent
+ ┃ ┃ ┃ ┃ ┣ 📜AddComponent.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜AddComponent.scss
+ ┃ ┃ ┃ ┣ 📂AddProduct
+ ┃ ┃ ┃ ┃ ┣ 📜AddProduct.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜AddProduct.scss
+ ┃ ┃ ┃ ┃ ┗ 📜image.png
+ ┃ ┃ ┃ ┣ 📂EditProduct
+ ┃ ┃ ┃ ┃ ┣ 📜EditProduct.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜EditProduct.scss
+ ┃ ┃ ┃ ┣ 📂modals
+ ┃ ┃ ┃ ┃ ┣ 📜ConfirmDeleteModal.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜ConfirmDeleteModal.scss
+ ┃ ┃ ┃ ┃ ┣ 📜ProductDetailModal.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜ProductDetailModal.scss
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜ManagementProduct.jsx
+ ┃ ┃ ┃ ┗ 📜ManagementProduct.scss
+ ┃ ┃ ┣ 📂ManagementVoucher
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜ListVoucher.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementVoucher.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementVoucher.scss
+ ┃ ┃ ┃ ┗ 📜VoucherFormModal.jsx
+ ┃ ┃ ┗ 📂User
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜ManagementUser.jsx
+ ┃ ┃ ┃ ┣ 📜ManagementUser.scss
+ ┃ ┃ ┃ ┣ 📜ModalAddUser.jsx
+ ┃ ┃ ┃ ┣ 📜ModalEditUser.jsx
+ ┃ ┃ ┃ ┗ 📜ModalEditUser.scss
+ ┃ ┣ 📂assets
+ ┃ ┃ ┣ 📜hero.png
+ ┃ ┃ ┣ 📜react.svg
+ ┃ ┃ ┗ 📜vite.svg
+ ┃ ┣ 📂components
+ ┃ ┃ ┣ 📂common
+ ┃ ┃ ┗ 📂layout
+ ┃ ┃ ┃ ┣ 📂Footer
+ ┃ ┃ ┃ ┃ ┣ 📜Footer.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜Footer.scss
+ ┃ ┃ ┃ ┗ 📂Header
+ ┃ ┃ ┃ ┃ ┣ 📜Header.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜Header.scss
+ ┃ ┣ 📂errors
+ ┃ ┃ ┣ 📂401
+ ┃ ┃ ┃ ┣ 📜UnauthorizedPage.jsx
+ ┃ ┃ ┃ ┗ 📜UnauthorizedPage.scss
+ ┃ ┃ ┣ 📂403
+ ┃ ┃ ┃ ┣ 📜ForbiddenPage.jsx
+ ┃ ┃ ┃ ┗ 📜ForbiddenPage.scss
+ ┃ ┃ ┣ 📂404
+ ┃ ┃ ┃ ┗ 📜NotFoundPage.jsx
+ ┃ ┃ ┣ 📂500
+ ┃ ┃ ┃ ┗ 📜ServerErrorPage.jsx
+ ┃ ┃ ┣ 📂Maintenance
+ ┃ ┃ ┃ ┗ 📜MaintenancePage.jsx
+ ┃ ┃ ┣ 📂Network
+ ┃ ┃ ┃ ┗ 📜NetworkErrorPage.jsx
+ ┃ ┃ ┗ 📂Session
+ ┃ ┃ ┃ ┗ 📜SessionErrorPage.jsx
+ ┃ ┣ 📂layouts
+ ┃ ┃ ┣ 📂AdminLayout
+ ┃ ┃ ┃ ┣ 📜AdminLayout.jsx
+ ┃ ┃ ┃ ┗ 📜AdminLayout.scss
+ ┃ ┃ ┗ 📂MainLayout
+ ┃ ┃ ┃ ┗ 📜MainLayout.jsx
+ ┃ ┣ 📂pages
+ ┃ ┃ ┣ 📂Cart
+ ┃ ┃ ┃ ┣ 📜Cart.jsx
+ ┃ ┃ ┃ ┗ 📜Cart.scss
+ ┃ ┃ ┣ 📂Checkout
+ ┃ ┃ ┃ ┣ 📜AddressSelectModal.jsx
+ ┃ ┃ ┃ ┣ 📜AddressSelectModal.scss
+ ┃ ┃ ┃ ┣ 📜Checkout.jsx
+ ┃ ┃ ┃ ┣ 📜Checkout.scss
+ ┃ ┃ ┃ ┣ 📜demo.png
+ ┃ ┃ ┃ ┗ 📜PaymentMethod.js
+ ┃ ┃ ┣ 📂Contact
+ ┃ ┃ ┃ ┣ 📜Contact.jsx
+ ┃ ┃ ┃ ┣ 📜Contact.scss
+ ┃ ┃ ┃ ┣ 📜ContactInfo.js
+ ┃ ┃ ┃ ┗ 📜image.png
+ ┃ ┃ ┣ 📂Home
+ ┃ ┃ ┃ ┣ 📜Home.jsx
+ ┃ ┃ ┃ ┣ 📜Home.scss
+ ┃ ┃ ┃ ┣ 📜Introduction.jsx
+ ┃ ┃ ┃ ┣ 📜Introduction.scss
+ ┃ ┃ ┃ ┣ 📜OPTIONS.js
+ ┃ ┃ ┃ ┣ 📜Question.jsx
+ ┃ ┃ ┃ ┣ 📜Question.scss
+ ┃ ┃ ┃ ┣ 📜ScrollToTop.jsx
+ ┃ ┃ ┃ ┣ 📜TopProduct.jsx
+ ┃ ┃ ┃ ┗ 📜TopProduct.scss
+ ┃ ┃ ┣ 📂Login
+ ┃ ┃ ┃ ┣ 📜Login.jsx
+ ┃ ┃ ┃ ┗ 📜Login.scss
+ ┃ ┃ ┣ 📂OrderSuccess
+ ┃ ┃ ┃ ┣ 📜basicFlowForOrder.txt
+ ┃ ┃ ┃ ┣ 📜demo.png
+ ┃ ┃ ┃ ┣ 📜OrderSuccess.jsx
+ ┃ ┃ ┃ ┗ 📜OrderSuccess.scss
+ ┃ ┃ ┣ 📂Payment
+ ┃ ┃ ┃ ┣ 📜Payment.jsx
+ ┃ ┃ ┃ ┗ 📜Payment.scss
+ ┃ ┃ ┣ 📂Product
+ ┃ ┃ ┃ ┣ 📜demoProduct.png
+ ┃ ┃ ┃ ┣ 📜Product.jsx
+ ┃ ┃ ┃ ┗ 📜Product.scss
+ ┃ ┃ ┣ 📂Profile
+ ┃ ┃ ┃ ┣ 📂MyAddress
+ ┃ ┃ ┃ ┃ ┣ 📜AddressModal.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜AddressModal.scss
+ ┃ ┃ ┃ ┃ ┣ 📜MyAddress.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜MyAddress.scss
+ ┃ ┃ ┃ ┣ 📂MyInfor
+ ┃ ┃ ┃ ┃ ┣ 📜MyInfor.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜MyInfor.scss
+ ┃ ┃ ┃ ┣ 📂MyLog
+ ┃ ┃ ┃ ┃ ┗ 📜MyLog.jsx
+ ┃ ┃ ┃ ┣ 📂MyOrder
+ ┃ ┃ ┃ ┃ ┣ 📜MyOrder.jsx
+ ┃ ┃ ┃ ┃ ┣ 📜MyOrder.scss
+ ┃ ┃ ┃ ┃ ┣ 📜OrderDetail.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜OrderDetail.scss
+ ┃ ┃ ┃ ┣ 📂MyOrdered
+ ┃ ┃ ┃ ┃ ┗ 📜MyOrdered.jsx
+ ┃ ┃ ┃ ┣ 📂Sidebar
+ ┃ ┃ ┃ ┃ ┣ 📜items.js
+ ┃ ┃ ┃ ┃ ┣ 📜Sidebar.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜Sidebar.scss
+ ┃ ┃ ┃ ┣ 📂WishList
+ ┃ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┃ ┣ 📜WishList.jsx
+ ┃ ┃ ┃ ┃ ┗ 📜WishList.scss
+ ┃ ┃ ┃ ┣ 📜Profile.jsx
+ ┃ ┃ ┃ ┗ 📜Profile.scss
+ ┃ ┃ ┣ 📂Register
+ ┃ ┃ ┃ ┗ 📜Register.jsx
+ ┃ ┃ ┣ 📂Toast
+ ┃ ┃ ┃ ┣ 📜instruct.txt
+ ┃ ┃ ┃ ┣ 📜Toast.jsx
+ ┃ ┃ ┃ ┣ 📜Toast.scss
+ ┃ ┃ ┃ ┗ 📜ToastContainer.jsx
+ ┃ ┃ ┣ 📂Voucher
+ ┃ ┃ ┃ ┣ 📜image.png
+ ┃ ┃ ┃ ┣ 📜imageAdmin.png
+ ┃ ┃ ┃ ┣ 📜Voucher.jsx
+ ┃ ┃ ┃ ┗ 📜Voucher.scss
+ ┃ ┃ ┣ 📜LoginRequiredModal.css
+ ┃ ┃ ┗ 📜LoginRequiredModal.jsx
+ ┃ ┣ 📂utils
+ ┃ ┃ ┣ 📜axiosInstance.js
+ ┃ ┃ ┗ 📜ProtectRoute.jsx
+ ┃ ┣ 📜App.css
+ ┃ ┣ 📜App.jsx
+ ┃ ┣ 📜index.css
+ ┃ ┗ 📜main.jsx
+ ┣ 📜.env
+ ┣ 📜.gitignore
+ ┣ 📜.oxlintrc.json
+ ┣ 📜demo-image.png
+ ┣ 📜index.html
+ ┣ 📜package-lock.json
+ ┣ 📜package.json
+ ┣ 📜README.md
+ ┣ 📜rootFe.txt
+ ┣ 📜vercel.json
+ ┗ 📜vite.config.js
