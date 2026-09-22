@@ -1,452 +1,913 @@
 # PC Store
 
+A full-stack e-commerce web application for selling laptops, PC components, and related computer products. PC Store provides a customer-facing storefront for browsing, cart management, checkout, and order tracking, plus an admin panel for catalog, order, user, and promotion management.
+
+The system is built as a **React SPA** communicating with a **Node.js REST API**, backed by **MongoDB**.
+
+---
+
 ## 1. Project Overview
 
-**PC Store** is a full-stack e-commerce web application for selling laptops and computer accessories, built as a single-store (non-marketplace) platform in the style of Shopee. It provides a customer-facing storefront for browsing, purchasing, and tracking laptop orders, plus a dedicated admin panel for managing catalog, orders, vouchers, and users.
+**PC Store** is an online retail platform focused on computer hardware—primarily laptops and PC components. It solves the problem of selling products with multiple configuration variants (CPU, RAM, storage, GPU, screen size), each with its own price, discount, and stock level.
 
-The system is a **MERN-style stack** (MongoDB, Express, React, Node.js), split into two independently deployable apps:
+| Aspect | Description |
+|---|---|
+| **Application type** | Full-stack e-commerce web application |
+| **Main purpose** | Allow customers to browse products, manage carts, place orders, and pay online or on delivery; allow admins to manage catalog, orders, users, vouchers, and customer questions |
+| **Architecture style** | Monorepo with separate `frontend/` and `backend/` packages |
+| **API style** | RESTful JSON API (routes mounted at the backend root, e.g. `/auth`, `/product`) |
 
-- `frontend/` — a React (Vite) single-page application for customers and admins
-- `backend/` — a Node.js/Express REST API following a layered Controller → Service → Repository → Model architecture
-
-Its main purpose is to demonstrate a realistic, production-shaped e-commerce backend: product variants with per-configuration pricing/stock, cart and checkout, voucher discounts (product and shipping vouchers), order status lifecycle, JWT authentication with refresh-token rotation, and real payment-gateway integrations (SePay bank-transfer webhook, MoMo).
+---
 
 ## 2. Features
 
 ### Customer features
 
-- Browse products by category (with parent/child category tree) and brand
-- View product detail with multiple configurations/variants (CPU, RAM, storage, GPU, screen), images, and reviews
-- Add products to cart, update quantities, view a cart summary
-- Manage shipping addresses, with a default address
-- Checkout with voucher application (separate product-discount and shipping-discount vouchers)
-- Pay via Cash on Delivery, bank transfer (SePay), or MoMo
-- Track order status and order history; cancel a pending order
-- Wishlist products
-- Leave product/variant reviews and ratings
-- Ask public questions about products/store (answered by admin)
-- Submit contact messages to the store
+- Browse product variants on the home page with filters (use case, brand, price, CPU, RAM, storage, GPU, screen size, resolution, in-stock) and sorting
+- View product detail pages with variant selection, images, pricing, and stock status
+- Add products to cart and update quantities
+- Checkout with shipping address selection, order notes, and payment method choice
+- Claim and apply vouchers (separate product discount and shipping discount vouchers)
+- View order history, order details, and cancel pending orders
+- Manage profile information (username, phone)
+- Manage saved delivery addresses (add, edit, delete, set default)
+- Wishlist (add/remove products, view saved items)
+- Browse promotional vouchers on the voucher page
+- Submit contact messages
+- Submit product questions on the home page and view approved Q&A
+- Bank transfer payment page with QR code and automatic payment status polling
 
 ### Admin features
 
-- Dashboard with revenue chart, order chart, order-status breakdown, latest products, and top-selling products
-- Product management: create/update/soft-delete products, manage variants (price, discount price, stock, specs) and product images (upload, set main image)
-- Category management (create/update/delete, tree view)
-- Brand management (create/update/delete, logo upload)
-- Order management: view all orders, update order status, view order items
-- Voucher management: create/update/delete product and shipping vouchers
-- User management: list users, view user stats, add users, update user status
-- Question management: view, reply to, hide, or delete customer questions
-- Contact-message management (view, update status, delete)
+- Dashboard with revenue chart, orders chart, order status statistics, latest products, and top-selling products
+- User management (list, search, filter, add users, update status: active/inactive/blocked)
+- Order management (list, filter, view details, update order status with allowed transitions)
+- Product management (create, edit, soft-delete, upload images, manage variants)
+- PC component management (dedicated add-component flow)
+- Category management (hierarchical parent/child categories)
+- Brand management (CRUD with logo upload)
+- Voucher management (create, update, delete)
+- Question moderation (view, reply, hide, delete customer questions)
 
 ### Authentication
 
-- Registration and login with hashed passwords (`bcrypt`)
-- JWT access tokens (8h expiry) and refresh tokens (3d expiry), with refresh tokens persisted in MongoDB and rotated on every refresh
-- Logout invalidates the stored refresh token
-- Role-based access control (`user` / `admin`) enforced via middleware
+- User registration (username, email, phone, password)
+- Login with email and password
+- JWT access token (8-hour expiry) and refresh token (3-day expiry)
+- Automatic access token refresh via Axios interceptor
+- Logout (invalidates refresh token)
+- Role-based access: `user` and `admin`
 
 ### Product management
 
-- Products hold descriptive data only (name, slug, description, rating average, sold count, use case, status); every product has one or more **variants** that hold price, discount price, stock, and hardware specs
-- Multiple images per product with a designated main image
+- Products with category, brand, slug, description, use case, rating average, sold count, and soft delete
+- Product variants with SKU, configuration name, technical specs, price, discount price, stock, and status
+- Multiple product images with main image support
+- Slug generation for products, categories, and brands
 
 ### Category management
 
-- Self-referencing category tree (`parent_id`) supporting nested categories
+- Self-referencing hierarchical categories (`parent_id`)
+- Admin tree view for category management
 
 ### Brand management
 
-- Brand catalog with uploaded logo images
+- Brand CRUD with logo image upload
+- Brand listing on the home page
 
 ### Cart
 
-- One cart per user, cart items reference a specific product variant and quantity, with an aggregated cart summary endpoint
+- One cart per user
+- Cart items linked to product variants
+- Stock validation when adding or updating items
+- Cart summary with line totals
 
 ### Orders
 
-- Snapshot-based order items (product name, image, SKU, config name, and price are copied at purchase time, independent of later product changes)
-- Stock validation and atomic stock deduction using MongoDB transactions
-- Order status flow: `pending → confirmed → shipping → completed`, with `cancelled` as a terminal state that restores stock
+- Order creation from selected cart items
+- Price snapshot on order items at checkout time
+- Stock deduction inside a MongoDB transaction
+- Order code generation (`DH` + timestamp)
+- Fixed shipping fee (20,000 VND)
+- Customer order cancellation (pending orders only)
+- Admin order status workflow
 
 ### Payments
 
-- **SePay** webhook integration: verifies an API-key header, parses the order code from the bank transfer content, and marks the matching order as paid
-- **MoMo** payment gateway integration for generating a hosted payment URL
+- **COD** (cash on delivery): order placed directly, payment collected on delivery
+- **Bank transfer (SePay)**: QR-based bank transfer with SePay webhook confirmation
+- Payment status polling on the frontend (every 3 seconds, 15-minute payment window)
 
-### Other features found in the source code
+### Other features
 
-- Voucher system with two voucher types (`product`, `shipping`), percentage or fixed discounts, minimum order value, max discount cap, and per-user voucher claiming/usage tracking
-- Soft-delete support for products (`mongoose-delete`)
-- Pagination, search, and sorting helpers shared across list endpoints
-- Server-rendered Handlebars views are configured on the backend (`express-handlebars`), alongside the primary JSON REST API
+- Product reviews API (backend implemented; no dedicated customer review UI on the product page)
+- Contact message submission and status tracking
+- Customer Q&A with admin reply workflow
+- Custom error pages (401, 403, 404, 500, network, maintenance, session)
+- Toast notifications
+- Static file serving for uploaded product and brand images
+
+---
 
 ## 3. Tech Stack
 
 ### Frontend
 
-- React 19 with `react-router-dom` v7 (client-side routing, nested/protected routes)
-- Vite as the build tool and dev server
-- Axios with request/response interceptors for JWT attachment and silent access-token refresh
-- Sass (`.scss`) for styling
-- `react-icons`
+| Technology | Purpose |
+|---|---|
+| React 19 | UI library |
+| Vite 8 | Build tool and dev server |
+| React Router DOM 7 | Client-side routing |
+| Axios | HTTP client with auth interceptors |
+| Sass | Component styling |
+| React Icons | Icon set |
+| Oxlint | Linting |
 
 ### Backend
 
-- Node.js with Express 5
-- Mongoose (MongoDB ODM), with `mongoose-delete` (soft delete) and `mongoose-slug-generator`
-- `jsonwebtoken` for access/refresh tokens, `bcrypt` for password hashing
-- `express-validator` for request validation
-- `multer` for image uploads (brand logos, product images)
-- `express-handlebars` for server-rendered views
-- `axios` for outbound calls to the MoMo payment gateway
-- `cors`, `morgan` (HTTP logging), `method-override`
+| Technology | Purpose |
+|---|---|
+| Node.js | Runtime |
+| Express 5 | HTTP server and routing |
+| Mongoose 9 | MongoDB ODM |
+| JSON Web Token (`jsonwebtoken`) | Access and refresh tokens |
+| bcrypt | Password hashing |
+| express-validator | Request validation |
+| Multer | Image upload handling |
+| CORS | Cross-origin requests |
+| Morgan | HTTP request logging |
+| slugify | Slug generation |
+| mongoose-delete | Soft delete for products |
+| express-handlebars | Legacy server-side view engine (alongside REST API) |
+| dotenv | Environment variable loading |
 
 ### Database
 
-- MongoDB, accessed through Mongoose ODM
+| Technology | Purpose |
+|---|---|
+| MongoDB | Primary database |
+| Mongoose | Schema modeling, indexing, transactions |
 
 ### Deployment
 
-- Frontend: Vercel (SPA rewrite configuration in `vercel.json`)
-- Backend: Render
+| Platform | Component |
+|---|---|
+| [Vercel](https://vercel.com) | Frontend (`vercel.json` SPA rewrites) |
+| [Render](https://render.com) | Backend (uses `process.env.PORT`) |
+| MongoDB Atlas (or compatible) | Database (via `MONGO_URL`) |
+
+---
 
 ## 4. System Architecture
 
-The backend follows a layered architecture. A request travels through:
+The backend follows a layered architecture. Each layer has a single responsibility:
 
 ```
-Frontend (React)
-   → REST API (Express routes)
-   → Controller
-   → Service (business logic, validation, transactions)
-   → Repository (Mongoose queries)
-   → Model (Mongoose schema)
-   → MongoDB
+Frontend (React SPA)
+    ↓ HTTP + JWT
+Routes (Express routers)
+    ↓
+Controllers (request/response handling)
+    ↓
+Services (business logic, transactions, validation)
+    ↓
+Repositories (database queries)
+    ↓
+Models (Mongoose schemas)
+    ↓
+MongoDB
 ```
 
-- **Routes** map HTTP verbs/paths to controller methods and attach `auth`/`authorize` middleware.
-- **Controllers** parse the request, call the corresponding service, and shape the HTTP response.
-- **Services** contain business rules — stock checks, voucher calculation, order-total calculation, MongoDB transactions for order creation/cancellation.
-- **Repositories** are the only layer that talks to Mongoose models directly, keeping query logic out of services.
-- **Models** define Mongoose schemas, indexes, and (for `Product`) the soft-delete plugin.
+| Layer | Responsibility |
+|---|---|
+| **Frontend** | UI rendering, routing, local auth state, API calls |
+| **Routes** | HTTP endpoint mapping, middleware attachment |
+| **Controllers** | Parse requests, call services, format JSON responses |
+| **Services** | Business rules, calculations, MongoDB transactions |
+| **Repositories** | Data access abstraction over Mongoose |
+| **Models** | Schema definitions, indexes, relationships |
+| **MongoDB** | Persistent data storage |
 
 ```mermaid
 flowchart LR
-    A[React Frontend] -->|Axios + JWT| B[Express Routes]
-    B --> C[Middlewares<br/>auth / authorize / errorHandler]
-    C --> D[Controllers]
-    D --> E[Services<br/>business logic & transactions]
-    E --> F[Repositories]
-    F --> G[Mongoose Models]
-    G --> H[(MongoDB)]
+    subgraph Client
+        FE[React Frontend]
+    end
 
-    D -. webhook .-> I[SePay]
-    E -. gateway call .-> J[MoMo]
+    subgraph Backend
+        R[Routes]
+        C[Controllers]
+        S[Services]
+        Repo[Repositories]
+        M[Models]
+    end
+
+    DB[(MongoDB)]
+
+    FE -->|REST + Bearer JWT| R
+    R --> C
+    C --> S
+    S --> Repo
+    Repo --> M
+    M --> DB
+
+    SEPAY[SePay Webhook] -->|POST /payment/sepay/webhook| R
 ```
+
+---
 
 ## 5. Project Structure
 
 ```
 website-laptop/
 ├── frontend/
+│   ├── public/                    # Static assets (logos, banners)
 │   ├── src/
-│   │   ├── pages/            # Home, Product, Cart, Checkout, Payment, Profile, Voucher, Contact...
-│   │   ├── admin/             # Dashboard, product/category/brand/voucher/user management, questions
-│   │   ├── layouts/           # MainLayout, AdminLayout
-│   │   ├── components/        # layout/ (Header, Footer), common/
-│   │   ├── errors/             # 401, 403, 404, 500, Network, Maintenance, Session pages
-│   │   ├── utils/              # axiosInstance.js (JWT interceptor), ProtectRoute.jsx
-│   │   └── App.jsx             # route definitions
+│   │   ├── admin/                 # Admin panel pages
+│   │   │   ├── Dashboard/
+│   │   │   ├── ManagementProduct.jsx/
+│   │   │   ├── ManagementOrder/
+│   │   │   ├── ManagementCategory/
+│   │   │   ├── ManagementBrand/
+│   │   │   ├── ManagementVoucher/
+│   │   │   ├── AdminQuestion/
+│   │   │   ├── User/
+│   │   │   └── AdminSidebar/
+│   │   ├── components/layout/     # Header, Footer
+│   │   ├── errors/                # Error pages (401, 403, 404, 500, ...)
+│   │   ├── layouts/               # MainLayout, AdminLayout
+│   │   ├── pages/                 # Customer pages (Home, Cart, Checkout, ...)
+│   │   ├── utils/                 # axiosInstance, ProtectRoute
+│   │   ├── App.jsx                # Route definitions
+│   │   └── main.jsx               # Entry point
+│   ├── vercel.json                # Vercel SPA routing
 │   ├── vite.config.js
-│   └── vercel.json
+│   └── package.json
 │
 └── backend/
-    └── src/
-        ├── app/
-        │   ├── controllers/    # one controller per resource (Product, Order, Payment, Voucher...)
-        │   ├── services/       # business logic, e.g. OrderService, VoucherService, PaymentService
-        │   ├── repositories/   # Mongoose data access layer
-        │   ├── models/         # Mongoose schemas (User, Product, ProductVariant, Order...)
-        │   ├── middlewares/    # auth.js, authorize.js, errorHandler.js
-        │   ├── gateway/        # MomoGateway.js
-        │   └── utils/          # AppError.js
-        ├── routes/             # Express routers per resource + routes/index.js
-        ├── helpers/            # filtering, pagination, sorting, validation
-        ├── config/db/          # Mongoose connection
-        ├── public/             # uploaded brand/product images (served as static files)
-        └── index.js            # app entry point
+    ├── src/
+    │   ├── app/
+    │   │   ├── controllers/       # HTTP handlers
+    │   │   ├── services/          # Business logic
+    │   │   ├── repositories/      # Data access
+    │   │   ├── models/            # Mongoose schemas
+    │   │   ├── middlewares/       # auth, authorize, errorHandler
+    │   │   ├── gateway/           # Payment gateways (MoMo, SePay docs)
+    │   │   └── utils/             # AppError helper
+    │   ├── routes/                # Express route modules
+    │   ├── helpers/               # Validation, filtering, pagination
+    │   ├── config/db/             # MongoDB connection
+    │   ├── public/                # Uploaded images (product, brand)
+    │   └── index.js               # Server entry point
+    └── package.json
 ```
+
+---
 
 ## 6. Frontend Architecture
 
-- **React + `react-router-dom` v7**, with a `createBrowserRouter`/`createRoutesFromElements` route tree defined in `App.jsx`.
-- **Layouts**: `MainLayout` wraps the public storefront (header/footer + nested pages such as `Home`, `Product`, `Cart`, `Checkout`, `Payment`, `Voucher`, `Contact`, and the `account` profile section); `AdminLayout` wraps all `/admin/*` pages (Dashboard, product/category/brand/voucher/user management, questions).
-- **Protected routes**: `utils/ProtectRoute.jsx` reads the logged-in user from `localStorage`, redirects unauthenticated users to `/login`, and can additionally restrict a route subtree to specific roles via an `allowedRoles` prop (used to gate the entire `/admin` tree to `role === "admin"`).
-- **API communication**: a shared `axiosInstance` (in `utils/axiosInstance.js`) attaches the JWT access token from `localStorage` to every outgoing request via a request interceptor.
-- **Authentication handling / silent refresh**: a response interceptor catches `401`/`403` responses, calls `POST /auth/refresh-token` with the stored refresh token, stores the new tokens, and retries the original request; if the refresh call also fails, local storage is cleared and the user is redirected to `/403`.
-- **Error pages**: dedicated `401`, `403`, `404`, `500`, `Network`, `Maintenance`, and `Session` pages under `src/errors/`.
-- **Modules**: `pages/Toast` provides app-wide toast notifications (`ToastContainer` mounted at the root of `App.jsx`); `pages/LoginRequiredModal.jsx` prompts guests to log in from guest-accessible pages such as product detail.
+### React structure
+
+The frontend is a single-page application bootstrapped with Vite. Pages are organized under `src/pages/` (customer) and `src/admin/` (admin panel).
+
+### Routing
+
+React Router v7 (`createBrowserRouter`) defines all routes in `App.jsx`:
+
+- **Public routes** (inside `MainLayout`): home, product detail, cart, login, register, contact, vouchers
+- **Protected routes** (inside `ProtectRoute`): account profile, orders, wishlist, addresses, checkout, order detail
+- **Admin routes** (inside `ProtectRoute` with `allowedRoles={["admin"]}`): dashboard, users, orders, products, categories, brands, vouchers, questions
+
+### Layouts
+
+- `MainLayout`: Header + page content + Footer
+- `AdminLayout`: Admin sidebar navigation + admin page content
+
+### State management
+
+There is no global state library (no Redux or Zustand). State is managed with React hooks (`useState`, `useEffect`, `useMemo`) per component. Authentication data is persisted in `localStorage`:
+
+- `accessToken`
+- `refreshToken`
+- `user` (JSON object with role)
+
+### API communication
+
+`axiosInstance` (`src/utils/axiosInstance.js`):
+
+- Attaches `Authorization: Bearer <accessToken>` on every request
+- On 401/403, attempts token refresh via `POST /auth/refresh-token`
+- Clears storage and redirects to `/403` if refresh fails
+
+All API calls use `import.meta.env.VITE_APP_URL` as the backend base URL.
+
+### Authentication handling
+
+- Login stores tokens and user in `localStorage`, then redirects to `/admin` (admin) or `/` (user)
+- Logout calls `POST /auth/logout` and clears `localStorage`
+- Admin users hitting non-admin protected routes are redirected to `/`
+
+### Protected routes
+
+`ProtectRoute` checks `localStorage.user`:
+
+- No user → redirect to `/login`
+- Optional `allowedRoles` prop → redirect to `/` if role not allowed
+
+### Important frontend modules
+
+| Module | Purpose |
+|---|---|
+| `pages/Home/Home.jsx` | Product listing with filters and pagination |
+| `pages/Product/Product.jsx` | Product detail, variant selection, add to cart, wishlist |
+| `pages/Cart/Cart.jsx` | Cart management and checkout navigation |
+| `pages/Checkout/Checkout.jsx` | Address, vouchers, payment method, place order |
+| `pages/Payment/Payment.jsx` | Bank transfer QR and payment polling |
+| `admin/Dashboard/Dashboard.jsx` | Admin analytics charts |
+| `pages/Toast/ToastContainer.jsx` | Global toast notifications |
+
+---
 
 ## 7. Backend Architecture
 
-- **Express application** (`src/index.js`) sets up CORS, JSON/urlencoded body parsing, `method-override`, `morgan` request logging, a Handlebars view engine, static file serving for `src/public`, and mounts all routers via `routes/index.js` before a global `errorHandler`.
-- **Routes** are grouped by resource (`/auth`, `/user`, `/product`, `/category`, `/brand`, `/cart`, `/cart-item`, `/order`, `/order-item`, `/voucher`, `/review`, `/payment`, `/admin`, `/wishlist`, `/contact`, `/question`, `/product-image`, `/product-variant`, `/address`).
-- **Controllers** validate input (via `express-validator` results), delegate to services, and return a JSON response.
-- **Services** hold the business logic — for example, `OrderService.createOrder` validates the cart, checks stock, applies at most one product voucher and one shipping voucher, computes totals, and creates the order + order items inside a MongoDB transaction, decrementing stock atomically.
-- **Repositories** wrap Mongoose queries (find/create/update/aggregate) for each model, keeping services persistence-agnostic.
-- **Middlewares**:
-  - `auth.js` verifies the `Authorization: Bearer <token>` JWT against `ACCESS_TOKEN_SECRET` and attaches the decoded payload to `req.user`.
-  - `authorize(...roles)` checks `req.user.role` against an allow-list and returns `403` if not permitted.
-  - `errorHandler.js` is a centralized Express error handler that logs the failing request/stack and returns a JSON error response (including the stack trace only when `NODE_ENV=development`).
-- **Typical request flow**: `Route → auth (optional) → authorize (optional) → validator (optional) → Controller → Service → Repository → Model → MongoDB → JSON response`.
+### Express application structure
+
+`src/index.js` bootstraps Express with:
+
+- CORS, JSON body parser, URL-encoded parser
+- Morgan logging
+- Static file serving from `public/`
+- Handlebars view engine (legacy)
+- Central route registration via `routes/index.js`
+- Global error handler middleware
+
+### Request flow
+
+```
+HTTP Request
+  → Route (middleware: auth, authorize, validators)
+  → Controller (extract params/body, call service)
+  → Service (business logic, transactions)
+  → Repository (MongoDB queries)
+  → Response JSON { success, message, data }
+```
+
+On error, `AppError` is thrown with a status code and caught by `errorHandler`, which returns:
+
+```json
+{ "success": false, "message": "Error description" }
+```
+
+### Routes
+
+Route modules are mounted in `routes/index.js` without an `/api` prefix:
+
+| Mount path | Module |
+|---|---|
+| `/auth` | Authentication |
+| `/user` | User profile |
+| `/address` | Delivery addresses |
+| `/category` | Categories |
+| `/brand` | Brands |
+| `/product` | Products |
+| `/product-variant` | Product variants |
+| `/product-image` | Product images |
+| `/cart` | Shopping carts |
+| `/cart-item` | Cart line items |
+| `/order` | Orders |
+| `/order-item` | Order line items |
+| `/voucher` | Vouchers |
+| `/review` | Reviews |
+| `/payment` | Payment webhooks |
+| `/wishlist` | Wishlists |
+| `/contact` | Contact messages |
+| `/question` | Customer questions |
+| `/admin` | Admin-only endpoints |
+
+### Controllers, services, repositories
+
+- **Controllers** handle HTTP concerns only (status codes, JSON shape)
+- **Services** contain business logic (order creation, voucher calculation, stock management, transactions)
+- **Repositories** encapsulate Mongoose queries and aggregations
+
+### Middlewares
+
+| Middleware | Purpose |
+|---|---|
+| `auth.js` | Verifies JWT access token from `Authorization: Bearer` header |
+| `authorize.js` | Role-based access control (`authorize("admin")`, `authorize("user")`) |
+| `errorHandler.js` | Centralized error response formatting |
+
+### Error handling
+
+Services throw `AppError(statusCode, message)`. The global handler logs the error and returns a consistent JSON error response. Stack traces are included only when `NODE_ENV=development`.
+
+---
 
 ## 8. Authentication & Authorization
 
-- **Register** (`POST /auth/register`) and **Login** (`POST /auth/login`) are validated with `express-validator`; passwords are hashed with `bcrypt` before being stored.
-- **JWT access token**: signed with `ACCESS_TOKEN_SECRET`, expires in **8 hours**.
-- **Refresh token**: signed with `REFRESH_TOKEN_SECRET`, expires in **3 days**, and is persisted in a `RefreshToken` MongoDB collection.
-- **Token refresh flow** (`POST /auth/refresh-token`): the submitted refresh token is looked up in the database, verified, and — if valid — the old token is deleted and a new access/refresh token pair is issued and stored (rotation).
-- **Logout** (`POST /auth/logout`, requires auth) deletes the caller's stored refresh token.
-- **Role-based authorization**: the `authorize(...roles)` middleware restricts endpoints to specific roles (`user`, `admin`); most catalog-mutating and dashboard endpoints require `admin`.
-- **Protected routes**: on the frontend, `ProtectRoute` blocks unauthenticated access to account and checkout pages, and restricts `/admin/*` to users with `role === "admin"`.
+### Registration
+
+- **Endpoint:** `POST /auth/register`
+- **Fields:** username, email, phone, password
+- Passwords are hashed with bcrypt (10 salt rounds)
+- Default role: `user`, default status: `active`
+
+### Login
+
+- **Endpoint:** `POST /auth/login`
+- **Fields:** email, password
+- Blocked users (`status: "blocked"`) cannot log in
+- On success, previous refresh tokens for the user are deleted and new tokens are issued
+
+### JWT access token
+
+- Signed with `ACCESS_TOKEN_SECRET`
+- Expiry: **8 hours**
+- Payload includes user document fields (including `_id`, `role`)
+- Sent as `Authorization: Bearer <token>`
+
+### Refresh token
+
+- Signed with `REFRESH_TOKEN_SECRET`
+- Expiry: **3 days**
+- Stored in the `RefreshToken` collection linked to `user_id`
+
+### Token refresh flow
+
+1. Frontend receives 401/403 on an API call
+2. Frontend sends `POST /auth/refresh-token` with the stored refresh token
+3. Backend verifies the token exists in the database and is valid
+4. Old refresh token is deleted; new access and refresh tokens are issued
+5. Original request is retried with the new access token
+
+### Logout
+
+- **Endpoint:** `POST /auth/logout` (requires auth)
+- Deletes the provided refresh token from the database
+
+### Role-based authorization
+
+| Role | Access |
+|---|---|
+| `user` | Customer endpoints (cart, orders, addresses, wishlist, checkout) |
+| `admin` | All admin routes under `/admin/*` |
+
+Admin routes use `auth` + `authorize("admin")` middleware.
+
+### Protected routes
+
+- **Backend:** JWT middleware on protected endpoints; `authorize()` for role checks
+- **Frontend:** `ProtectRoute` wrapper for authenticated and admin-only pages
+
+---
 
 ## 9. Database Design
 
-MongoDB collections (Mongoose models) and their key relationships:
+MongoDB stores all application data. Mongoose schemas define 19 models.
 
-- **User** — account with `username`, `email`, `phone`, hashed `password`, `role` (`user`/`admin`), `status`
-- **RefreshToken** — `user_id → User`, stores active refresh tokens
-- **Address** — `user_id → User`; delivery addresses, one can be `is_default`
-- **Category** — self-referencing `parent_id → Category` for a category tree
-- **Brand** — brand name, slug, logo
-- **Product** — `category_id → Category`, `brand_id → Brand`; descriptive fields only (soft-deletable)
-- **ProductVariant** — `product_id → Product`; SKU, config name, specs (CPU/RAM/storage/GPU/screen), `price`, `discount_price`, `stock`, `status`
-- **ProductImage** — `product_id → Product`; image URL and `is_main` flag
-- **Review** — `product_id → Product`, `variant_id → ProductVariant`, `user_id → User`; rating and comment
-- **Wishlist** — `user_id → User`, `product_id → Product` (unique pair)
-- **Cart** — one per `user_id → User`
-- **CartItem** — `cart_id → Cart`, `variant_id → ProductVariant`, `quantity`
-- **Voucher** — `voucher_type` (`product`/`shipping`), `discount_type` (`percent`/`fixed`), validity window, usage limit
-- **UserVoucher** — `user_id → User`, `voucher_id → Voucher`; tracks a claimed voucher's `available`/`used` status
-- **Order** — `user_id → User`, `address_id → Address`, `product_user_voucher_id`/`shipping_user_voucher_id → UserVoucher`; amounts, `status`, `payment_method`, `payment_status`, SePay/MoMo references
-- **OrderItem** — `order_id → Order`, `product_id → Product`, `variant_id → ProductVariant`; a purchase-time snapshot of name/image/SKU/config/price
-- **Payment** — `order_id → Order` (unique); MoMo `method`, `status`, `transaction_id`
-- **Question** — `user_id → User`; customer question with optional `admin_reply`
-- **ContactMessage** — optional `user_id → User`; name/email/phone/message with a status
+### Core models
+
+| Model | Key fields |
+|---|---|
+| **User** | username, email, phone, password, role, status |
+| **RefreshToken** | user_id, refreshToken |
+| **Address** | user_id, receiver_name, phone, province, district, ward, detail, is_default |
+| **Category** | parent_id, name, slug |
+| **Brand** | name, slug, logo_url |
+| **Product** | category_id, brand_id, name, slug, description, use_case, rating_avg, sold_count, status, image_url |
+| **ProductVariant** | product_id, sku, config_name, specs, price, discount_price, stock, status |
+| **ProductImage** | product_id, image_url, is_main |
+| **Cart** | user_id (unique) |
+| **CartItem** | cart_id, variant_id, quantity |
+| **Order** | user_id, address_id, order_code, subtotal, discounts, shipping_fee, total_amount, status, payment_method, payment_status |
+| **OrderItem** | order_id, product_id, variant_id, snapshot fields, price, quantity, subtotal |
+| **Voucher** | code, voucher_type, discount_type, discount_value, max_discount, min_order_value, quantity, dates, status |
+| **UserVoucher** | user_id, voucher_id, status (available/used) |
+| **Wishlist** | user_id, product_id |
+| **Review** | product_id, variant_id, user_id, rating, comment |
+| **Question** | user_id, content, status, admin_reply |
+| **ContactMessage** | user_id, name, email, phone, message, status |
+| **Payment** | order_id, method, status, transaction_id |
+
+### Key relationships
+
+- **Category → Category:** self-referencing `parent_id` for hierarchical categories
+- **Product → ProductVariant:** one product has many variants (`product_id`)
+- **Product → ProductImage:** one product has many images (`product_id`)
+- **Product → Category, Brand:** `category_id`, `brand_id` references
+- **User → Cart:** one cart per user (`user_id`, unique)
+- **Cart → CartItem → ProductVariant:** cart items reference variants
+- **User → Order → OrderItem:** orders belong to users; items snapshot product/variant data
+- **User → UserVoucher → Voucher:** users claim vouchers; vouchers are marked used on checkout
+- **User → Wishlist → Product:** unique pair per user and product
 
 ```mermaid
 erDiagram
-    USER ||--o{ ADDRESS : has
-    USER ||--o| CART : owns
-    USER ||--o{ ORDER : places
-    USER ||--o{ WISHLIST : saves
-    USER ||--o{ REVIEW : writes
-    USER ||--o{ USER_VOUCHER : claims
-    USER ||--o{ REFRESH_TOKEN : has
+    User ||--o| Cart : has
+    User ||--o{ Address : has
+    User ||--o{ Order : places
+    User ||--o{ UserVoucher : claims
+    User ||--o{ Wishlist : saves
+    User ||--o{ Question : asks
+    User ||--o{ Review : writes
 
-    CATEGORY ||--o{ CATEGORY : "parent of"
-    CATEGORY ||--o{ PRODUCT : contains
-    BRAND ||--o{ PRODUCT : makes
+    Category ||--o{ Category : "parent/child"
+    Category ||--o{ Product : contains
+    Brand ||--o{ Product : manufactures
 
-    PRODUCT ||--o{ PRODUCT_VARIANT : has
-    PRODUCT ||--o{ PRODUCT_IMAGE : has
-    PRODUCT ||--o{ REVIEW : receives
-    PRODUCT ||--o{ WISHLIST : "saved in"
+    Product ||--o{ ProductVariant : has
+    Product ||--o{ ProductImage : has
+    Product ||--o{ Wishlist : referenced_by
 
-    PRODUCT_VARIANT ||--o{ CART_ITEM : "referenced by"
-    PRODUCT_VARIANT ||--o{ ORDER_ITEM : "referenced by"
-    PRODUCT_VARIANT ||--o{ REVIEW : "reviewed as"
+    Cart ||--o{ CartItem : contains
+    ProductVariant ||--o{ CartItem : referenced_in
 
-    CART ||--o{ CART_ITEM : contains
+    Order ||--|{ OrderItem : contains
+    Order }o--o| Voucher : "product/shipping voucher"
+    Address ||--o{ Order : "ships to"
 
-    ORDER ||--o{ ORDER_ITEM : contains
-    ORDER ||--o| PAYMENT : has
-    ADDRESS ||--o{ ORDER : "ships to"
-
-    VOUCHER ||--o{ USER_VOUCHER : "claimed as"
-    USER_VOUCHER ||--o| ORDER : "applied to"
+    Voucher ||--o{ UserVoucher : claimed_as
+    ProductVariant ||--o{ OrderItem : "snapshot at purchase"
+    Product ||--o{ OrderItem : "snapshot at purchase"
 ```
+
+---
 
 ## 10. Core Business Logic
 
-- **Product variants**: every product's price and stock live exclusively on its `ProductVariant` documents, so one product can offer several configurations (CPU/RAM/storage combinations) with independent pricing and stock.
-- **Pricing & discounts**: each variant has an optional `discount_price`; `OrderService` computes `subtotal` from the base `price` and `product_discount` from the difference between `price` and `discount_price` across all ordered quantities.
-- **Inventory/stock**: stock is validated before checkout (`variant.status === "active"` and `quantity <= stock`), decremented atomically inside the order-creation transaction, and restored when an order is cancelled.
-- **Cart calculations**: `CartItemController`/`Service` expose a cart summary endpoint that aggregates item subtotals for the cart.
-- **Order creation**: implemented as a single MongoDB transaction that validates the selected cart items, applies at most one product voucher and one shipping voucher, computes the final total, creates the `Order` and its `OrderItem` snapshots, marks used vouchers, decrements stock, and clears the purchased cart items — rolling back entirely on any failure.
-- **Order status flow**: updating an order to `completed` increments each product's `sold_count`; updating to `cancelled` restores the ordered stock; a `completed` order cannot be moved to any other status.
-- **Voucher handling**: vouchers are split into `product` (percentage or fixed discount on merchandise total, capped by `max_discount`) and `shipping` (percentage or fixed discount on the shipping fee) types, each gated by an active date range, `status`, and a minimum order value; a user must claim a voucher (`UserVoucher`) before it can be applied to an order, and it is marked `used` once consumed.
-- **Payment processing**: orders can be paid via Cash on Delivery, bank transfer (verified through the SePay webhook), or MoMo (via a generated payment URL).
+### Product variants
+
+- Pricing and inventory live on `ProductVariant`, not on `Product`
+- Each variant has technical specs (CPU, RAM, storage, GPU, screen size, resolution)
+- Effective selling price: `discount_price ?? price`
+- Variant statuses: `active`, `out_of_stock`, `discontinued`
+
+### Pricing and discounts
+
+- **Product discount:** difference between `price` and `discount_price` per variant, summed across cart items
+- **Voucher discount:** separate product-type and shipping-type vouchers; one of each per order
+- **Shipping fee:** fixed at 20,000 VND
+- **Total calculation:** `subtotal - product_discount - voucher_discount + shipping_fee`
+
+### Inventory / stock
+
+- Stock is validated before adding to cart and before order creation
+- Stock is decremented atomically during order creation (MongoDB transaction)
+- Stock is restored when an order is cancelled (by customer or admin)
+- `sold_count` on `Product` is incremented only when admin marks an order as `completed`
+
+### Cart calculations
+
+- Cart items reference variants; line totals use effective variant price × quantity
+- Cart summary endpoint aggregates total quantity and total price
+
+### Order creation
+
+Order creation (`OrderService.createOrder`) runs inside a MongoDB transaction:
+
+1. Validate cart items belong to the user's cart
+2. Validate variant stock and active status
+3. Calculate subtotal, product discount, voucher discounts, shipping fee, total
+4. Create order with generated order code (`DH` + timestamp)
+5. Create order items with price/name/image snapshots
+6. Mark user vouchers as used
+7. Decrease variant stock
+8. Delete purchased cart items
+9. Commit or rollback on failure
+
+The backend computes all monetary fields; the client sends only `cart_item_ids`, `address_id`, `payment_method`, optional voucher IDs, and `note`.
+
+### Order status flow
+
+| Status | Meaning |
+|---|---|
+| `pending` | New order, awaiting confirmation |
+| `confirmed` | Order confirmed by admin |
+| `shipping` | Order is being delivered |
+| `completed` | Order fulfilled; `sold_count` incremented |
+| `cancelled` | Order cancelled; stock restored |
+
+**Admin allowed transitions** (enforced in frontend; backend validates status values):
+
+```
+pending    → confirmed | cancelled
+confirmed  → shipping  | cancelled
+shipping   → completed | cancelled
+completed  → (terminal)
+cancelled  → (terminal)
+```
+
+**Customer cancellation:** only allowed when order status is `pending`.
+
+### Voucher handling
+
+- Vouchers have types: `product` (discount on order value) or `shipping` (discount on shipping fee)
+- Discount types: `percent` (with optional `max_discount` cap) or `fixed`
+- Users must **claim** vouchers before use (`POST /voucher/claim`)
+- At checkout, users apply claimed vouchers via `POST /voucher/apply`
+- Vouchers are validated for date range, status, minimum order value, and ownership
+- Used vouchers are marked `used` during order creation
+
+### Payment processing
+
+- **COD:** order created with `payment_method: "cod"`, `payment_status: "pending"`
+- **Bank transfer:** order created with `payment_method: "bank"`; customer is redirected to the payment page with a VietQR-generated QR code
+- **SePay webhook:** confirms bank transfers automatically (see Section 11)
+- **MoMo:** `MomoGateway` and `PaymentService.createMomoPayment` exist in the codebase but are **not exposed via a route** and are not used by the current checkout flow
+
+---
 
 ## 11. Order & Payment Flow
 
-Order status lifecycle:
+### Order lifecycle
 
+```mermaid
+stateDiagram-v2
+    [*] --> pending: Customer places order
+    pending --> confirmed: Admin confirms
+    pending --> cancelled: Customer or admin cancels
+    confirmed --> shipping: Admin updates
+    confirmed --> cancelled: Admin cancels
+    shipping --> completed: Admin completes
+    shipping --> cancelled: Admin cancels
+    completed --> [*]
+    cancelled --> [*]
 ```
-pending → confirmed → shipping → completed
-   └────────────────→ cancelled
-```
 
-- Only a `pending` order can be cancelled by the customer (`OrderService.cancelOrder`); cancelling restores the reserved stock for each order item.
-- `completed` is a terminal state — the status can no longer be changed once reached.
+### Payment status vs. order status
 
-`payment_status` (`pending → paid`, or `failed` / `refunded`) is tracked independently of `status`, and is updated by:
+| Field | Values | Notes |
+|---|---|---|
+| `payment_status` | `pending`, `paid`, `failed`, `refunded` | Tracks payment completion |
+| `status` | `pending`, `confirmed`, `shipping`, `completed`, `cancelled` | Tracks fulfillment lifecycle |
 
-- the **SePay webhook** for bank-transfer orders, or
-- the **MoMo** payment flow, or
-- an authenticated "mark as paid" endpoint used for other payment methods (e.g. COD confirmation).
+For bank transfer orders, `payment_status` remains `pending` until SePay confirms the transfer. Order fulfillment status (`status`) is managed separately by admin.
 
-**SePay webhook flow** (`POST /payment/sepay/webhook`):
+### COD flow
+
+1. Customer selects COD at checkout
+2. Order is created with `payment_method: "cod"`
+3. Customer is redirected to the order success page
+4. Payment is collected on delivery
+
+### Bank transfer + SePay flow
+
+1. Customer selects bank transfer at checkout
+2. Order is created with `payment_method: "bank"`, `payment_status: "pending"`
+3. Frontend redirects to `/order/payment?id=<orderId>`
+4. Payment page displays a VietQR code with bank account, amount, and transfer content (`order_code`)
+5. Frontend polls order status every 3 seconds for up to 15 minutes
+6. Customer completes bank transfer with the order code in the transfer description
+7. SePay detects the transaction and sends a webhook to the backend
+8. Backend validates and updates the order
+9. Frontend detects `payment_status: "paid"` and redirects to order success
+
+### SePay webhook flow
+
+**Endpoint:** `POST /payment/sepay/webhook`
 
 ```mermaid
 sequenceDiagram
+    participant Customer
+    participant Bank
     participant SePay
-    participant Backend as Backend Webhook
-    participant DB as MongoDB (Order)
+    participant Backend
+    participant Frontend
 
-    SePay->>Backend: POST /payment/sepay/webhook (Apikey header + transfer data)
-    Backend->>Backend: Validate Apikey against SEPAY_WEBHOOK_API_KEY
-    Backend->>Backend: Extract order code (DHxxxxxxxxxx) from transfer content
-    Backend->>DB: Find order by order_code
-    alt order found & not already paid & amount sufficient
-        Backend->>DB: Update payment_status = "paid", store reference/transaction id, paid_at
-        Backend-->>SePay: 200 { success: true }
-    else order missing / already paid / amount insufficient
-        Backend-->>SePay: 200 { success: true, message: "..." } (no-op)
-    end
+    Customer->>Bank: Transfer with order code (DH...)
+    Bank->>SePay: Transaction detected
+    SePay->>Backend: POST /payment/sepay/webhook
+    Backend->>Backend: Validate Authorization header (Apikey)
+    Backend->>Backend: Extract order code from content/description
+    Backend->>Backend: Find order by order_code
+    Backend->>Backend: Verify transferAmount >= total_amount
+    Backend->>Backend: Update payment_status = paid
+    Frontend->>Backend: Poll GET /order/:id
+    Backend-->>Frontend: payment_status = paid
+    Frontend->>Customer: Redirect to order success
 ```
 
-The webhook only accepts incoming transfers (`transferType === "in"`), extracts an order code matching the pattern `DH<digits>` from the transfer content/description, and requires the transferred amount to be at least the order's `total_amount` before marking it paid.
+**Webhook validation steps:**
+
+1. Verify `Authorization: Apikey <SEPAY_WEBHOOK_API_KEY>`
+2. Ignore outbound transfers (`transferType !== "in"`)
+3. Extract order code matching pattern `DH\d+` from `content` or `description`
+4. Find order by `order_code`
+5. Skip if already paid
+6. Verify `transferAmount >= order.total_amount`
+7. Update order: `payment_status: "paid"`, store `payment_reference`, `sepay_transaction_id`, `paid_at`
+
+---
 
 ## 12. API Overview
 
-Base path: none of the routers are mounted under a shared `/api` prefix — each router is mounted directly at its resource root (e.g. `/product`, `/order`) by `routes/index.js`. 🔒 = requires a valid access token, 🔒👑 = requires an `admin` role.
+Base URL: backend server root (e.g. `http://localhost:3000`). There is no `/api` prefix.
 
-### Authentication (`/auth`)
+Standard response shape:
 
-| Method | Endpoint              | Auth | Purpose                                       |
-| ------ | --------------------- | ---- | --------------------------------------------- |
-| POST   | `/auth/register`      | –    | Create a new account                          |
-| POST   | `/auth/login`         | –    | Log in, receive access/refresh tokens         |
-| POST   | `/auth/refresh-token` | –    | Exchange a refresh token for a new token pair |
-| POST   | `/auth/logout`        | 🔒   | Invalidate the current refresh token          |
+```json
+{ "success": true, "message": "...", "data": { } }
+```
 
-### Users (`/user`)
+### Authentication
 
-| Method      | Endpoint                      | Auth | Purpose                       |
-| ----------- | ----------------------------- | ---- | ----------------------------- |
-| GET         | `/user/me`                    | 🔒   | Get current user's profile    |
-| PATCH / PUT | `/user/me`, `/user/update/me` | 🔒   | Update current user's profile |
-| GET         | `/user/all`                   | 🔒   | List users                    |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| POST | `/auth/register` | Register a new account | Public |
+| POST | `/auth/login` | Login, receive tokens | Public |
+| POST | `/auth/refresh-token` | Refresh access token | Public |
+| POST | `/auth/logout` | Invalidate refresh token | User |
 
-### Products (`/product`)
+### Users
 
-| Method | Endpoint              | Auth | Purpose                         |
-| ------ | --------------------- | ---- | ------------------------------- |
-| GET    | `/product/all`        | –    | List products (filter/paginate) |
-| GET    | `/product/slug/:slug` | –    | Product detail by slug          |
-| GET    | `/product/:productId` | –    | Product detail by id            |
-| GET    | `/product/bestseller` | 🔒   | Best-selling products           |
-| POST   | `/product/add`        | 🔒👑 | Create product                  |
-| PUT    | `/product/update/:id` | 🔒👑 | Update product                  |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/user/me` | Get current user profile | User |
+| PATCH | `/user/me` | Update profile | User |
+| PUT | `/user/update/me` | Update profile | User |
+| GET | `/admin/all-users` | List users (search, filter, paginate) | Admin |
+| GET | `/admin/users/stats` | User statistics | Admin |
+| POST | `/admin/add/users` | Create user | Admin |
+| PATCH | `/admin/users/:id/status` | Update user status | Admin |
+| PATCH | `/admin/users/update/:id` | Update user info | Admin |
 
-### Product variants (`/product-variant`) & images (`/product-image`)
+### Products
 
-| Method | Endpoint                              | Auth | Purpose                     |
-| ------ | ------------------------------------- | ---- | --------------------------- |
-| GET    | `/product-variant/product/:productId` | 🔒   | List variants for a product |
-| POST   | `/product-variant/add`                | 🔒👑 | Add a variant               |
-| PUT    | `/product-variant/update/:id`         | 🔒👑 | Update a variant            |
-| DELETE | `/product-variant/delete/:id`         | 🔒👑 | Delete a variant            |
-| GET    | `/product-image/:productId`           | 🔒   | List images for a product   |
-| POST   | `/product-image/add`                  | 🔒👑 | Upload product images       |
-| PUT    | `/product-image/set-main/:id`         | 🔒👑 | Set main image              |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/product/all` | List products (filter, paginate) | Public |
+| GET | `/product/:productId` | Product detail with variants and images | Public |
+| GET | `/product/slug/:slug` | Get product by slug | Public |
+| GET | `/product-variant/top-selling` | Top-selling variants | Public |
+| GET | `/product-variant/image/all` | Variants with images for home listing | Public |
+| POST | `/admin/products/add` | Create product with images | Admin |
+| PUT | `/admin/products/update/:productId` | Update product | Admin |
+| DELETE | `/admin/products/:id/soft-delete` | Soft-delete product | Admin |
+| PUT | `/admin/variants/:variantId` | Update variant | Admin |
+| DELETE | `/admin/variants/:variantId` | Delete variant | Admin |
 
-### Categories (`/category`) & Brands (`/brand`)
+### Categories
 
-| Method | Endpoint               | Auth | Purpose                      |
-| ------ | ---------------------- | ---- | ---------------------------- |
-| GET    | `/category/:slug`      | 🔒   | Category detail by slug      |
-| PUT    | `/category/update/:id` | –    | Update category              |
-| GET    | `/brand/admin/all`     | –    | List brands                  |
-| POST   | `/brand/admin/add`     | 🔒   | Add brand (with logo upload) |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/admin/category/all/tree` | Category tree | Public |
+| POST | `/admin/category/add` | Create category | Admin |
+| PUT | `/admin/category/update/:id` | Update category | Admin |
+| DELETE | `/admin/category/delete/:id` | Delete category | Admin |
 
-### Cart (`/cart`, `/cart-item`)
+### Brands
 
-| Method | Endpoint                     | Auth | Purpose                       |
-| ------ | ---------------------------- | ---- | ----------------------------- |
-| GET    | `/cart/my-cart/all`          | 🔒   | Get current user's cart items |
-| POST   | `/cart-item/add`             | 🔒   | Add item to cart              |
-| PUT    | `/cart-item/update/:id`      | 🔒   | Update item quantity          |
-| DELETE | `/cart-item/delete/:id`      | 🔒   | Remove item                   |
-| GET    | `/cart-item/summary/:cartId` | 🔒   | Cart totals summary           |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/brand/admin/all` | List all brands | Public |
+| POST | `/brand/admin/add` | Create brand with logo | Admin |
+| PUT | `/brand/admin/update/:id` | Update brand | Admin |
+| DELETE | `/brand/admin/delete/:id` | Delete brand | Admin |
 
-### Orders (`/order`)
+### Cart
 
-| Method | Endpoint                                 | Auth | Purpose                                 |
-| ------ | ---------------------------------------- | ---- | --------------------------------------- |
-| GET    | `/order/my-orders`                       | 🔒   | Current user's orders                   |
-| POST   | `/order/add`                             | 🔒   | Create order from cart items (checkout) |
-| GET    | `/order/:id`                             | 🔒   | Order detail                            |
-| PATCH  | `/order/:id/cancel`, `/order/cancel/:id` | 🔒   | Cancel a pending order                  |
-| PATCH  | `/order/update/:id/status`               | 🔒   | Update order status                     |
-| PATCH  | `/order/payment/:id`                     | 🔒   | Mark order as paid                      |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/cart/my-cart/all` | Get current user's cart items | User |
+| POST | `/cart-item/add` | Add variant to cart | User |
+| PUT | `/cart-item/update/:id` | Update item quantity | User |
+| DELETE | `/cart-item/delete/:id` | Remove cart item | User |
+| GET | `/cart-item/summary/:cartId` | Cart totals | User |
 
-### Vouchers (`/voucher`)
+### Orders
 
-| Method | Endpoint            | Auth | Purpose                          |
-| ------ | ------------------- | ---- | -------------------------------- |
-| GET    | `/voucher/active`   | –    | Active vouchers                  |
-| GET    | `/voucher/my`       | 🔒   | Vouchers claimed by current user |
-| POST   | `/voucher/claim`    | 🔒   | Claim a voucher                  |
-| POST   | `/voucher/validate` | 🔒   | Validate a voucher for checkout  |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| POST | `/order/add` | Create order from cart | User |
+| GET | `/order/my-orders` | List current user's orders | User |
+| GET | `/order/:id` | Order detail with items | User |
+| PATCH | `/order/:id/cancel` | Cancel pending order | User |
+| GET | `/admin/orders` | List all orders | Admin |
+| PATCH | `/admin/orders/:id/status` | Update order status | Admin |
+| GET | `/admin/orders/:id/items` | Get order line items | Admin |
 
-### Payments (`/payment`)
+### Payments
 
-| Method | Endpoint                 | Auth            | Purpose                     |
-| ------ | ------------------------ | --------------- | --------------------------- |
-| POST   | `/payment/sepay/webhook` | Webhook API key | SePay transfer confirmation |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| POST | `/payment/sepay/webhook` | SePay bank transfer webhook | Webhook API key |
 
-### Questions (`/question`) & Contact (`/contact`)
+### Vouchers
 
-| Method | Endpoint                    | Auth | Purpose                    |
-| ------ | --------------------------- | ---- | -------------------------- |
-| POST   | `/question/add`             | 🔒   | Submit a question          |
-| GET    | `/question/approved`        | –    | Public, answered questions |
-| PATCH  | `/question/admin/:id/reply` | 🔒👑 | Admin reply                |
-| POST   | `/contact-message/add`      | 🔒   | Submit a contact message   |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/voucher/intro` | Featured vouchers for home page | Public |
+| GET | `/voucher/all` | List vouchers | Public |
+| GET | `/voucher/my` | User's claimed vouchers | User |
+| POST | `/voucher/claim` | Claim a voucher | User |
+| POST | `/voucher/apply` | Validate and calculate voucher discount | User |
+| POST | `/admin/voucher/add` | Create voucher | Admin |
+| PUT | `/admin/voucher/update/:id` | Update voucher | Admin |
+| DELETE | `/admin/voucher/delete/:id` | Delete voucher | Admin |
 
-### Admin (`/admin`)
+### Questions
 
-| Method | Endpoint                                                                | Auth | Purpose                          |
-| ------ | ----------------------------------------------------------------------- | ---- | -------------------------------- |
-| GET    | `/admin/dashboard`                                                      | 🔒👑 | Dashboard summary                |
-| GET    | `/admin/revenue-chart`, `/admin/orders-chart`, `/admin/order-statistic` | 🔒👑 | Chart data                       |
-| GET    | `/admin/orders`                                                         | 🔒👑 | All orders                       |
-| PATCH  | `/admin/orders/:id/status`                                              | 🔒👑 | Update order status              |
-| POST   | `/admin/products/add`                                                   | 🔒👑 | Create product with image upload |
-| GET    | `/admin/products/all`                                                   | 🔒👑 | List products                    |
-| POST   | `/admin/voucher/add`                                                    | 🔒👑 | Create voucher                   |
-| GET    | `/admin/category/all/tree`                                              | –    | Category tree                    |
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/question/approved` | Public approved Q&A | Public |
+| POST | `/question/add` | Submit a question | User |
+| GET | `/question/admin/all` | List all questions | Admin |
+| PATCH | `/question/admin/:id/reply` | Admin reply | Admin |
+| PATCH | `/question/admin/:id/hide` | Hide question | Admin |
+| DELETE | `/question/admin/:id` | Delete question | Admin |
 
-_(Not every trivial endpoint is listed above — see `backend/src/routes/` for the full set.)_
+### Admin (Dashboard)
+
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/admin/dashboard` | Dashboard summary stats | Admin |
+| GET | `/admin/revenue-chart` | Revenue chart (7 days) | Admin |
+| GET | `/admin/orders-chart` | Orders chart (7 days) | Admin |
+| GET | `/admin/order-statistic` | Order status breakdown | Admin |
+| GET | `/admin/latest-products` | Recently added products | Admin |
+| GET | `/admin/top-products` | Top-selling products | Admin |
+
+### Other endpoints
+
+| Method | Path | Purpose | Auth |
+|---|---|---|---|
+| GET | `/address/all` | List user addresses | User |
+| POST | `/address/add` | Add address | User |
+| PATCH | `/address/:id/default` | Set default address | User |
+| POST | `/wishlist/add/:productId` | Add to wishlist | User |
+| DELETE | `/wishlist/remove/:productId` | Remove from wishlist | User |
+| GET | `/wishlist/all` | List wishlist | User |
+| POST | `/contact/contact-message/add` | Submit contact form | User |
+| POST | `/review/add` | Create product review | User |
+
+---
 
 ## 13. Environment Variables
 
+### Backend (`.env`)
+
 ```env
-# Backend (.env)
+PORT=3000
 SERVER_PORT=3000
-APP_URL=http://localhost:3000
 MONGO_URL=your_mongodb_connection_string
 ACCESS_TOKEN_SECRET=your_access_token_secret
 REFRESH_TOKEN_SECRET=your_refresh_token_secret
 SEPAY_WEBHOOK_API_KEY=your_sepay_webhook_api_key
+NODE_ENV=development
+
+# Optional — used by MoMo gateway code (not wired to active checkout routes)
+MOMO_ACCESS_KEY=your_momo_access_key
+MOMO_SECRET_KEY=your_momo_secret_key
+MOMO_PARTNER_CODE=your_momo_partner_code
+MOMO_REDIRECT_URL=http://localhost:5173/order-success
+MOMO_IPN_URL=https://your-backend-url/payment/momo/ipn
 ```
 
+### Frontend (`.env`)
+
 ```env
-# Frontend (.env)
 VITE_APP_URL=http://localhost:3000
 ```
 
-> Replace all placeholder values with your own secrets before running the project. Never commit a populated `.env` file.
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- MongoDB instance (local or Atlas)
+
+### Backend
+
+```bash
+cd backend
+npm install
+# Create .env with the variables above
+npm start
+```
+
+The server listens on `PORT` (default `3000`).
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+# Create .env with VITE_APP_URL pointing to the backend
+npm run dev
+```
+
+The dev server runs via Vite (default port `5173`).
+
+### Production
+
+- Frontend: deployed to Vercel with SPA rewrites (`vercel.json`)
+- Backend: deployed to Render (uses `process.env.PORT`)
+
+---
+
+## Author
+
+Pham Thanh Tan
