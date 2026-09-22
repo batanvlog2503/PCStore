@@ -6,6 +6,12 @@ const jwt = require("jsonwebtoken")
 const User = require("../models/User")
 const RefreshToken = require("../models/RefreshToken")
 
+const generateAccessToken = async (user) => {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "8h" })
+}
+const generateRefreshToken = async (user) => {
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "3d" })
+}
 class UserController {
   async getAllUsers(req, res, next) {
     try {
