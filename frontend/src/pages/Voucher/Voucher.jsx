@@ -178,7 +178,7 @@ export const Voucher = () => {
         ),
       )
     } catch (error) {
-      alert(error.response?.data?.message || "Không nhận được voucher")
+      toast.error(error.response?.data?.message || "Không nhận được voucher")
     } finally {
       setTimeout(() => setClaimingId(null), 500)
     }

@@ -15,7 +15,8 @@ router.get("/my", auth, authorize("user"), VoucherController.getMyVouchers)
 router.post("/apply", auth, authorize("user"), VoucherController.applyVoucher)
 router.get(
   "/claimed-ids",
-
+  auth,
+  authorize("user"),
   VoucherController.getClaimedIds,
 )
 router.get("/all", VoucherController.getAll)
