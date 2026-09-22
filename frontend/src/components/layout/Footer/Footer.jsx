@@ -105,7 +105,7 @@ const Footer = () => {
                 <i className="fa-solid fa-phone"></i>
                 <div>
                   <strong>Hotline</strong>
-                  <span>1900 1234</span>
+                  <span>0947584056</span>
                   <em>(8:00 - 22:00, tất cả các ngày)</em>
                 </div>
               </li>
@@ -113,7 +113,7 @@ const Footer = () => {
                 <i className="fa-solid fa-envelope"></i>
                 <div>
                   <strong>Email</strong>
-                  <span>support@techzone.vn</span>
+                  <span>tanden1357@gmail.com</span>
                 </div>
               </li>
             </ul>
@@ -154,7 +154,7 @@ const Footer = () => {
             <h3>Đăng ký nhận tin</h3>
             <p>
               Nhận thông tin khuyến mãi, sản phẩm mới và các tin tức công nghệ
-              mới nhất từ TechZone.
+              mới nhất từ PCStore.
             </p>
 
             <h4>Kết nối với chúng tôi</h4>

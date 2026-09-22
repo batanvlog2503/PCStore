@@ -332,9 +332,6 @@ $bp-lg: 992px;
       }
     }
 
-    // Accordion: dùng grid-template-rows 0fr -> 1fr để có animation
-    // chiều cao mượt mà (transition height: auto không hoạt động được
-    // trực tiếp trong CSS thuần, đây là cách lách chuẩn hiện nay)
     .nav-submenu {
       display: grid;
       grid-template-rows: 0fr;
@@ -380,7 +377,8 @@ $bp-lg: 992px;
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 11px 14px;
+    padding: 14px 14px;
+    margin-bottom: 18px;
     border: none;
     border-radius: 10px;
     background: none;
