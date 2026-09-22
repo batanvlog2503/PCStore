@@ -48,7 +48,11 @@ app.use(morgan("combined"))
 app.use(express.static(path.join(__dirname, "public")))
 console.log("Static path:", path.join(__dirname, "public"))
 // Template engine setup
-app.use(cors())
+app.use(
+  cors({
+    origin: "https://pcstore-frontend.vercel.app/",
+  }),
+)
 app.use(express.urlencoded({ extended: true })) // đọc form
 app.use(express.json()) // cho phép đọc json
 
