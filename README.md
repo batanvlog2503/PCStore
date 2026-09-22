@@ -902,6 +902,30 @@ The dev server runs via Vite (default port `5173`).
 
 ---
 
+## Screenshots
+
+### Home Page
+![Home Page](./docs/screenshots/home.png)
+
+### Product Detail
+![Product Detail](./docs/screenshots/product-detail.png)
+
+### Shopping Cart
+![Shopping Cart](./docs/screenshots/cart.png)
+
+### Checkout
+![Checkout] (./docs/screenshots/checkout.png)
+
+### Payment
+![Payment](./docs/screenshots/payment.png)
+
+### Admin Dashboard
+![Admin Dashboard](./docs/screenshots/admin-dashboard.png)
+
+### Order Management
+![Order Management](./docs/screenshots/orders.png)
+
+
 ## Author
 
 Pham Thanh Tan
