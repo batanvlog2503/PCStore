@@ -11,7 +11,8 @@ const STATUS_LABEL = {
 // Trạng thái mới hợp lệ tương ứng với từng trạng thái hiện tại
 // (tránh cho phép nhảy lung tung, ví dụ completed -> pending)
 const NEXT_STATUS_OPTIONS = {
-  pending: ["shipping", "cancelled"],
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["shipping", "cancelled"],
   shipping: ["completed", "cancelled"],
   completed: [],
   cancelled: [],
