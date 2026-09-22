@@ -8,11 +8,15 @@ class PaymentController {
       const expectedAuthorization = `Apikey ${process.env.SEPAY_WEBHOOK_API_KEY}`
 
       if (authorization !== expectedAuthorization) {
+        console.log("❌ Webhook API key không hợp lệ")
+
         return res.status(401).json({
           success: false,
           message: "Unauthorized webhook",
         })
       }
+
+      console.log("✅ Webhook API key hợp lệ")
 
       const {
         content,
