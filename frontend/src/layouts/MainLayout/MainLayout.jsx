@@ -1,10 +1,12 @@
 import React from "react"
 import { Header } from "../../components/layout/Header/Header"
 import { Outlet } from "react-router-dom"
+import ScrollToTop from "../../pages/Home/ScrollToTop"
 import Footer from "../../components/layout/Footer/Footer"
 export const MainLayout = () => {
   return (
     <div className="container-fluid main-layout p-0">
+      <ScrollToTop></ScrollToTop>
       <div className="container-fluid header p-0">
         <Header></Header>
       </div>
