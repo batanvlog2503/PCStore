@@ -183,14 +183,23 @@ $transition-fast: 0.2s ease-in-out;
       background-color: rgba($color-orange, 0.14);
       color: darken($color-orange, 10%);
     }
+
+    // Đã xác nhận
+    &.status-confirmed {
+      background-color: rgba($color-green, 0.14);
+      color: darken($color-green, 10%);
+    }
+
     &.status-shipping {
       background-color: rgba($color-blue, 0.12);
       color: darken($color-blue, 8%);
     }
+
     &.status-completed {
       background-color: rgba($color-green, 0.12);
       color: darken($color-green, 6%);
     }
+
     &.status-cancelled {
       background-color: rgba($color-red, 0.12);
       color: $color-red;

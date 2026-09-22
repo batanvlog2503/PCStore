@@ -3,6 +3,7 @@ import "./OrderStatusModal.scss"
 
 const STATUS_LABEL = {
   pending: "Chờ xác nhận",
+  confirmed: "Đã xác nhận",
   shipping: "Đang giao",
   completed: "Hoàn thành",
   cancelled: "Đã huỷ",
