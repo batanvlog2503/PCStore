@@ -86,7 +86,7 @@ class PaymentController {
 
       const updatedOrder = await OrderRepo.updateById(order._id, {
         payment_status: "paid",
-        status: "confirmed",
+        status: "pending",
 
         payment_reference: referenceCode,
         sepay_transaction_id: id,
