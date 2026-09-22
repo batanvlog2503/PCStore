@@ -92,3 +92,5 @@ Method	Endpoint	Auth	Mô tả
 POST	/payments/:orderId	🔒	Khởi tạo thanh toán (COD tự tạo record, online thì trả link thanh toán)
 POST	/payments/webhook/:provider	–	Webhook callback từ cổng thanh toán (Momo/VNPay)
 GET	/payments/:orderId	🔒	Xem trạng thái thanh toán của 1 đơn
+
+

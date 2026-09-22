@@ -24,7 +24,8 @@ db.connect()
 
 const app = express()
 
-const port = 3000
+// Render sẽ cung cấp process.env.PORT
+const port = process.env.PORT || process.env.SERVER_PORT || 3000
 
 // import router và middleware với phương thức ghi đè method-override
 
@@ -59,4 +60,6 @@ console.log("Views path:", path.join(__dirname, "resources\\views"))
 route(app)
 
 app.use(errorHandler)
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`))
+app.listen(port, "0.0.0.0", () => {
+  console.log(`App listening on port ${port}`)
+})
