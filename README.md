@@ -1,4 +1,5 @@
 # PC Store
+# Please wait 1 minute while the website loads the data.
 
 A full-stack e-commerce web application for selling laptops, PC components, and related computer products. PC Store provides a customer-facing storefront for browsing, cart management, checkout, and order tracking, plus an admin panel for catalog, order, user, and promotion management.
 
